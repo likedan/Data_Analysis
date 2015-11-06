@@ -6,8 +6,8 @@ beanstalk.use('unit_to_update')
 beanstalk.put('ZH350127')
 beanstalk.watch('update_unit_ZH350127')
 print "AAA"
-job = beanstalk.reserve()
 print beanstalk.using()
+job = beanstalk.reserve()
 print job.body
 
 # def addJob(id):
