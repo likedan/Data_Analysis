@@ -1,7 +1,7 @@
 import beanstalkc
 import threading
 
-beanstalk = beanstalkc.Connection(host='localhost', port=14711)
+beanstalk = beanstalkc.Connection(host='localhost', port=11300)
 beanstalk.use('unit_to_update')
 beanstalk.put('ZH350127')
 beanstalk.watch('update_unit_ZH350127')
