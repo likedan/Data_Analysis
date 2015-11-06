@@ -11,7 +11,7 @@ job = beanstalk.reserve()
 print job.body
 
 def addJob(id):
-    beanstalk = beanstalkc.Connection(host='localhost', port=14711)
+    beanstalk = beanstalkc.Connection(host='localhost', port=11300)
     beanstalk.use('unit_to_update')
     beanstalk.put(id)
     string = 'update_unit_' + id
