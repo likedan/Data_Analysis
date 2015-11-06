@@ -5,10 +5,9 @@ beanstalk = beanstalkc.Connection(host='localhost', port=11300)
 beanstalk.use('unit_to_update')
 beanstalk.put('ZH350127')
 beanstalk.watch('update_unit_ZH350127')
-while True:
-    job = beanstalk.reserve()
-    print beanstalk.using()
-    print job.body
+job = beanstalk.reserve()
+print beanstalk.using()
+print job.body
 
 # def addJob(id):
 #     beanstalk = beanstalkc.Connection(host='localhost', port=14711)
