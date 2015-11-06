@@ -1,16 +1,9 @@
 import beanstalkc
 beanstalk = beanstalkc.Connection(host='localhost', port=14711)
-beanstalk.use('crawler')
-beanstalk.put('hey!')
+beanstalk.use('group_to_update')
+beanstalk.put('ZH350127')
+beanstalk.watch('ZH350127')
 
-print beanstalk.tubes()
-beanstalk.watch('done')
-job = beanstalk.reserve(timeout=100)
-print job.body + " job"
-crawler.watch("crawler")
-job1 = crawler.reserve(timeout=10)
-print job1.body
-#processing
-crawler.use('done')
-crawler.put("result")
+job = beanstalk.reserve(timeout=10000)
 print job.body
+#processing
