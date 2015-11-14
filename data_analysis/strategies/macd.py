@@ -46,7 +46,10 @@ class MACD:
 
         dif_slope = []
         dea_slope = []
+        # two signal intersect
         intersection = []
+
+        # signal cross zero axis
         macd_cross_axis = []
         macdsignal_cross_axis = []
 
@@ -92,26 +95,26 @@ class MACD:
         normalized_dea_slope = dea_slope / dea_slope_mean
         normalized_dif_slope = dif_slope / dif_slope_mean
 
-        # analyze trend
-        # print self.get_trend(100,self.macdsignal[(len(self.macdsignal) - 100):len(self.macdsignal)])
-        # print self.get_trend(50,self.macdsignal[(len(self.macdsignal) - 50):len(self.macdsignal)])
-        # print self.get_trend(20,self.macdsignal[(len(self.macdsignal) - 20):len(self.macdsignal)])
-        # print self.get_trend(10,self.macdsignal[(len(self.macdsignal) - 10):len(self.macdsignal)])
-
 
         #analyze slope of dif and dea
         if dea_slope[0] > 0:
-            if abs(dea_slope[0]) < dea_slope_mean:
+            if abs(normalized_dea_slope[0]) < 1:
                 buy_score += normalized_dif_slope[0] + normalized_dea_slope[0]
             else:
                 buy_score += normalized_dif_slope[0] - normalized_dea_slope[0]
         else:
-            if abs(dea_slope[0]) < dea_slope_mean:
+            if abs(normalized_dea_slope[0]) < 1:
                 buy_score += normalized_dif_slope[0] - normalized_dea_slope[0]
             else:
                 buy_score += normalized_dea_slope[0]
 
+        normalized_macd = self.macdsignal / (np.nanmax(self.macdsignal) - np.nanmin(self.macdsignal))
+        # analyze trend
+        trend100 = self.get_trend(100, normalized_macd[(len(self.macdsignal) - 100):len(self.macdsignal)]) * 20
+        trend50 = self.get_trend(50, normalized_macd[(len(self.macdsignal) - 50):len(self.macdsignal)]) * 10
+        trend20 = self.get_trend(20, normalized_macd[(len(self.macdsignal) - 20):len(self.macdsignal)]) * 8
 
+        buy_score = buy_score * (1 + trend20) * (1 + trend50) * (1 + trend100)
         #analyze trend
         print buy_score
 
@@ -120,4 +123,4 @@ class MACD:
         x = np.arange(days)
         y = np.array(indicator)
         slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
-        return (slope, r_value, p_value, std_err)
+        return slope
