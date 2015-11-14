@@ -89,12 +89,12 @@ class MACD:
         normalized_dif_slope = dif_slope / dif_slope_mean
 
         # analyze trend
+        # print self.get_trend(100,self.macdsignal[(len(self.macdsignal) - 100):len(self.macdsignal)])
+        # print self.get_trend(50,self.macdsignal[(len(self.macdsignal) - 50):len(self.macdsignal)])
+        # print self.get_trend(20,self.macdsignal[(len(self.macdsignal) - 20):len(self.macdsignal)])
+        # print self.get_trend(10,self.macdsignal[(len(self.macdsignal) - 10):len(self.macdsignal)])
 
-        x = np.arange(100)
-        y = np.array(self.macdsignal[(len(self.macdsignal) - 100):len(self.macdsignal)])
-        slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
-        # print slope
-        # print r_value
+
         #analyze slope of dif and dea
         if dea_slope[0] > 0:
             if abs(dea_slope[0]) < dea_slope_mean:
@@ -110,3 +110,10 @@ class MACD:
 
         #analyze trend
         print buy_score
+
+    # get the linear regression line
+    def get_trend(self, days, indicator):
+        x = np.arange(days)
+        y = np.array(indicator)
+        slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+        return (slope, r_value, p_value, std_err)
