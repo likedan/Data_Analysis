@@ -13,6 +13,7 @@ class MACD:
         self.start_date = start_date
         self.end_date = end_date
         self.calculate_macd()
+
     def calculate_macd(self):
         yahoo = Share(self.stockID)
         data = yahoo.get_historical(self.start_date.strftime('%Y-%m-%d'), self.end_date.strftime('%Y-%m-%d'))
