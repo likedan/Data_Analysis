@@ -16,5 +16,6 @@ for entry in db.data.find():
     if "trade_timetable" in entry:
         trade_timetable = entry["trade_timetable"]
         for trade in trade_timetable:
-            t = time.strftime("%Y-%m-%d", time.localtime(int(trade["time"])))
+            print(trade["time"][0:10])
+            t = time.strftime("%Y-%m-%d", time.localtime(int(trade["time"][0:10])))
             print(t)
