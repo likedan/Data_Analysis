@@ -3,15 +3,16 @@ import sys
 sys.path.append('chinese_stock_api')
 from cstock.request import Requester
 from cstock.yahoo_engine import YahooEngine
+import time
 
 class Engine:
     def __init__(self):
         self.engine = YahooEngine()
         self.requester = Requester(self.engine)
 
-    def getNextThreeDaysHighest(self, time, stock):
-        data1 = time.strftime("%Y-%m-%d", time.localtime(time))
-        data2 = time.strftime("%Y-%m-%d", time.localtime(time + 7 * 24*60*60))
+    def getNextThreeDaysHighest(self, date, stock):
+        data1 = time.strftime("%Y-%m-%d", date.localtime(date))
+        data2 = time.strftime("%Y-%m-%d", date.localtime(date + 7 * 24*60*60))
 
         stock_obj = self.requester.request(stock,(data1,data2))
         for obj in reversed(stock_obj)[0:3]:
