@@ -9,7 +9,7 @@ class Engine:
         self.engine = YahooEngine()
         self.requester = Requester(self.engine)
 
-    def getNextThreeDaysHighest(time, stock):
+    def getNextThreeDaysHighest(self, time, stock):
         stock_obj = self.requester.request(stock,("2014-03-04","2014-03-06"))
         print stock_obj[0].as_dict()
         print len(stock_obj)
