@@ -8,13 +8,14 @@ eng = engine.Engine()
 def calculateMaxGain(data, engine):
     for stock in data["list"]:
         stockName = stock.keys()[0][2:]
+        stockNum = stockName[2:]
         amount = 0
         if stock[stockName]["from_value"] == None:
             amount = stock[stockName]["to_value"]
         elif stock[stockName]["to_value"] - stock[stockName]["from_value"] > 0:
             amount = stock[stockName]["to_value"] - stock[stockName]["from_value"]
         price = stock[stockName]["current_price"]
-        highest = eng.getNextThreeDaysHighest(float(data["time"])/1000.0 + 13*60*60, stockName)
+        highest = eng.getNextThreeDaysHighest(float(data["time"])/1000.0 + 13*60*60, stockNum)
         print price
         print highest
 
