@@ -4,10 +4,10 @@ import time
 import engine
 
 eng = engine.Engine()
-eng.getNextThreeDaysHighest("300339","300339")
+eng.getNextThreeDaysHighest(1432588511.637, "300339")
 
 def calculateMaxGain(data):
-    t = time.strftime("%Y-%m-%d", time.localtime(data["time"]/1000 + 13*60*60))
+    t = time.strftime("%Y-%m-%d", time.localtime(float(data["time"])/1000 + 13*60*60))
     for stock in data["list"]:
         stockName = stock.keys()[0]
         amount = 0
