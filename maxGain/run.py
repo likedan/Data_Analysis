@@ -7,7 +7,7 @@ eng = engine.Engine()
 
 def calculateMaxGain(data, engine):
     for stock in data["list"]:
-        stockName = stock.keys()[0][2:]
+        stockName = stock.keys()[0]
         stockNum = stockName[2:]
         amount = 0
         if stock[stockName]["from_value"] == None:
