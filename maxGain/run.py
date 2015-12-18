@@ -25,6 +25,6 @@ for entry in db.data.find():
 	print(entry["id"])
         trade_timetable = entry["trade_timetable"]
         for trade in trade_timetable:
-            calculateMaxGain(trade)
+            calculateMaxGain(trade, eng)
 
 	print("---------")
