@@ -14,7 +14,9 @@ print stock_obj[0].as_dict()
 db = database.Database()
 for entry in db.data.find():
     if "trade_timetable" in entry:
+	print(entry["id"])
         trade_timetable = entry["trade_timetable"]
         for trade in trade_timetable:
-            t = time.strftime("%Y-%m-%d", time.localtime(trade["time"]/1000))
+            t = time.strftime("%Y-%m-%d", time.localtime(trade["time"]/1000 + 13*60*60))
             print(t)
+	print("---------")
