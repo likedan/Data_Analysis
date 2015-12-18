@@ -15,7 +15,7 @@ class Engine:
         data2 = time.strftime("%Y-%m-%d", time.localtime(date + 7 * 24*60*60))
 
         stock_obj = self.requester.request(stock,(data1,data2))
-        for obj in reversed(stock_obj)[0:3]:
+        for obj in list(reversed(stock_obj)[0:3]):
             print obj.as_dict()
 
 # # add a pin without detail info
