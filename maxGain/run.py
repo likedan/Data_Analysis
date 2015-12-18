@@ -14,11 +14,11 @@ def calculateMaxGain(data):
     t = time.strftime("%Y-%m-%d", time.localtime(data["time"]/1000 + 13*60*60))
     for stock in data["list"]:
         amount = 0
-        if trade["from_value"] == None:
-            amount = trade["to_value"]
-        elif trade["to_value"] - trade["from_value"] > 0:
-            amount = trade["to_value"] - trade["from_value"]
-        price = trade["current_price"]
+        if stock["from_value"] == None:
+            amount = stock["to_value"]
+        elif stock["to_value"] - stock["from_value"] > 0:
+            amount = stock["to_value"] - stock["from_value"]
+        price = stock["current_price"]
         print amount
         print price
 
