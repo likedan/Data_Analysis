@@ -15,11 +15,11 @@ def calculateMaxGain(data):
     for stock in data["list"]:
         stockName = stock.keys()[0]
         amount = 0
-        if stock["stockName"]["from_value"] == None:
-            amount = stock["stockName"]["to_value"]
-        elif stock["stockName"]["to_value"] - stock["stockName"]["from_value"] > 0:
-            amount = stock["stockName"]["to_value"] - stock["stockName"]["from_value"]
-        price = stock["stockName"]["current_price"]
+        if stock[stockName]["from_value"] == None:
+            amount = stock[stockName]["to_value"]
+        elif stock[stockName]["to_value"] - stock[stockName]["from_value"] > 0:
+            amount = stock[stockName]["to_value"] - stock[stockName]["from_value"]
+        price = stock[stockName]["current_price"]
         print amount
         print price
 
