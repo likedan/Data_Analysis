@@ -10,9 +10,9 @@ class Engine:
         self.requester = Requester(self.engine)
 
     def getNextThreeDaysHighest(self, time, stock):
-        stock_obj = self.requester.request(stock,("2014-03-04","2014-03-06"))
-        print stock_obj[0].as_dict()
-        print len(stock_obj)
+        stock_obj = self.requester.request(stock,("2015-12-14","2015-12-20"))
+        for obj in stock_obj:
+            print obj.as_dict()
 
 # # add a pin without detail info
 #     def addPinID(self, id):
