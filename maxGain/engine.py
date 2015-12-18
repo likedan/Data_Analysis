@@ -11,8 +11,8 @@ class Engine:
         self.requester = Requester(self.engine)
 
     def getNextThreeDaysHighest(self, date, stock):
-        data1 = time.strftime("%Y-%m-%d", date.localtime(date))
-        data2 = time.strftime("%Y-%m-%d", date.localtime(date + 7 * 24*60*60))
+        data1 = time.strftime("%Y-%m-%d", time.localtime(date))
+        data2 = time.strftime("%Y-%m-%d", time.localtime(date + 7 * 24*60*60))
 
         stock_obj = self.requester.request(stock,(data1,data2))
         for obj in reversed(stock_obj)[0:3]:
