@@ -11,7 +11,17 @@ stock_obj = requester.request('000626',("2014-03-04","2014-03-06"))
 print stock_obj[0].as_dict()
 
 def calculateMaxGain(data):
-    print "data"
+    t = time.strftime("%Y-%m-%d", time.localtime(data["time"]/1000 + 13*60*60))
+    for stock in data["list"]:
+        amount = 0
+        if trade["from_value"] == None:
+            amount = trade["to_value"]
+        elif trade["to_value"] - trade["from_value"] > 0:
+            amount = trade["to_value"] - trade["from_value"]
+        price = trade["current_price"]
+        print amount
+        print price
+
 
 
 db = database.Database()
@@ -20,6 +30,6 @@ for entry in db.data.find():
 	print(entry["id"])
         trade_timetable = entry["trade_timetable"]
         for trade in trade_timetable:
-            t = time.strftime("%Y-%m-%d", time.localtime(trade["time"]/1000 + 13*60*60))
-            print(t)
+            calculateMaxGain(trade)
+
 	print("---------")
