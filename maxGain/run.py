@@ -10,6 +10,9 @@ requester = Requester(engine)
 stock_obj = requester.request('000626',("2014-03-04","2014-03-06"))
 print stock_obj[0].as_dict()
 
+def calculateMaxGain(data):
+    print "data"
+
 
 db = database.Database()
 for entry in db.data.find():
