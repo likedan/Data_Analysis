@@ -1,24 +1,18 @@
 #!/usr/bin/env python
-import sys
-sys.path.append('chinese_stock_api')
-from cstock.request import Requester
-from cstock.yahoo_engine import YahooEngine
-import time
+import pymongo
+import datetime
+from pymongo import MongoClient
 
-class Engine:
+class Database:
     def __init__(self):
-        self.engine = YahooEngine()
-        self.requester = Requester(self.engine)
+        try:
+            client = MongoClient('127.0.0.1', 27017)
+            print "Connected successfully!!!"
+        except pymongo.errors.ConnectionFailure, e:
+           print "Could not connect to MongoDB: %s" % e
+        self.db = client['xq']
+        self.data = self.db['unit']
 
-    def getNextThreeDaysHighest(self, date, stock):
-        data1 = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(date))
-        data2 = time.strftime("%Y-%m-%d", time.localtime(date + 7 * 24*60*60))
-        print data1
-        stock_obj = self.requester.request(stock,(data1,data2))
-        highest = []
-        for obj in list(reversed(stock_obj))[0:3]:
-            highest.append(obj.as_dict()["high"])
-        return highest
 
 # # add a pin without detail info
 #     def addPinID(self, id):
