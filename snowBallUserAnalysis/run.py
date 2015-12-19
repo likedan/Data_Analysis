@@ -39,6 +39,7 @@ for entry in db.data.find():
         print intercept
         print r_value
         print p_value
+        print "~~~~~~"
 
 #     if "trade_timetable" in entry:
 # 	print(entry["id"])
