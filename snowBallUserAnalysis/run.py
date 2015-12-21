@@ -78,7 +78,7 @@ def calculateThreeDaysGain():
 # for index in xrange(4):
 #     print index
 
-buildUserOrientedDatabase()s
+buildUserOrientedDatabase()
 
 #
 # 	print("---------")
