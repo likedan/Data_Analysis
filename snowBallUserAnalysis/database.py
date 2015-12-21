@@ -14,7 +14,7 @@ class Database:
         self.data = self.db['unit']
 
         self.extract_db = client['extract']
-        self.extract_data = self.db['units']
+        self.extract_data = self.extract_db['units']
 
     def insertAUnit(self, id, slope, covariance):
             info = {"_id": id, "revenue_slope" : slope, "revenue_covariance": covariance}
