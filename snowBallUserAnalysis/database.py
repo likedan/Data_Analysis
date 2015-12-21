@@ -18,6 +18,7 @@ class Database:
         self.user_timeline = self.extract_db['user_timeline']
 
     def insertAUserChange(self, userid, data):
+        userid = str(int(userid))
         userInfo = self.user_timeline.find_one({"_id": userid})
         if userInfo == None:
             self.user_timeline.insert_one({"_id": userid})
