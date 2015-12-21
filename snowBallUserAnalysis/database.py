@@ -15,6 +15,33 @@ class Database:
 
         self.extract_db = client['extract']
         self.extract_users = self.extract_db['users']
+        self.user_timeline = self.extract_db['user_timeline']
+
+    def insertAUserChange(self, userid, data):
+        userInfo = self.user_timeline.find_one({"_id": userid})
+        if userInfo == None:
+            self.user_timeline.insert_one({"_id": userid})
+            userInfo = {"_id": userid, "timeline": {}}
+        record = {}
+        for entry in data["list"]:
+            stockID = entry.keys()[0]
+            record[stockID] = {}
+            record[stockID]["current_price"] = entry[stockID]["current_price"]
+            if record[stockID]["prev_price"] == None:
+                record[stockID]["isbuy"] = True
+                record[stockID]["amount"] = entry[stockID]["to_value"]
+            else:
+                if entry[stockID]["to_value"] - entry[stockID]["from_value"] > 0:
+                    record[stockID]["isbuy"] = True
+                    record[stockID]["amount"] = entry[stockID]["to_value"] - entry[stockID]["from_value"]
+                else:
+                    record[stockID]["isbuy"] = False
+                    record[stockID]["amount"] = entry[stockID]["from_value"] - entry[stockID]["to_value"]
+                    record[stockID]["gain"] = (entry[stockID]["current_price"] - entry[stockID]["prev_price"]) / entry[stockID]["prev_price"]
+
+        print record
+        userInfo["timeline"][data["time"]] = record
+        self.user_timeline.update({'_id': userid}, userInfo)
 
     def insertAUnit(self, userid, id, slope, covariance, valid):
         userInfo = self.extract_users.find_one({"_id": userid})
@@ -28,6 +55,8 @@ class Database:
         else:
             userInfo["units"]["id"] = {"valid": False}
         self.extract_users.update({'_id': userid}, userInfo)
+
+
 # # add a pin without detail info
 #     def addPinID(self, id):
 #         if self.pins.find_one({"_id": id}) == None:
