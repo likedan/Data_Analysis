@@ -38,7 +38,7 @@ class Database:
                 else:
                     record[stockID]["isbuy"] = False
                     record[stockID]["amount"] = entry[stockID]["from_value"] - entry[stockID]["to_value"]
-                    record[stockID]["prev_price"] = entry[stockID]["current_price"]
+                    record[stockID]["prev_price"] = entry[stockID]["prev_price"]
         userInfo["timeline"][str(int(data["time"]))] = record
         self.user_timeline.update({'_id': userid}, userInfo)
 

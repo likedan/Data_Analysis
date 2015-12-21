@@ -87,7 +87,7 @@ def countTimeline():
     # count = 0
     # total = 0
     for entry in db.user_timeline.find():
-        if len(entry["timeline"]) >= 5:
+        if len(entry["timeline"]) > 5:
             total = total + len(entry["timeline"])
             count = count + 1
     print count
