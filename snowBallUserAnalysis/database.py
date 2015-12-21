@@ -23,11 +23,11 @@ class Database:
             self.user_timeline.insert_one({"_id": userid})
             userInfo = {"_id": userid, "timeline": {}}
         record = {}
-        for entry in data["list"][0]:
+        for entry in data["list"]:
             stockID = entry.keys()[0]
             record[stockID] = {}
             record[stockID]["current_price"] = entry[stockID]["current_price"]
-            if record[stockID]["prev_price"] == None:
+            if entry[stockID]["prev_price"] == None:
                 record[stockID]["isbuy"] = True
                 record[stockID]["amount"] = entry[stockID]["to_value"]
             else:
