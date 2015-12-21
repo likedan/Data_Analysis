@@ -76,7 +76,7 @@ def countTimeline():
     db = database.Database()
     count = 0
     for entry in db.user_timeline.find():
-        if len(entry["timeline"]) > 5:
+        if len(entry["timeline"]) >= 5:
             count = count + 1
     print count
 # data1 = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(1447257600))
