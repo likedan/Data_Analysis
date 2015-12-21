@@ -21,7 +21,7 @@ class Database:
         userInfo = self.user_timeline.find_one({"_id": userid})
         if userInfo == None:
             self.user_timeline.insert_one({"_id": userid})
-            userInfo = {"_id": userid, "timeline":{}}
+            userInfo = {"_id": str(int(userid)), "timeline":{}}
         record = {}
         for entry in data["list"]:
             stockID = entry.keys()[0]
@@ -40,7 +40,7 @@ class Database:
                     record[stockID]["gain"] = (entry[stockID]["current_price"] - entry[stockID]["prev_price"]) / entry[stockID]["prev_price"]
         print record
         print userInfo
-        userInfo["timeline"][data["time"]] = record
+        userInfo["timeline"][str(int(data["time"]))] = record
         self.user_timeline.update({'_id': userid}, userInfo)
 
     def insertAUnit(self, userid, id, slope, covariance, valid):
