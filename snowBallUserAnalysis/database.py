@@ -18,6 +18,7 @@ class Database:
 
     def insertAUnit(self, id, slope, covariance):
             info = {"_id": id, "revenue_slope" : slope, "revenue_covariance": covariance}
+            print "insert"
             self.extract_data.insert_one(info)
 # # add a pin without detail info
 #     def addPinID(self, id):

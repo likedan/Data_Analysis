@@ -26,7 +26,7 @@ import numpy as np
 
 db = database.Database()
 for entry in db.data.find():
-    if "revenue_trend" in entry:
+    if "revenue_trend" in entry and len(entry["trade_timetable"]) >= 5:
         revenue_trend = entry["revenue_trend"]
         netValue = []
         for point in revenue_trend:
@@ -35,10 +35,10 @@ for entry in db.data.find():
 
         slope, intercept, r_value, p_value, std_err = stats.linregress(X, np.array(netValue))
 
+        db.insertAUnit(entry["id"], slope, r_value)
         print slope
         print intercept
         print r_value
-        print p_value
         print "~~~~~~"
 
 #     if "trade_timetable" in entry:
