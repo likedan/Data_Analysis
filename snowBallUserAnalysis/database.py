@@ -13,7 +13,12 @@ class Database:
         self.db = client['xq']
         self.data = self.db['unit']
 
+        self.extract_db = client['extract']
+        self.extract_data = self.db['units']
 
+    def insertAUnit(self, id, slope, covariance):
+            info = {"_id": id, "revenue_slope" : slope, "revenue_covariance": covariance}
+            self.extract_data.insert_one(info)
 # # add a pin without detail info
 #     def addPinID(self, id):
 #         if self.pins.find_one({"_id": id}) == None:
