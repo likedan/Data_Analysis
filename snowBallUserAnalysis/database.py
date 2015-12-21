@@ -41,7 +41,7 @@ class Database:
                     record[stockID]["gain"] = (entry[stockID]["current_price"] - entry[stockID]["prev_price"]) / entry[stockID]["prev_price"]
         print record
         print userInfo
-        userInfo["timeline"][str(int(data["time"]))] = record
+        userInfo["timeline"][data["time"]] = record
         self.user_timeline.update({'_id': userid}, userInfo)
 
     def insertAUnit(self, userid, id, slope, covariance, valid):
