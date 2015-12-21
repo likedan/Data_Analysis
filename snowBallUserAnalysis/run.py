@@ -77,20 +77,21 @@ def countTimeline():
     db = database.Database()
     count = 0
     total = 0
-    for entry in db.data.find():
-        if "trade_timetable" in entry:
-            if len(entry["trade_timetable"]) > 5:
-                count = count + 1
-                total = total + len(entry["trade_timetable"])
-                print total
-    print count
-    count = 0
-    total = 0
+    # for entry in db.data.find():
+    #     if "trade_timetable" in entry:
+    #         if len(entry["trade_timetable"]) > 5:
+    #             count = count + 1
+    #             total = total + len(entry["trade_timetable"])
+    #             print total
+    # print count
+    # count = 0
+    # total = 0
     for entry in db.user_timeline.find():
         if len(entry["timeline"]) >= 5:
             total = total + len(entry["timeline"])
             count = count + 1
     print count
+    print total
 
 
 # data1 = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(1447257600))
