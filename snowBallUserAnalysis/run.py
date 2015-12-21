@@ -54,6 +54,7 @@ def calculateEntireLinearRegression():
 
 def buildUserOrientedDatabase():
     db = database.Database()
+    count = 0
     for entry in db.data.find():
         if "trade_timetable" in entry:
             for diction in entry["trade_timetable"]:
@@ -79,6 +80,13 @@ def countTimeline():
         if len(entry["timeline"]) >= 5:
             count = count + 1
     print count
+    count = 0
+    for entry in db.data.find():
+        if "trade_timetable" in entry:
+            if len(entry["trade_timetable"]) > 5:
+                count = count + 1
+    print count
+
 # data1 = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(1447257600))
 # print data1
 #
