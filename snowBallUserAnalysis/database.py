@@ -37,7 +37,8 @@ class Database:
                 else:
                     record[stockID]["isbuy"] = False
                     record[stockID]["amount"] = entry[stockID]["from_value"] - entry[stockID]["to_value"]
-                    record[stockID]["gain"] = (entry[stockID]["current_price"] - entry[stockID]["prev_price"]) / entry[stockID]["prev_price"]        print record
+                    record[stockID]["gain"] = (entry[stockID]["current_price"] - entry[stockID]["prev_price"]) / entry[stockID]["prev_price"]
+        print record
         print userInfo
         userInfo["timeline"][data["time"]] = record
         self.user_timeline.update({'_id': userid}, userInfo)
