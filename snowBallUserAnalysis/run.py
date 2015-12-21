@@ -40,7 +40,7 @@ for entry in db.data.find():
             print slope
             print intercept
             print r_value
-            print "~~~~~~
+            print "~~~~~~"
         else:
             db.insertAUnit(entry["owner"], entry["id"], 0, 0, False)
 
