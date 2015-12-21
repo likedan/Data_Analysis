@@ -36,13 +36,13 @@ for entry in db.data.find():
 
             slope, intercept, r_value, p_value, std_err = stats.linregress(X, np.array(netValue))
 
-            db.insertAUnit(entry["id"], slope, r_value, True)
+            db.insertAUnit(entry["owner"], entry["id"], slope, r_value, True)
             print slope
             print intercept
             print r_value
             print "~~~~~~
         else:
-            db.insertAUnit(entry["id"], 0, 0, False)
+            db.insertAUnit(entry["owner"], entry["id"], 0, 0, False)
 
 #     if "trade_timetable" in entry:
 # 	print(entry["id"])
