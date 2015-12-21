@@ -72,13 +72,20 @@ def calculateThreeDaysGain():
                 for index in xrange(4):
                     calculateMaxGain(trade_timetable[index], trade_timetable[index + 1], eng, revenue_trend)
 
+def countTimeline()
+    db = database.Database()
+    count = 0
+    for entry in db.user_timeline.find():
+        if len(entry["timeline"]) > 5:
+            count = count + 1
+    print count
 # data1 = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(1447257600))
 # print data1
 #
 # for index in xrange(4):
 #     print index
 
-buildUserOrientedDatabase()
+countTimeline()
 
 #
 # 	print("---------")
