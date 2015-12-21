@@ -23,7 +23,7 @@ class Database:
             self.user_timeline.insert_one({"_id": userid})
             userInfo = {"_id": userid, "timeline": {}}
         record = {}
-        for entry in data["list"]:
+        for entry in data["list"][0]:
             stockID = entry.keys()[0]
             record[stockID] = {}
             record[stockID]["current_price"] = entry[stockID]["current_price"]
