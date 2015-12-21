@@ -7,27 +7,27 @@ import numpy as np
 
 
 
-def calculateMaxGain(datanext, data, engine, trend):
-
-    for entry in trend:
-        if
-
-    for stock in data["list"]:
-        stockName = stock.keys()[0]
-        stockNum = stockName[2:]
-
-        if datanext["time"]
-        for s in datanext["list"]:
-        amount = 0
-        # highest = eng.getNextThreeDaysHighest(float(data["time"])/1000.0, stockNum)
-
-        if stock[stockName]["from_value"] == None:
-            amount = stock[stockName]["to_value"]
-        elif stock[stockName]["to_value"] - stock[stockName]["from_value"] > 0:
-            amount = stock[stockName]["to_value"] - stock[stockName]["from_value"]
-        price = stock[stockName]["current_price"]
-        print price
-        print highest
+# def calculateMaxGain(datanext, data, engine, trend):
+#
+#     for entry in trend:
+#         if
+#
+#     for stock in data["list"]:
+#         stockName = stock.keys()[0]
+#         stockNum = stockName[2:]
+#
+#         if datanext["time"]
+#         for s in datanext["list"]:
+#         amount = 0
+#         # highest = eng.getNextThreeDaysHighest(float(data["time"])/1000.0, stockNum)
+#
+#         if stock[stockName]["from_value"] == None:
+#             amount = stock[stockName]["to_value"]
+#         elif stock[stockName]["to_value"] - stock[stockName]["from_value"] > 0:
+#             amount = stock[stockName]["to_value"] - stock[stockName]["from_value"]
+#         price = stock[stockName]["current_price"]
+#         print price
+#         print highest
 
 
 
