@@ -14,12 +14,20 @@ class Database:
         self.data = self.db['unit']
 
         self.extract_db = client['extract']
-        self.extract_data = self.extract_db['units']
+        self.extract_users = self.extract_db['users']
 
-    def insertAUnit(self, id, slope, covariance):
-            info = {"_id": id, "revenue_slope" : slope, "revenue_covariance": covariance}
+    def insertAUnit(self, userid, id, slope, covariance, valid):
+        userInfo = self.extract_users.find_one({"_id": userid})
+        if userInfo == None:
+            self.extract_users.insert_one({"_id": userid})
+            userInfo = {"_id": userid, "units": {}}
+
+        if valid:
+            userInfo["units"]["id"] = {"revenue_slope" : slope, "revenue_covariance": covariance, "valid": True}
             print "insert"
-            self.extract_data.insert_one(info)
+        else:
+            userInfo["units"]["id"] = {"valid": False}
+        self.extract_users.update({'_id': userid}, userInfo)
 # # add a pin without detail info
 #     def addPinID(self, id):
 #         if self.pins.find_one({"_id": id}) == None:
