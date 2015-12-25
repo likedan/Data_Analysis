@@ -18,6 +18,9 @@ with open('stockList') as f:
         stock_list.append(stock)
 
 for stock_name in stock_list:
+    downloadStock(stock_name, db)
+
+def downloadStock(stock_name, db):
     stock = db[stock_name]
     last_updated_time = stock.find_one({"_id": "last_updated_time"})
     if last_updated_time == None:

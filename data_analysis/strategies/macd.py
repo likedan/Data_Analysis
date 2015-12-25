@@ -1,30 +1,33 @@
-from yahoo_finance import Share
 import talib
 import numpy as np
 from talib.abstract import *
 import matplotlib.pyplot as plt
 import datetime
 from scipy import stats
+import pymongo
+from pymongo import MongoClient
 
 class MACD:
-
-    def __init__(self, stockID, start_date, end_date):
+    def __init__(self, stockID, length = -1):
         self.stockID = stockID
-        self.start_date = start_date
-        self.end_date = end_date
+        self.length = length
+        client = MongoClient('127.0.0.1', 27017)
+        self.db = client['stock_historical_data']
         self.calculate_macd()
 
     def calculate_macd(self):
-
-        #get MACD data from Yahoo API
-        yahoo = Share(self.stockID)
-        data = yahoo.get_historical(self.start_date.strftime('%Y-%m-%d'), self.end_date.strftime('%Y-%m-%d'))
         adj_close_arr = []
-        for index in data:
-            adj_close_arr.append(index["Adj_Close"])
-        adj_close_arr = list(reversed(adj_close_arr))
+        count = 0
+        for entry in self.db[self.stockID].find().sort("_id",pymongo.ASCENDING):
+            if "Adj_Close" in entry:
+                adj_close_arr.append(entry["Adj_Close"])
+                if self.length != -1:
+                    if count < self.length:
+                        count = count + 1
+                    else:
+                        break
         float_data = [float(x) for x in adj_close_arr]
-
+        #
         #calculate MACD data with talib
         self.macd, self.macdsignal, self.macdhist = talib.MACD(np.array(float_data), fastperiod=12, slowperiod=26, signalperiod=9)
         self.stockPrice = adj_close_arr[(len(adj_close_arr) - len(self.macd)):len(adj_close_arr)]
