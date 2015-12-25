@@ -18,7 +18,8 @@ class MACD:
     def calculate_macd(self):
         adj_close_arr = []
         count = 0
-        for entry in self.db[self.stockID].find().sort("_id",pymongo.ASCENDING):
+        for entry in self.db[self.stockID].find().sort("_id",pymongo.DESCENDING):
+            print entry
             if "Adj_Close" in entry:
                 adj_close_arr.append(entry["Adj_Close"])
                 if self.length != -1:
@@ -26,8 +27,11 @@ class MACD:
                         count = count + 1
                     else:
                         break
+        adj_close_arr = list(reversed(adj_close_arr))
         float_data = [float(x) for x in adj_close_arr]
-        #
+
+        print float_data
+
         #calculate MACD data with talib
         self.macd, self.macdsignal, self.macdhist = talib.MACD(np.array(float_data), fastperiod=12, slowperiod=26, signalperiod=9)
         self.stockPrice = adj_close_arr[(len(adj_close_arr) - len(self.macd)):len(adj_close_arr)]

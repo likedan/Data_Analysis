@@ -3,7 +3,7 @@ sys.path.append('strategies')
 import macd
 from datetime import date, timedelta
 
-macddd = macd.MACD("DGAZ")
+macddd = macd.MACD("UGAZ", 130)
 macddd.plot()
 # for day in range(0, 50):
 #     print day
