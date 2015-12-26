@@ -7,7 +7,11 @@ from scipy import stats
 import pymongo
 from pymongo import MongoClient
 
+global discount_for_lost
+discount_for_lost = 1.2
+
 class MACD:
+
     def __init__(self, stockID, length = -1):
         self.stockID = stockID
         self.length = length
@@ -64,6 +68,28 @@ class MACD:
         will_intersect = []
         refuse_intersect = []
 
+        outcome = []
+
+        stock_3_slope = []
+        stock_3_cov = []
+        stock_3_pval = []
+        stock_3_err = []
+
+        stock_8_slope = []
+        stock_8_cov = []
+        stock_8_pval = []
+        stock_8_err = []
+
+        stock_20_slope = []
+        stock_20_cov = []
+        stock_20_pval = []
+        stock_20_err = []
+
+        stock_50_slope = []
+        stock_50_cov = []
+        stock_50_pval = []
+        stock_50_err = []
+
         for index in range(0, len(self.macd) - 1):
             ind_N = (len(self.macd) - 2 - index + 1)
             ind_P = (len(self.macd) - 2 - index)
@@ -110,7 +136,8 @@ class MACD:
                 else:
                     will_intersect.append(0)
 
-        for i in xrange(len(will_intersect) - 1):
+        for i in xrange(len(will_intersect) - 50):
+            # calculate refuse intersection
             if intersection[i] == 0 and will_intersect[i] == 0 and will_intersect[i + 1] != 0:
                 if will_intersect[i + 1] == -1:
                     refuse_intersect.append(1)
@@ -119,112 +146,56 @@ class MACD:
             else:
                 refuse_intersect.append(0)
 
+            total_gain = 0.0
 
+            #calculate the cumulative gain of the next 3 days
+            if i < 3:
+                outcome.append(None)
+            else:
+                price_range = [float(price_data[i]["Close"])]
+                for x in xrange(3):
+                    price_range.append(float(price_data[i-x-1]["Open"]))
+                    price_range.append(float(price_data[i-x-1]["Close"]))
 
-# # analyze by intersections
-#         if macdsignal_cross_axis[0][1] == True:
-#             #goes to high position
-#             if macdsignal_cross_axis[0][0] == 0:
-#                 buy_score = buy_score + 2
-#             elif macdsignal_cross_axis[0][0] == 1:
-#                 buy_score = buy_score + 1
-#         else:
-#             if macdsignal_cross_axis[0][0] == 0:
-#                 buy_score = buy_score - 2
-#             elif macdsignal_cross_axis[0][0] == 1:
-#                 buy_score = buy_score - 1
-#
-#         if macd_cross_axis[0][1] == True:
-#             #goes to high position
-#             if macd_cross_axis[0][0] == 0:
-#                 buy_score = buy_score + 1
-#             elif macd_cross_axis[0][0] == 1:
-#                 buy_score = buy_score + 0.5
-#         else:
-#             if macd_cross_axis[0][0] == 0:
-#                 buy_score = buy_score - 1
-#             elif macd_cross_axis[0][0] == 1:
-#                 buy_score = buy_score - 0.5
-#
-#         if intersection[0][1] == True:
-#             #golden intersection
-#             if intersection[0][0] == 0:
-#                 buy_score = buy_score + 5
-#             elif intersection[0][0] == 1:
-#                 buy_score = buy_score + 3
-#
-#             if intersection[0][0] < 3:
-#                 #within3 days
-#                 if self.macdsignal[0] < 0:
-#                     #low position
-#                     if macdsignal_cross_axis[0][0] > intersection[2][0]:
-#                         #double gold in low
-#                         if self.macdsignal[intersection[2][0]] < self.macdsignal[intersection[0][0]]:
-#                             #moving up
-#                             buy_score = buy_score + 10
-#
-#                 else:
-#                     #high position
-#                     if macdsignal_cross_axis[0][0] > intersection[2][0]:
-#                         #double gold in high
-#                         if self.macdsignal[intersection[2][0]] < self.macdsignal[intersection[0][0]]:
-#                             #moving up
-#                             buy_score = buy_score + 5
-#
-#         if intersection[0][1] == False:
-#             #death intersection
-#             if intersection[0][0] == 0:
-#                 buy_score = buy_score - 5
-#             elif intersection[0][0] == 1:
-#                 buy_score = buy_score - 3
-#
-#             if intersection[0][0] < 3:
-#                 #within3 days
-#                 if self.macdsignal[0] < 0:
-#                     #low position
-#                     if macdsignal_cross_axis[0][0] > intersection[2][0]:
-#                         #double death in low
-#                         if self.macdsignal[intersection[2][0]] > self.macdsignal[intersection[0][0]]:
-#                             #moving down
-#                             buy_score = buy_score - 10
-#
-#                 else:
-#                     #high position
-#                     if macdsignal_cross_axis[0][0] > intersection[2][0]:
-#                         #double death in high
-#                         if self.macdsignal[intersection[2][0]] > self.macdsignal[intersection[0][0]]:
-#                             #moving down
-#                             buy_score = buy_score - 5
-#
-#         dea_slope = np.nan_to_num(dea_slope)
-#         dif_slope = np.nan_to_num(dif_slope)
-#
-#         # # analyze trend
-#         trend100 = self.get_trend(100, normalized_macd[(len(self.macdsignal) - 100):len(self.macdsignal)])
-#         trend50 = self.get_trend(50, normalized_macd[(len(self.macdsignal) - 50):len(self.macdsignal)])
-#         trend20 = self.get_trend(20, normalized_macd[(len(self.macdsignal) - 20):len(self.macdsignal)])
-#
-#         if trend100 > 0:
-#             buy_score += 0.5
-#         else:
-#             buy_score -= 0.5
-#         if trend50 > 0:
-#             buy_score += 1
-#         else:
-#             buy_score -= 1
-#         if trend20 > 0:
-#             buy_score += 1.5
-#         else:
-#             buy_score -= 1.5
-#
-#         print buy_score
+                for x in xrange(len(price_range) - 1):
+                    value = price_range[x + 1] - price_range[x]
+                    if value < 0:
+                        value = value * discount_for_lost
+                    total_gain = total_gain + value
+                outcome.append(total_gain / price_range[0])
 
-        # # #add weight according to trend
-        # # buy_score = buy_score * (1 + trend20) * (1 + trend50) * (1 + trend100)
+            price_range = []
+            for x in xrange(50):
+                price_range.append(float(price_data[i+x]["Close"]))
+                price_range.append(float(price_data[i+x]["Open"]))
 
-    # get the linear regression line
-    def get_trend(self, days, indicator):
-        x = np.arange(days)
+            regression_data = self.get_trend(list(reversed(price_range[0:5])))
+            stock_3_slope.append(regression_data[0])
+            stock_3_cov.append(regression_data[1])
+            stock_3_pval.append(regression_data[2])
+            stock_3_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(price_range[0:15])))
+            stock_8_slope.append(regression_data[0])
+            stock_8_cov.append(regression_data[1])
+            stock_8_pval.append(regression_data[2])
+            stock_8_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(price_range[0:39])))
+            stock_20_slope.append(regression_data[0])
+            stock_20_cov.append(regression_data[1])
+            stock_20_pval.append(regression_data[2])
+            stock_20_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(price_range[0:99])))
+            stock_50_slope.append(regression_data[0])
+            stock_50_cov.append(regression_data[1])
+            stock_50_pval.append(regression_data[2])
+            stock_50_err.append(regression_data[3])
+            print regression_data
+
+    def get_trend(self, indicator):
+        x = np.arange(len(indicator))
         y = np.array(indicator)
         slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
-        return slope
+        return (slope, r_value, p_value, std_err)
