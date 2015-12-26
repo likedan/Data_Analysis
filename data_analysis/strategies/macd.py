@@ -230,7 +230,6 @@ class MACD:
         for i in xrange(len(will_intersect) - 50):
 
             total_gain = 0.0
-
             #calculate the cumulative gain of the next 3 days
             if i < 3:
                 outcome.append(None)
@@ -385,12 +384,17 @@ class MACD:
                 consecutive_days_features(10, macdsignal_cross_axis, "macdsignal_cross_axis_day")
                 consecutive_days_features(10, refuse_intersect, "refuse_intersect_day")
                 consecutive_days_features(10, will_intersect, "will_intersect_day")
+                consecutive_days_features(10, local_min, "local_min_day")
+                consecutive_days_features(10, local_max, "local_max_day")
 
                 cross_count = 0
                 gold_intersect_count = 0
                 death_intersect_count = 0
                 refuse_gold_intersect_count = 0
                 refuse_death_intersect_count = 0
+                local_min_count = 0
+                local_max_count = 0
+
                 for i in xrange(50):
                     if i == 20:
                         day_features["cross_count_20"] = cross_count
@@ -398,6 +402,8 @@ class MACD:
                         day_features["death_intersect_count_20"] = death_intersect_count
                         day_features["refuse_gold_intersect_count_20"] = refuse_gold_intersect_count
                         day_features["refuse_death_intersect_count_20"] = refuse_death_intersect_count
+                        day_features["local_min_count_20"] = local_min_count
+                        day_features["local_max_count_20"] = local_max_count
 
                     if intersection[index + i] == 1:
                         gold_intersect_count = gold_intersect_count + 1
@@ -412,11 +418,19 @@ class MACD:
                     if macdsignal_cross_axis[index + i] != 0:
                         cross_count = cross_count + 1
 
+                    if local_min[index + i] != 0:
+                        local_min_count = local_min_count + 1
+
+                    if local_max[index + i] != 0:
+                        local_max_count = local_max_count + 1
+
                 day_features["cross_count_50"] = cross_count
                 day_features["gold_intersect_count_50"] = gold_intersect_count
                 day_features["death_intersect_count_50"] = death_intersect_count
                 day_features["refuse_gold_intersect_count_50"] = refuse_gold_intersect_count
                 day_features["refuse_death_intersect_count_50"] = refuse_death_intersect_count
+                day_features["local_min_count_50"] = local_min_count
+                day_features["local_max_count_50"] = local_max_count
 
                 day_features["stock_3_slope"] = stock_3_slope[index]
                 day_features["stock_3_cov"] = stock_3_cov[index]
@@ -438,6 +452,7 @@ class MACD:
                 day_features["stock_50_pval"] = stock_50_pval[index]
                 day_features["stock_50_err"] = stock_50_err[index]
 
+                day_features["dea_1_slope"] = dea_slope[index]
                 day_features["dea_3_slope"] = dea_3_slope[index]
                 day_features["dea_3_cov"] = dea_3_cov[index]
                 day_features["dea_3_pval"] = dea_3_pval[index]
@@ -458,6 +473,7 @@ class MACD:
                 day_features["dea_50_pval"] = dea_50_pval[index]
                 day_features["dea_50_err"] = dea_50_err[index]
 
+                day_features["dif_1_slope"] = dif_slope[index]
                 day_features["dif_3_slope"] = dif_3_slope[index]
                 day_features["dif_3_cov"] = dif_3_cov[index]
                 day_features["dif_3_pval"] = dif_3_pval[index]
@@ -493,9 +509,33 @@ class MACD:
                 day_features["dif_dea_20_slope"] = dif_20_slope[index] - dea_20_slope[index]
                 day_features["dif_dea_50_slope"] = dif_50_slope[index] - dea_50_slope[index]
 
-                print day_features
-                # print day_features
-            # self.features[self.stockID].update({"_id": entry["_id"]}, entry, upsert=True)
+                def get_prev_two_local_value(array):
+                    first = None
+                    for x in xrange(index, len(outcome)):
+                        if array[x] != 0:
+                            if first == None:
+                                first = dea[x]
+                            else:
+                                return (first, dea[x])
+                    return None
+                minn = get_prev_two_local_value(local_min)
+                if minn == None:
+                    day_features["last_two_min_compare"] = 0
+                elif minn[0] > minn[1]:
+                    day_features["last_two_min_compare"] = -1
+                else:
+                    day_features["last_two_min_compare"] = 1
+
+                maxx = get_prev_two_local_value(local_max)
+                if maxx == None:
+                    day_features["last_two_max_compare"] = 0
+                elif maxx[0] > maxx[1]:
+                    day_features["last_two_max_compare"] = -1
+                else:
+                    day_features["last_two_max_compare"] = 1
+
+                self.features[self.stockID].update({"_id": day_features["_id"]}, day_features, upsert=True)
+
         save_features()
 
     def get_trend(self, indicator):
