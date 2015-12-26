@@ -110,7 +110,6 @@ class MACD:
                 else:
                     will_intersect.append(0)
 
-        test = []
         for i in xrange(len(will_intersect) - 1):
             if intersection[i] == 0 and will_intersect[i] == 0 and will_intersect[i + 1] != 0:
                 if will_intersect[i + 1] == -1:
@@ -119,8 +118,7 @@ class MACD:
                     refuse_intersect.append(-1)
             else:
                 refuse_intersect.append(0)
-            test.append((will_intersect[i], intersection[i], refuse_intersect[i]))
-        print test
+
 
 
 # # analyze by intersections
