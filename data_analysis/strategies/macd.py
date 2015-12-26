@@ -90,6 +90,46 @@ class MACD:
         stock_50_pval = []
         stock_50_err = []
 
+        dea_3_slope = []
+        dea_3_cov = []
+        dea_3_pval = []
+        dea_3_err = []
+
+        dea_8_slope = []
+        dea_8_cov = []
+        dea_8_pval = []
+        dea_8_err = []
+
+        dea_20_slope = []
+        dea_20_cov = []
+        dea_20_pval = []
+        dea_20_err = []
+
+        dea_50_slope = []
+        dea_50_cov = []
+        dea_50_pval = []
+        dea_50_err = []
+
+        dif_3_slope = []
+        dif_3_cov = []
+        dif_3_pval = []
+        dif_3_err = []
+
+        dif_8_slope = []
+        dif_8_cov = []
+        dif_8_pval = []
+        dif_8_err = []
+
+        dif_20_slope = []
+        dif_20_cov = []
+        dif_20_pval = []
+        dif_20_err = []
+
+        dif_50_slope = []
+        dif_50_cov = []
+        dif_50_pval = []
+        dif_50_err = []
+
         for index in range(0, len(self.macd) - 1):
             ind_N = (len(self.macd) - 2 - index + 1)
             ind_P = (len(self.macd) - 2 - index)
@@ -169,6 +209,7 @@ class MACD:
                 price_range.append(float(price_data[i+x]["Close"]))
                 price_range.append(float(price_data[i+x]["Open"]))
 
+            #calculate regression data
             regression_data = self.get_trend(list(reversed(price_range[0:5])))
             stock_3_slope.append(regression_data[0])
             stock_3_cov.append(regression_data[1])
@@ -192,10 +233,62 @@ class MACD:
             stock_50_cov.append(regression_data[1])
             stock_50_pval.append(regression_data[2])
             stock_50_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(dea[i:(i+2)])))
+            dea_3_slope.append(regression_data[0])
+            dea_3_cov.append(regression_data[1])
+            dea_3_pval.append(regression_data[2])
+            dea_3_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(dea[i:(i+7)])))
+            dea_8_slope.append(regression_data[0])
+            dea_8_cov.append(regression_data[1])
+            dea_8_pval.append(regression_data[2])
+            dea_8_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(dea[i:(i+19)])))
+            dea_20_slope.append(regression_data[0])
+            dea_20_cov.append(regression_data[1])
+            dea_20_pval.append(regression_data[2])
+            dea_20_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(dea[i:(i+49)])))
+            dea_50_slope.append(regression_data[0])
+            dea_50_cov.append(regression_data[1])
+            dea_50_pval.append(regression_data[2])
+            dea_50_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(dif[i:(i+2)])))
+            dif_3_slope.append(regression_data[0])
+            dif_3_cov.append(regression_data[1])
+            dif_3_pval.append(regression_data[2])
+            dif_3_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(dif[i:(i+7)])))
+            dif_8_slope.append(regression_data[0])
+            dif_8_cov.append(regression_data[1])
+            dif_8_pval.append(regression_data[2])
+            dif_8_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(dif[i:(i+19)])))
+            dif_20_slope.append(regression_data[0])
+            dif_20_cov.append(regression_data[1])
+            dif_20_pval.append(regression_data[2])
+            dif_20_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(dif[i:(i+49)])))
+            dif_50_slope.append(regression_data[0])
+            dif_50_cov.append(regression_data[1])
+            dif_50_pval.append(regression_data[2])
+            dif_50_err.append(regression_data[3])
             print regression_data
 
+
     def get_trend(self, indicator):
-        x = np.arange(len(indicator))
+        # print indicator
         y = np.array(indicator)
+        y = y[~np.isnan(y)]
+        x = np.arange(len(y))
+
         slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
         return (slope, r_value, p_value, std_err)
