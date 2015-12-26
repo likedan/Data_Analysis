@@ -6,6 +6,7 @@ import datetime
 from scipy import stats
 import pymongo
 from pymongo import MongoClient
+from sklearn import tree
 
 global discount_for_lost
 discount_for_lost = 1.2
@@ -17,6 +18,7 @@ class MACD:
         self.length = length
         client = MongoClient('127.0.0.1', 27017)
         self.db = client['stock_historical_data']
+        self.features = client['stock_features']
         self.calculate_macd()
     def calculate_macd(self):
         self.stock_price = []
@@ -67,6 +69,9 @@ class MACD:
         # -1 = downward   1 = upward  0 = no
         will_intersect = []
         refuse_intersect = []
+
+        local_min = []
+        local_max = []
 
         outcome = []
 
@@ -188,9 +193,11 @@ class MACD:
 
             total_gain = 0.0
 
-            #calculate the cumulative gain of the next 3 days
+            #calculate the cumulative gain of the next 3 days  local min and local max
             if i < 3:
                 outcome.append(None)
+                local_min.append(0)
+                local_max.append(0)
             else:
                 price_range = [float(price_data[i]["Close"])]
                 for x in xrange(3):
@@ -203,6 +210,32 @@ class MACD:
                         value = value * discount_for_lost
                     total_gain = total_gain + value
                 outcome.append(total_gain / price_range[0])
+
+                is_max = True
+                for x in xrange(1,3):
+                    if dea[i + x] < dea[i + x - 1] and dea[i - x] < dea[i - x + 1]:
+                        is_max = True
+                    else:
+                        is_max = False
+                        break
+
+                if is_max:
+                    local_max.append(1)
+                else:
+                    local_max.append(0)
+
+                is_min = True
+                for x in xrange(1,3):
+                    if dea[i + x] > dea[i + x - 1] and dea[i - x] > dea[i - x + 1]:
+                        is_min = True
+                    else:
+                        is_min = False
+                        break
+
+                if is_min:
+                    local_min.append(1)
+                else:
+                    local_min.append(0)
 
             price_range = []
             for x in xrange(50):
@@ -281,8 +314,60 @@ class MACD:
             dif_50_cov.append(regression_data[1])
             dif_50_pval.append(regression_data[2])
             dif_50_err.append(regression_data[3])
-            print regression_data
 
+        #generate features from extract data
+        def save_features():
+            for index in xrange(len(outcome)):
+                day_features = {"_id": price_data[index]["Date"]}
+                day_features["outcome"] = outcome[index]
+
+                def get_intersection_value(day_num):
+                    if intersection[day_num] == 0:
+                        return 0
+                    elif intersection[day_num] == 1:
+                        if dea[day_num] > 0:
+                            return 2
+                        else:
+                            return 1
+                    elif intersection[day_num] == -1:
+                        if dea[day_num] > 0:
+                            return -1
+                        else:
+                            return -2
+
+                day_features["intersection_day1"] = get_intersection_value(index)
+                day_features["intersection_day2"] = get_intersection_value(index + 1)
+                day_features["intersection_day3"] = get_intersection_value(index + 2)
+                day_features["intersection_day4"] = get_intersection_value(index + 3)
+                day_features["intersection_day5"] = get_intersection_value(index + 4)
+
+                day_features["macd_cross_axis_day1"] = macd_cross_axis[index]
+                day_features["macd_cross_axis_day2"] = macd_cross_axis[index + 1]
+                day_features["macd_cross_axis_day3"] = macd_cross_axis[index + 2]
+                day_features["macd_cross_axis_day4"] = macd_cross_axis[index + 3]
+                day_features["macd_cross_axis_day5"] = macd_cross_axis[index + 4]
+
+                day_features["macdsignal_cross_axis_day1"] = macdsignal_cross_axis[index]
+                day_features["macdsignal_cross_axis_day2"] = macdsignal_cross_axis[index + 1]
+                day_features["macdsignal_cross_axis_day3"] = macdsignal_cross_axis[index + 2]
+                day_features["macdsignal_cross_axis_day4"] = macdsignal_cross_axis[index + 3]
+                day_features["macdsignal_cross_axis_day5"] = macdsignal_cross_axis[index + 4]
+
+                day_features["refuse_intersect_day1"] = refuse_intersect[index]
+                day_features["refuse_intersect_day2"] = refuse_intersect[index + 1]
+                day_features["refuse_intersect_day3"] = refuse_intersect[index + 2]
+                day_features["refuse_intersect_day4"] = refuse_intersect[index + 3]
+                day_features["refuse_intersect_day5"] = refuse_intersect[index + 4]
+
+                day_features["will_intersect_day1"] = will_intersect[index]
+                day_features["will_intersect_day2"] = will_intersect[index + 1]
+                day_features["will_intersect_day3"] = will_intersect[index + 2]
+                day_features["will_intersect_day4"] = will_intersect[index + 3]
+                day_features["will_intersect_day5"] = will_intersect[index + 4]
+
+                print macd_cross_axis[index]
+            # self.features[self.stockID].update({"_id": entry["_id"]}, entry, upsert=True)
+        save_features()
 
     def get_trend(self, indicator):
         # print indicator
