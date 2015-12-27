@@ -8,6 +8,7 @@ import pymongo
 from pymongo import MongoClient
 from sklearn import ensemble
 from sklearn import neighbors
+from sklearn import tree
 import sys
 
 global discount_for_lost
@@ -138,6 +139,26 @@ class MACD:
         dif_50_pval = []
         dif_50_err = []
 
+        bar_3_slope = []
+        bar_3_cov = []
+        bar_3_pval = []
+        bar_3_err = []
+
+        bar_8_slope = []
+        bar_8_cov = []
+        bar_8_pval = []
+        bar_8_err = []
+
+        bar_20_slope = []
+        bar_20_cov = []
+        bar_20_pval = []
+        bar_20_err = []
+
+        bar_50_slope = []
+        bar_50_cov = []
+        bar_50_pval = []
+        bar_50_err = []
+
         for index in range(0, len(self.macd) - 1):
             ind_N = (len(self.macd) - 2 - index + 1)
             ind_P = (len(self.macd) - 2 - index)
@@ -194,6 +215,8 @@ class MACD:
             else:
                 refuse_intersect.append(0)
 
+
+
             #calculate the cumulative gain of the next 3 days  local min and local max
             if i < 3:
                 local_min.append(0)
@@ -232,28 +255,31 @@ class MACD:
 
         for i in xrange(len(will_intersect) - 50):
 
-            total_gain = 0.0
             #calculate the cumulative gain of the next 5 days
-            # if i < 5:
-            #     outcome.append(None)
-            # else:
-            #     price_range = [float(price_data[i]["Close"])]
-            #     for x in xrange(5):
-            #         price_range.append(float(price_data[i-x-1]["Open"]))
-            #         price_range.append(float(price_data[i-x-1]["Close"]))
-            #
-            #     for x in xrange(len(price_range) - 1):
-            #         value = price_range[x + 1] - price_range[x]
-            #         if value < 0:
-            #             value = value * discount_for_lost
-            #         total_gain = total_gain + value
-            #     outcome.append(total_gain / price_range[0])
-
             if i < 5:
                 outcome.append(None)
             else:
-                price_diff = float(price_data[i-5]["Close"])-float(price_data[i]["Close"])
-                outcome.append(price_diff/float(price_data[i]["Close"]))
+                price_range_o = []
+                price_range_c = []
+
+                for x in xrange(5):
+                    price_range_o.append(float(price_data[i-x]["High"]))
+                    price_range_c.append(float(price_data[i-x]["Low"]))
+
+                y = np.array(price_range_o)
+                x = np.arange(5)
+                slope1, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+
+                y = np.array(price_range_c)
+                x = np.arange(5)
+                slope2, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+                outcome.append((slope1, slope2))
+            # if i < 5:
+            #     outcome.append(None)
+            # else:
+            #
+            #     price_diff = float(price_data[i-1]["Close"])-float(price_data[i]["Close"])
+            #     outcome.append(price_diff/float(price_data[i]["Close"]))
             # if i < 1:
             #     outcome.append(None)
             # else:
@@ -340,24 +366,42 @@ class MACD:
             dif_50_pval.append(regression_data[2])
             dif_50_err.append(regression_data[3])
 
+            regression_data = self.get_trend(list(reversed(bar[i:(i+2)])))
+            bar_3_slope.append(regression_data[0])
+            bar_3_cov.append(regression_data[1])
+            bar_3_pval.append(regression_data[2])
+            bar_3_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(bar[i:(i+7)])))
+            bar_8_slope.append(regression_data[0])
+            bar_8_cov.append(regression_data[1])
+            bar_8_pval.append(regression_data[2])
+            bar_8_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(bar[i:(i+19)])))
+            bar_20_slope.append(regression_data[0])
+            bar_20_cov.append(regression_data[1])
+            bar_20_pval.append(regression_data[2])
+            bar_20_err.append(regression_data[3])
+
+            regression_data = self.get_trend(list(reversed(bar[i:(i+49)])))
+            bar_50_slope.append(regression_data[0])
+            bar_50_cov.append(regression_data[1])
+            bar_50_pval.append(regression_data[2])
+            bar_50_err.append(regression_data[3])
+
         #generate features from extract data
         def save_features():
             for index in xrange(len(outcome)):
                 day_features = {"_id": price_data[index]["Date"]}
 
                 def get_outcome_value():
-                    if outcome[index] >= 0 and outcome[index] < 0.05:
+                    if outcome[index][0] >= 0 and outcome[index][1] >= 0:
                         return 1
-                    elif outcome[index] >= -0.05 and outcome[index] < 0:
-                        return 0
-                    elif outcome[index] >= 0.05 and outcome[index] < 0.15:
-                        return 2
-                    elif outcome[index] >= -0.15 and outcome[index] <= 0.05:
+                    elif outcome[index][0] <= 0 and outcome[index][1] <= 0:
                         return -1
-                    elif outcome[index] > 0.15:
-                        return 3
-                    elif outcome[index] < -0.15:
-                        return -2
+                    else:
+                        return 0
                 if index > 5:
                     day_features["outcome"] = get_outcome_value()
                 else:
@@ -385,12 +429,16 @@ class MACD:
                     for i in xrange(day_num):
                         key = string + str(i)
                         day_features[key] = array[index + i]
-                consecutive_days_features(50, macd_cross_axis, "macd_cross_axis_day")
-                consecutive_days_features(50, macdsignal_cross_axis, "macdsignal_cross_axis_day")
-                consecutive_days_features(50, refuse_intersect, "refuse_intersect_day")
-                consecutive_days_features(50, will_intersect, "will_intersect_day")
-                consecutive_days_features(50, local_min, "local_min_day")
-                consecutive_days_features(50, local_max, "local_max_day")
+
+                consecutive_days_features(10, macd_cross_axis, "macd_cross_axis_day")
+                consecutive_days_features(10, macdsignal_cross_axis, "macdsignal_cross_axis_day")
+                consecutive_days_features(10, refuse_intersect, "refuse_intersect_day")
+                consecutive_days_features(10, will_intersect, "will_intersect_day")
+                consecutive_days_features(10, local_min, "local_min_day")
+                consecutive_days_features(10, local_max, "local_max_day")
+
+                day_features["dea_slope_change"] = dea_slope[index] - dea_slope[index+1]
+                day_features["dif_slope_change"] = dif_slope[index] - dif_slope[index+1]
 
                 cross_count = 0
                 gold_intersect_count = 0
@@ -499,6 +547,26 @@ class MACD:
                 day_features["dif_50_pval"] = dif_50_pval[index]
                 day_features["dif_50_err"] = dif_50_err[index]
 
+                day_features["bar_3_slope"] = bar_3_slope[index]
+                day_features["bar_3_cov"] = bar_3_cov[index]
+                day_features["bar_3_pval"] = bar_3_pval[index]
+                day_features["bar_3_err"] = bar_3_err[index]
+
+                day_features["bar_8_slope"] = bar_8_slope[index]
+                day_features["bar_8_cov"] = bar_8_cov[index]
+                day_features["bar_8_pval"] = bar_8_pval[index]
+                day_features["bar_8_err"] = bar_8_err[index]
+
+                day_features["bar_20_slope"] = bar_20_slope[index]
+                day_features["bar_20_cov"] = bar_20_cov[index]
+                day_features["bar_20_pval"] = bar_20_pval[index]
+                day_features["bar_20_err"] = bar_20_err[index]
+
+                day_features["bar_50_slope"] = bar_50_slope[index]
+                day_features["bar_50_cov"] = bar_50_cov[index]
+                day_features["bar_50_pval"] = bar_50_pval[index]
+                day_features["bar_50_err"] = bar_50_err[index]
+
                 day_features["stock_dif_3_slope"] = stock_3_slope[index] - dif_3_slope[index]
                 day_features["stock_dif_8_slope"] = stock_8_slope[index] - dif_8_slope[index]
                 day_features["stock_dif_20_slope"] = stock_20_slope[index] - dif_20_slope[index]
@@ -577,20 +645,15 @@ class MACD:
                     entry_data.append(float(entry[key]))
             train_data.append(entry_data)
 
-        self.forest = ensemble.RandomForestClassifier(n_estimators=30)
+        self.forest = ensemble.RandomForestClassifier(n_estimators=10)
         self.forest.fit(train_data, result)
-
-        self.bagging = ensemble.BaggingClassifier()
-        self.bagging.fit(train_data, result)
 
         self.extra = ensemble.ExtraTreesClassifier()
         self.extra.fit(train_data, result)
 
-        self.gradient = ensemble.GradientBoostingClassifier()
-        self.gradient.fit(train_data, result)
+        self.KNN = neighbors.KNeighborsClassifier()
+        self.KNN.fit(train_data, result)
 
-        self.calib = neighbors.KNeighborsClassifier()
-        self.calib.fit(train_data, result)
 
     def predict(self, ending_index = 3):
         test_list = []
@@ -616,39 +679,32 @@ class MACD:
             train_data.append(entry_data)
         out_p = self.forest.predict_proba(train_data)
         out_f = self.forest.predict(train_data)
-        out_b = self.bagging.predict(train_data)
         out_e = self.extra.predict(train_data)
-        out_g = self.gradient.predict(train_data)
-        out_c = self.calib.predict(train_data)
+        out_k = self.KNN.predict(train_data)
 
         sample = 0.0
         out_b_succ = 0.0
         out_e_succ = 0.0
         out_f_succ = 0.0
-        out_g_succ = 0.0
-        out_c_succ = 0.0
+        out_k_succ = 0.0
+
         for index in xrange(len(out_f)):
             if result[index][1] != None:
-                if abs(int(result[index][1]) - int(out_b[index])) <= 0:
-                    out_b_succ = out_b_succ + 1
                 if abs(int(result[index][1]) - int(out_f[index])) <= 0:
                     out_f_succ = out_f_succ + 1
-                if abs(int(result[index][1]) - int(out_g[index])) <= 0:
-                    out_g_succ = out_g_succ + 1
                 if abs(int(result[index][1]) - int(out_e[index])) <= 0:
                     out_e_succ = out_e_succ + 1
-                if abs(int(result[index][1]) - int(out_c[index])) <= 0:
-                    out_c_succ = out_c_succ + 1
-                sample = sample + 1
-                print str(result[index][0]) + "  " + str(result[index][1])  + "  " + str(out_f[index]) + "  " + str(out_b[index]) + "  " + str(out_e[index]) +  "  " + str(out_g[index]) +  "  " + str(out_c[index])
+                if abs(int(result[index][1]) - int(out_k[index])) <= 0:
+                    out_k_succ = out_k_succ + 1
 
-        print out_b_succ / sample
+                sample = sample + 1
+                print str(result[index][0]) + "  " + str(result[index][1])  + "  " + str(out_f[index]) + "  " + str(out_e[index]) + "  " + str(out_k[index])
+
         print out_e_succ / sample
         print out_f_succ / sample
-        print out_g_succ / sample
-        print out_c_succ / sample
-
+        print out_k_succ / sample
         # #print features importance
-        # f = []
+        f = []
         # for index in xrange(len(self.forest.feature_importances_)):
         #     f.append((features[index],self.forest.feature_importances_[index]))
+        # print(sorted(f, key=lambda x: x[1]))
