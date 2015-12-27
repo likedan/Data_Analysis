@@ -6,7 +6,8 @@ import datetime
 from scipy import stats
 import pymongo
 from pymongo import MongoClient
-from sklearn import tree
+from sklearn import ensemble
+import sys
 
 global discount_for_lost
 discount_for_lost = 1.2
@@ -20,6 +21,7 @@ class MACD:
         self.db = client['stock_historical_data']
         self.features = client['stock_features']
         self.calculate_macd()
+
     def calculate_macd(self):
         self.stock_price = []
         adj_close_arr = []
@@ -546,3 +548,53 @@ class MACD:
 
         slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
         return (slope, r_value, p_value, std_err)
+
+    def train(self, starting_index = 3):
+        feature_list = []
+        for entry in self.features[self.stockID].find().sort("_id",pymongo.DESCENDING):
+            feature_list.append(entry)
+        feature_list = list(feature_list[starting_index:len(feature_list)])
+
+        train_data = []
+        result = []
+        for entry in feature_list:
+            entry_data = []
+            for key in entry.keys():
+                if key == "outcome":
+                    result.append(entry["outcome"])
+                elif key != "_id":
+                    if not np.isfinite(entry[key]):
+                        entry_data.append(np.finfo(np.float32).max)
+                    elif np.isnan(entry[key]):
+                        entry_data.append(0)
+                    else:
+                        entry_data.append(float(entry[key]))
+            train_data.append(entry_data)
+
+        self.forest = ensemble.RandomForestClassifier()
+        self.forest.fit(train_data, result)
+
+    def predict(self, ending_index = 3):
+        test_list = []
+        for entry in self.features[self.stockID].find().sort("_id",pymongo.DESCENDING):
+            test_list.append(entry)
+        test_list = list(test_list[0:ending_index])
+        train_data = []
+        result = []
+        for entry in test_list:
+            entry_data = []
+            for key in entry.keys():
+                if key == "outcome":
+                    result.append((entry["_id"],entry["outcome"]))
+                elif key != "_id":
+                    if not np.isfinite(entry[key]):
+                        entry_data.append(np.finfo(np.float32).max)
+                    elif np.isnan(entry[key]):
+                        entry_data.append(0)
+                    else:
+                        entry_data.append(float(entry[key]))
+            train_data.append(entry_data)
+        out = self.forest.predict(train_data)
+
+        for index in xrange(len(out)):
+            print str(result[index][0]) + "  " + str(result[index][1]) + "  " + str(out[index])
