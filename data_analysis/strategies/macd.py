@@ -7,6 +7,7 @@ from scipy import stats
 import pymongo
 from pymongo import MongoClient
 from sklearn import ensemble
+from sklearn import neighbors
 import sys
 
 global discount_for_lost
@@ -232,21 +233,34 @@ class MACD:
         for i in xrange(len(will_intersect) - 50):
 
             total_gain = 0.0
-            #calculate the cumulative gain of the next 3 days
-            if i < 3:
+            #calculate the cumulative gain of the next 5 days
+            # if i < 5:
+            #     outcome.append(None)
+            # else:
+            #     price_range = [float(price_data[i]["Close"])]
+            #     for x in xrange(5):
+            #         price_range.append(float(price_data[i-x-1]["Open"]))
+            #         price_range.append(float(price_data[i-x-1]["Close"]))
+            #
+            #     for x in xrange(len(price_range) - 1):
+            #         value = price_range[x + 1] - price_range[x]
+            #         if value < 0:
+            #             value = value * discount_for_lost
+            #         total_gain = total_gain + value
+            #     outcome.append(total_gain / price_range[0])
+
+            if i < 5:
                 outcome.append(None)
             else:
-                price_range = [float(price_data[i]["Close"])]
-                for x in xrange(3):
-                    price_range.append(float(price_data[i-x-1]["Open"]))
-                    price_range.append(float(price_data[i-x-1]["Close"]))
+                price_diff = float(price_data[i-5]["Close"])-float(price_data[i]["Close"])
+                outcome.append(price_diff/float(price_data[i]["Close"]))
+            # if i < 1:
+            #     outcome.append(None)
+            # else:
+            #     price_range = [float(price_data[i]["Close"]),float(price_data[i-1]["Close"])]
+            #     gain = (price_range[1] - price_range[0])/price_range[0]
+            #     outcome.append(gain)
 
-                for x in xrange(len(price_range) - 1):
-                    value = price_range[x + 1] - price_range[x]
-                    if value < 0:
-                        value = value * discount_for_lost
-                    total_gain = total_gain + value
-                outcome.append(total_gain / price_range[0])
 
             price_range = []
             for x in xrange(50):
@@ -332,33 +346,22 @@ class MACD:
                 day_features = {"_id": price_data[index]["Date"]}
 
                 def get_outcome_value():
-                    if outcome[index] >= -0.015 and outcome[index] <= 0.015:
-                        return 0
-                    elif outcome[index] > 0.015 and outcome[index] <= 0.05:
+                    if outcome[index] >= 0 and outcome[index] < 0.05:
                         return 1
-                    elif outcome[index] < -0.015 and outcome[index] >= -0.05:
-                        return -1
-                    elif outcome[index] > 0.05 and outcome[index] <= 0.09:
+                    elif outcome[index] >= -0.05 and outcome[index] < 0:
+                        return 0
+                    elif outcome[index] >= 0.05 and outcome[index] < 0.15:
                         return 2
-                    elif outcome[index] < -0.05 and outcome[index] >= -0.09:
-                        return -2
-                    elif outcome[index] > 0.09 and outcome[index] <= 0.14:
+                    elif outcome[index] >= -0.15 and outcome[index] <= 0.05:
+                        return -1
+                    elif outcome[index] > 0.15:
                         return 3
-                    elif outcome[index] < -0.09 and outcome[index] >= -0.14:
-                        return -3
-                    elif outcome[index] > 0.14 and outcome[index] <= 0.2:
-                        return 4
-                    elif outcome[index] < -0.14 and outcome[index] >= -0.2:
-                        return -4
-                    elif outcome[index] > 0.2 and outcome[index] <= 0.3:
-                        return 5
-                    elif outcome[index] < -0.2 and outcome[index] >= -0.3:
-                        return -5
-                    elif outcome[index] > 0.3:
-                        return 10
-                    elif outcome[index] < -0.3:
-                        return -10
-                day_features["outcome"] = get_outcome_value()
+                    elif outcome[index] < -0.15:
+                        return -2
+                if index > 5:
+                    day_features["outcome"] = get_outcome_value()
+                else:
+                    day_features["outcome"] = None
 
                 def get_intersection_value(day_num):
                     if intersection[day_num] == 0:
@@ -382,12 +385,12 @@ class MACD:
                     for i in xrange(day_num):
                         key = string + str(i)
                         day_features[key] = array[index + i]
-                consecutive_days_features(10, macd_cross_axis, "macd_cross_axis_day")
-                consecutive_days_features(10, macdsignal_cross_axis, "macdsignal_cross_axis_day")
-                consecutive_days_features(10, refuse_intersect, "refuse_intersect_day")
-                consecutive_days_features(10, will_intersect, "will_intersect_day")
-                consecutive_days_features(10, local_min, "local_min_day")
-                consecutive_days_features(10, local_max, "local_max_day")
+                consecutive_days_features(50, macd_cross_axis, "macd_cross_axis_day")
+                consecutive_days_features(50, macdsignal_cross_axis, "macdsignal_cross_axis_day")
+                consecutive_days_features(50, refuse_intersect, "refuse_intersect_day")
+                consecutive_days_features(50, will_intersect, "will_intersect_day")
+                consecutive_days_features(50, local_min, "local_min_day")
+                consecutive_days_features(50, local_max, "local_max_day")
 
                 cross_count = 0
                 gold_intersect_count = 0
@@ -557,22 +560,37 @@ class MACD:
 
         train_data = []
         result = []
+
+        features = []
+        for key in feature_list[0].keys():
+            if key != "_id" and key != "outcome":
+                features.append(key)
         for entry in feature_list:
             entry_data = []
-            for key in entry.keys():
-                if key == "outcome":
-                    result.append(entry["outcome"])
-                elif key != "_id":
-                    if not np.isfinite(entry[key]):
-                        entry_data.append(np.finfo(np.float32).max)
-                    elif np.isnan(entry[key]):
-                        entry_data.append(0)
-                    else:
-                        entry_data.append(float(entry[key]))
+            result.append(entry["outcome"])
+            for key in features:
+                if not np.isfinite(entry[key]):
+                    entry_data.append(np.finfo(np.float32).max)
+                elif np.isnan(entry[key]):
+                    entry_data.append(0)
+                else:
+                    entry_data.append(float(entry[key]))
             train_data.append(entry_data)
 
-        self.forest = ensemble.RandomForestClassifier()
+        self.forest = ensemble.RandomForestClassifier(n_estimators=30)
         self.forest.fit(train_data, result)
+
+        self.bagging = ensemble.BaggingClassifier()
+        self.bagging.fit(train_data, result)
+
+        self.extra = ensemble.ExtraTreesClassifier()
+        self.extra.fit(train_data, result)
+
+        self.gradient = ensemble.GradientBoostingClassifier()
+        self.gradient.fit(train_data, result)
+
+        self.calib = neighbors.KNeighborsClassifier()
+        self.calib.fit(train_data, result)
 
     def predict(self, ending_index = 3):
         test_list = []
@@ -581,20 +599,56 @@ class MACD:
         test_list = list(test_list[0:ending_index])
         train_data = []
         result = []
+        features = []
+        for key in test_list[0].keys():
+            if key != "_id" and key != "outcome":
+                features.append(key)
         for entry in test_list:
             entry_data = []
-            for key in entry.keys():
-                if key == "outcome":
-                    result.append((entry["_id"],entry["outcome"]))
-                elif key != "_id":
-                    if not np.isfinite(entry[key]):
-                        entry_data.append(np.finfo(np.float32).max)
-                    elif np.isnan(entry[key]):
-                        entry_data.append(0)
-                    else:
-                        entry_data.append(float(entry[key]))
+            result.append((entry["_id"],entry["outcome"]))
+            for key in features:
+                if not np.isfinite(entry[key]):
+                    entry_data.append(np.finfo(np.float32).max)
+                elif np.isnan(entry[key]):
+                    entry_data.append(0)
+                else:
+                    entry_data.append(float(entry[key]))
             train_data.append(entry_data)
-        out = self.forest.predict(train_data)
+        out_p = self.forest.predict_proba(train_data)
+        out_f = self.forest.predict(train_data)
+        out_b = self.bagging.predict(train_data)
+        out_e = self.extra.predict(train_data)
+        out_g = self.gradient.predict(train_data)
+        out_c = self.calib.predict(train_data)
 
-        for index in xrange(len(out)):
-            print str(result[index][0]) + "  " + str(result[index][1]) + "  " + str(out[index])
+        sample = 0.0
+        out_b_succ = 0.0
+        out_e_succ = 0.0
+        out_f_succ = 0.0
+        out_g_succ = 0.0
+        out_c_succ = 0.0
+        for index in xrange(len(out_f)):
+            if result[index][1] != None:
+                if abs(int(result[index][1]) - int(out_b[index])) <= 0:
+                    out_b_succ = out_b_succ + 1
+                if abs(int(result[index][1]) - int(out_f[index])) <= 0:
+                    out_f_succ = out_f_succ + 1
+                if abs(int(result[index][1]) - int(out_g[index])) <= 0:
+                    out_g_succ = out_g_succ + 1
+                if abs(int(result[index][1]) - int(out_e[index])) <= 0:
+                    out_e_succ = out_e_succ + 1
+                if abs(int(result[index][1]) - int(out_c[index])) <= 0:
+                    out_c_succ = out_c_succ + 1
+                sample = sample + 1
+                print str(result[index][0]) + "  " + str(result[index][1])  + "  " + str(out_f[index]) + "  " + str(out_b[index]) + "  " + str(out_e[index]) +  "  " + str(out_g[index]) +  "  " + str(out_c[index])
+
+        print out_b_succ / sample
+        print out_e_succ / sample
+        print out_f_succ / sample
+        print out_g_succ / sample
+        print out_c_succ / sample
+
+        # #print features importance
+        # f = []
+        # for index in xrange(len(self.forest.feature_importances_)):
+        #     f.append((features[index],self.forest.feature_importances_[index]))
