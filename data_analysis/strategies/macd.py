@@ -79,85 +79,11 @@ class MACD:
 
         outcome = []
 
-        stock_3_slope = []
-        stock_3_cov = []
-        stock_3_pval = []
-        stock_3_err = []
-
-        stock_8_slope = []
-        stock_8_cov = []
-        stock_8_pval = []
-        stock_8_err = []
-
-        stock_20_slope = []
-        stock_20_cov = []
-        stock_20_pval = []
-        stock_20_err = []
-
-        stock_50_slope = []
-        stock_50_cov = []
-        stock_50_pval = []
-        stock_50_err = []
-
-        dea_3_slope = []
-        dea_3_cov = []
-        dea_3_pval = []
-        dea_3_err = []
-
-        dea_8_slope = []
-        dea_8_cov = []
-        dea_8_pval = []
-        dea_8_err = []
-
-        dea_20_slope = []
-        dea_20_cov = []
-        dea_20_pval = []
-        dea_20_err = []
-
-        dea_50_slope = []
-        dea_50_cov = []
-        dea_50_pval = []
-        dea_50_err = []
-
-        dif_3_slope = []
-        dif_3_cov = []
-        dif_3_pval = []
-        dif_3_err = []
-
-        dif_8_slope = []
-        dif_8_cov = []
-        dif_8_pval = []
-        dif_8_err = []
-
-        dif_20_slope = []
-        dif_20_cov = []
-        dif_20_pval = []
-        dif_20_err = []
-
-        dif_50_slope = []
-        dif_50_cov = []
-        dif_50_pval = []
-        dif_50_err = []
-
-        bar_3_slope = []
-        bar_3_cov = []
-        bar_3_pval = []
-        bar_3_err = []
-
-        bar_8_slope = []
-        bar_8_cov = []
-        bar_8_pval = []
-        bar_8_err = []
-
-        bar_20_slope = []
-        bar_20_cov = []
-        bar_20_pval = []
-        bar_20_err = []
-
-        bar_50_slope = []
-        bar_50_cov = []
-        bar_50_pval = []
-        bar_50_err = []
+        slope_days = [2,3,4,5,6,7,8,9,10,12,15,20,30,50]
+        stock_slope_data = []
+        dea_slope_data = []
+        dif_slope_data = []
+        bar_slope_data = []
 
         for index in range(0, len(self.macd) - 1):
             ind_N = (len(self.macd) - 2 - index + 1)
@@ -251,12 +177,9 @@ class MACD:
                 else:
                     local_min.append(0)
 
-
-
         for i in xrange(len(will_intersect) - 50):
-
             #calculate the cumulative gain of the next 5 days
-            if i < 1:
+            if i < 2:
                 outcome.append(None)
             else:
                 price_range_o = []
@@ -269,11 +192,14 @@ class MACD:
                 y = np.array(price_range_o)
                 x = np.arange(2)
                 slope1, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+                slope1 = slope1 / float(price_data[i]["Close"]) * 100
 
                 y = np.array(price_range_c)
                 x = np.arange(2)
                 slope2, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+                slope2 = slope2 / float(price_data[i]["Close"]) * 100
                 outcome.append((slope1, slope2))
+
             # if i < 5:
             #     outcome.append(None)
             # else:
@@ -287,108 +213,41 @@ class MACD:
             #     gain = (price_range[1] - price_range[0])/price_range[0]
             #     outcome.append(gain)
 
-
             price_range = []
             for x in xrange(50):
                 price_range.append(float(price_data[i+x]["Close"]))
                 price_range.append(float(price_data[i+x]["Open"]))
 
             #calculate regression data
-            regression_data = self.get_trend(list(reversed(price_range[0:5])))
-            stock_3_slope.append(regression_data[0])
-            stock_3_cov.append(regression_data[1])
-            stock_3_pval.append(regression_data[2])
-            stock_3_err.append(regression_data[3])
 
-            regression_data = self.get_trend(list(reversed(price_range[0:15])))
-            stock_8_slope.append(regression_data[0])
-            stock_8_cov.append(regression_data[1])
-            stock_8_pval.append(regression_data[2])
-            stock_8_err.append(regression_data[3])
+            for day in xrange(len(slope_days)):
+                regression_data = self.get_trend(list(reversed(price_range[0:(2*slope_days[day]-1)])))
+                if len(stock_slope_data) < len(slope_days):
+                    stock_slope_data.append([regression_data])
+                else:
+                    stock_slope_data[day].append(regression_data)
 
-            regression_data = self.get_trend(list(reversed(price_range[0:39])))
-            stock_20_slope.append(regression_data[0])
-            stock_20_cov.append(regression_data[1])
-            stock_20_pval.append(regression_data[2])
-            stock_20_err.append(regression_data[3])
 
-            regression_data = self.get_trend(list(reversed(price_range[0:99])))
-            stock_50_slope.append(regression_data[0])
-            stock_50_cov.append(regression_data[1])
-            stock_50_pval.append(regression_data[2])
-            stock_50_err.append(regression_data[3])
+            for day in xrange(len(slope_days)):
+                regression_data = self.get_trend(list(reversed(dea[0:(slope_days[day]-1)])))
+                if len(dea_slope_data) < len(slope_days):
+                    dea_slope_data.append([regression_data])
+                else:
+                    dea_slope_data[day].append(regression_data)
 
-            regression_data = self.get_trend(list(reversed(dea[i:(i+2)])))
-            dea_3_slope.append(regression_data[0])
-            dea_3_cov.append(regression_data[1])
-            dea_3_pval.append(regression_data[2])
-            dea_3_err.append(regression_data[3])
+            for day in xrange(len(slope_days)):
+                regression_data = self.get_trend(list(reversed(dif[0:(slope_days[day]-1)])))
+                if len(dif_slope_data) < len(slope_days):
+                    dif_slope_data.append([regression_data])
+                else:
+                    dif_slope_data[day].append(regression_data)
 
-            regression_data = self.get_trend(list(reversed(dea[i:(i+7)])))
-            dea_8_slope.append(regression_data[0])
-            dea_8_cov.append(regression_data[1])
-            dea_8_pval.append(regression_data[2])
-            dea_8_err.append(regression_data[3])
-
-            regression_data = self.get_trend(list(reversed(dea[i:(i+19)])))
-            dea_20_slope.append(regression_data[0])
-            dea_20_cov.append(regression_data[1])
-            dea_20_pval.append(regression_data[2])
-            dea_20_err.append(regression_data[3])
-
-            regression_data = self.get_trend(list(reversed(dea[i:(i+49)])))
-            dea_50_slope.append(regression_data[0])
-            dea_50_cov.append(regression_data[1])
-            dea_50_pval.append(regression_data[2])
-            dea_50_err.append(regression_data[3])
-
-            regression_data = self.get_trend(list(reversed(dif[i:(i+2)])))
-            dif_3_slope.append(regression_data[0])
-            dif_3_cov.append(regression_data[1])
-            dif_3_pval.append(regression_data[2])
-            dif_3_err.append(regression_data[3])
-
-            regression_data = self.get_trend(list(reversed(dif[i:(i+7)])))
-            dif_8_slope.append(regression_data[0])
-            dif_8_cov.append(regression_data[1])
-            dif_8_pval.append(regression_data[2])
-            dif_8_err.append(regression_data[3])
-
-            regression_data = self.get_trend(list(reversed(dif[i:(i+19)])))
-            dif_20_slope.append(regression_data[0])
-            dif_20_cov.append(regression_data[1])
-            dif_20_pval.append(regression_data[2])
-            dif_20_err.append(regression_data[3])
-
-            regression_data = self.get_trend(list(reversed(dif[i:(i+49)])))
-            dif_50_slope.append(regression_data[0])
-            dif_50_cov.append(regression_data[1])
-            dif_50_pval.append(regression_data[2])
-            dif_50_err.append(regression_data[3])
-
-            regression_data = self.get_trend(list(reversed(bar[i:(i+2)])))
-            bar_3_slope.append(regression_data[0])
-            bar_3_cov.append(regression_data[1])
-            bar_3_pval.append(regression_data[2])
-            bar_3_err.append(regression_data[3])
-
-            regression_data = self.get_trend(list(reversed(bar[i:(i+7)])))
-            bar_8_slope.append(regression_data[0])
-            bar_8_cov.append(regression_data[1])
-            bar_8_pval.append(regression_data[2])
-            bar_8_err.append(regression_data[3])
-
-            regression_data = self.get_trend(list(reversed(bar[i:(i+19)])))
-            bar_20_slope.append(regression_data[0])
-            bar_20_cov.append(regression_data[1])
-            bar_20_pval.append(regression_data[2])
-            bar_20_err.append(regression_data[3])
-
-            regression_data = self.get_trend(list(reversed(bar[i:(i+49)])))
-            bar_50_slope.append(regression_data[0])
-            bar_50_cov.append(regression_data[1])
-            bar_50_pval.append(regression_data[2])
-            bar_50_err.append(regression_data[3])
+            for day in xrange(len(slope_days)):
+                regression_data = self.get_trend(list(reversed(bar[0:(slope_days[day]-1)])))
+                if len(bar_slope_data) < len(slope_days):
+                    bar_slope_data.append([regression_data])
+                else:
+                    bar_slope_data[day].append(regression_data)
 
         #generate features from extract data
         def save_features():
@@ -396,13 +255,9 @@ class MACD:
                 day_features = {"_id": price_data[index]["Date"]}
 
                 def get_outcome_value():
-                    if outcome[index][0] >= 0 and outcome[index][1] >= 0:
-                        return 1
-                    elif outcome[index][0] <= 0 and outcome[index][1] <= 0:
-                        return -1
-                    else:
-                        return 0
-                if index > 1:
+                    return outcome[index][0] + outcome[index][1]
+
+                if index >= 2:
                     day_features["outcome"] = get_outcome_value()
                 else:
                     day_features["outcome"] = None
@@ -485,103 +340,45 @@ class MACD:
                 day_features["local_min_count_50"] = local_min_count
                 day_features["local_max_count_50"] = local_max_count
 
-                day_features["stock_3_slope"] = stock_3_slope[index]
-                day_features["stock_3_cov"] = stock_3_cov[index]
-                day_features["stock_3_pval"] = stock_3_pval[index]
-                day_features["stock_3_err"] = stock_3_err[index]
+                for day in xrange(len(slope_days)):
+                    key = "stock_" + str(slope_days[day]) + "_slope"
+                    day_features[key] = stock_slope_data[day][index][0]
+                    key = "stock_" + str(slope_days[day]) + "_cov"
+                    day_features[key] = stock_slope_data[day][index][1]
+                    key = "stock_" + str(slope_days[day]) + "_pval"
+                    day_features[key] = stock_slope_data[day][index][2]
+                    key = "stock_" + str(slope_days[day]) + "_err"
+                    day_features[key] = stock_slope_data[day][index][3]
 
-                day_features["stock_8_slope"] = stock_8_slope[index]
-                day_features["stock_8_cov"] = stock_8_cov[index]
-                day_features["stock_8_pval"] = stock_8_pval[index]
-                day_features["stock_8_err"] = stock_8_err[index]
+                    key = "dea_" + str(slope_days[day]) + "_slope"
+                    day_features[key] = dea_slope_data[day][index][0]
+                    key = "dea_" + str(slope_days[day]) + "_cov"
+                    day_features[key] = dea_slope_data[day][index][1]
+                    key = "dea_" + str(slope_days[day]) + "_pval"
+                    day_features[key] = dea_slope_data[day][index][2]
+                    key = "dea_" + str(slope_days[day]) + "_err"
+                    day_features[key] = dea_slope_data[day][index][3]
 
-                day_features["stock_20_slope"] = stock_20_slope[index]
-                day_features["stock_20_cov"] = stock_20_cov[index]
-                day_features["stock_20_pval"] = stock_20_pval[index]
-                day_features["stock_20_err"] = stock_20_err[index]
+                    key = "dif_" + str(slope_days[day]) + "_slope"
+                    day_features[key] = dif_slope_data[day][index][0]
+                    key = "dif_" + str(slope_days[day]) + "_cov"
+                    day_features[key] = dif_slope_data[day][index][1]
+                    key = "dif_" + str(slope_days[day]) + "_pval"
+                    day_features[key] = dif_slope_data[day][index][2]
+                    key = "dif_" + str(slope_days[day]) + "_err"
+                    day_features[key] = dif_slope_data[day][index][3]
 
-                day_features["stock_50_slope"] = stock_50_slope[index]
-                day_features["stock_50_cov"] = stock_50_cov[index]
-                day_features["stock_50_pval"] = stock_50_pval[index]
-                day_features["stock_50_err"] = stock_50_err[index]
+                    key = "bar_" + str(slope_days[day]) + "_slope"
+                    day_features[key] = bar_slope_data[day][index][0]
+                    key = "bar_" + str(slope_days[day]) + "_cov"
+                    day_features[key] = bar_slope_data[day][index][1]
+                    key = "bar_" + str(slope_days[day]) + "_pval"
+                    day_features[key] = bar_slope_data[day][index][2]
+                    key = "bar_" + str(slope_days[day]) + "_err"
+                    day_features[key] = bar_slope_data[day][index][3]
 
-                day_features["dea_1_slope"] = dea_slope[index]
-                day_features["dea_3_slope"] = dea_3_slope[index]
-                day_features["dea_3_cov"] = dea_3_cov[index]
-                day_features["dea_3_pval"] = dea_3_pval[index]
-                day_features["dea_3_err"] = dea_3_err[index]
 
-                day_features["dea_8_slope"] = dea_8_slope[index]
-                day_features["dea_8_cov"] = dea_8_cov[index]
-                day_features["dea_8_pval"] = dea_8_pval[index]
-                day_features["dea_8_err"] = dea_8_err[index]
-
-                day_features["dea_20_slope"] = dea_20_slope[index]
-                day_features["dea_20_cov"] = dea_20_cov[index]
-                day_features["dea_20_pval"] = dea_20_pval[index]
-                day_features["dea_20_err"] = dea_20_err[index]
-
-                day_features["dea_50_slope"] = dea_50_slope[index]
-                day_features["dea_50_cov"] = dea_50_cov[index]
-                day_features["dea_50_pval"] = dea_50_pval[index]
-                day_features["dea_50_err"] = dea_50_err[index]
-
-                day_features["dif_1_slope"] = dif_slope[index]
-                day_features["dif_3_slope"] = dif_3_slope[index]
-                day_features["dif_3_cov"] = dif_3_cov[index]
-                day_features["dif_3_pval"] = dif_3_pval[index]
-                day_features["dif_3_err"] = dif_3_err[index]
-
-                day_features["dif_8_slope"] = dif_8_slope[index]
-                day_features["dif_8_cov"] = dif_8_cov[index]
-                day_features["dif_8_pval"] = dif_8_pval[index]
-                day_features["dif_8_err"] = dif_8_err[index]
-
-                day_features["dif_20_slope"] = dif_20_slope[index]
-                day_features["dif_20_cov"] = dif_20_cov[index]
-                day_features["dif_20_pval"] = dif_20_pval[index]
-                day_features["dif_20_err"] = dif_20_err[index]
-
-                day_features["dif_50_slope"] = dif_50_slope[index]
-                day_features["dif_50_cov"] = dif_50_cov[index]
-                day_features["dif_50_pval"] = dif_50_pval[index]
-                day_features["dif_50_err"] = dif_50_err[index]
-
-                day_features["bar_3_slope"] = bar_3_slope[index]
-                day_features["bar_3_cov"] = bar_3_cov[index]
-                day_features["bar_3_pval"] = bar_3_pval[index]
-                day_features["bar_3_err"] = bar_3_err[index]
-
-                day_features["bar_8_slope"] = bar_8_slope[index]
-                day_features["bar_8_cov"] = bar_8_cov[index]
-                day_features["bar_8_pval"] = bar_8_pval[index]
-                day_features["bar_8_err"] = bar_8_err[index]
-
-                day_features["bar_20_slope"] = bar_20_slope[index]
-                day_features["bar_20_cov"] = bar_20_cov[index]
-                day_features["bar_20_pval"] = bar_20_pval[index]
-                day_features["bar_20_err"] = bar_20_err[index]
-
-                day_features["bar_50_slope"] = bar_50_slope[index]
-                day_features["bar_50_cov"] = bar_50_cov[index]
-                day_features["bar_50_pval"] = bar_50_pval[index]
-                day_features["bar_50_err"] = bar_50_err[index]
-
-                day_features["stock_dif_3_slope"] = stock_3_slope[index] - dif_3_slope[index]
-                day_features["stock_dif_8_slope"] = stock_8_slope[index] - dif_8_slope[index]
-                day_features["stock_dif_20_slope"] = stock_20_slope[index] - dif_20_slope[index]
-                day_features["stock_dif_50_slope"] = stock_50_slope[index] - dif_50_slope[index]
-
-                day_features["stock_dea_3_slope"] = stock_3_slope[index] - dea_3_slope[index]
-                day_features["stock_dea_8_slope"] = stock_8_slope[index] - dea_8_slope[index]
-                day_features["stock_dea_20_slope"] = stock_20_slope[index] - dea_20_slope[index]
-                day_features["stock_dea_50_slope"] = stock_50_slope[index] - dea_50_slope[index]
-
-                day_features["dif_dea_3_slope"] = dif_3_slope[index] - dea_3_slope[index]
-                day_features["dif_dea_8_slope"] = dif_8_slope[index] - dea_8_slope[index]
-                day_features["dif_dea_20_slope"] = dif_20_slope[index] - dea_20_slope[index]
-                day_features["dif_dea_50_slope"] = dif_50_slope[index] - dea_50_slope[index]
-
+                # print day_features
                 def get_prev_two_local_value(array):
                     first = None
                     for x in xrange(index, len(outcome)):
@@ -645,14 +442,14 @@ class MACD:
                     entry_data.append(float(entry[key]))
             train_data.append(entry_data)
 
-        self.forest = ensemble.RandomForestClassifier(n_estimators=10)
+        self.forest = ensemble.RandomForestRegressor(n_estimators=10)
         self.forest.fit(train_data, result)
 
-        self.extra = ensemble.ExtraTreesClassifier()
-        self.extra.fit(train_data, result)
-
-        self.KNN = neighbors.KNeighborsClassifier()
-        self.KNN.fit(train_data, result)
+        # self.extra = ensemble.ExtraTreesClassifier()
+        # self.extra.fit(train_data, result)
+        #
+        # self.KNN = neighbors.KNeighborsClassifier()
+        # self.KNN.fit(train_data, result)
 
 
     def predict(self, ending_index = 3):
@@ -677,34 +474,53 @@ class MACD:
                 else:
                     entry_data.append(float(entry[key]))
             train_data.append(entry_data)
-        out_p = self.forest.predict_proba(train_data)
+        # out_p = self.forest.predict_proba(train_data)
         out_f = self.forest.predict(train_data)
-        out_e = self.extra.predict(train_data)
-        out_k = self.KNN.predict(train_data)
+        # out_e = self.extra.predict(train_data)
+        # out_k = self.KNN.predict(train_data)
 
         sample = 0.0
-        out_b_succ = 0.0
-        out_e_succ = 0.0
-        out_f_succ = 0.0
-        out_k_succ = 0.0
+        same_side = 0.0
+        smaller_than_1 = 0.0
+        smaller_than_2 = 0.0
+        smaller_than_3 = 0.0
+        smaller_than_5 = 0.0
+
+        big_val = 0.0
+        big_inaccurate = 0.0
 
         for index in xrange(len(out_f)):
             if result[index][1] != None:
-                if abs(int(result[index][1]) - int(out_f[index])) <= 0:
-                    out_f_succ = out_f_succ + 1
-                if abs(int(result[index][1]) - int(out_e[index])) <= 0:
-                    out_e_succ = out_e_succ + 1
-                if abs(int(result[index][1]) - int(out_k[index])) <= 0:
-                    out_k_succ = out_k_succ + 1
+                if abs(float(result[index][1]) - float(out_f[index])) <= 1:
+                    smaller_than_1 = smaller_than_1 + 1
+                if abs(float(result[index][1]) - float(out_f[index])) <= 2:
+                    smaller_than_2 = smaller_than_2 + 1
+                if abs(float(result[index][1]) - float(out_f[index])) <= 3:
+                    smaller_than_3 = smaller_than_3 + 1
+                if abs(float(result[index][1]) - float(out_f[index])) <= 5:
+                    smaller_than_5 = smaller_than_5 + 1
 
+                if float(result[index][1]) > 0 and float(out_f[index]) > 0:
+                    same_side = same_side + 1
+                elif float(result[index][1]) < 0 and float(out_f[index]) < 0:
+                    same_side = same_side + 1
+
+                if float(out_f[index]) > 5:
+                    big_val = big_val + 1
+                    if float(result[index][1]) < 0:
+                        big_inaccurate = big_inaccurate + 1
                 sample = sample + 1
-                print str(result[index][0]) + "  " + str(result[index][1])  + "  " + str(out_f[index]) + "  " + str(out_e[index]) + "  " + str(out_k[index])
+                print str(result[index][0]) + "  " + str(result[index][1])  + "  " + str(out_f[index])
 
-        print out_e_succ / sample
-        print out_f_succ / sample
-        print out_k_succ / sample
+        print same_side / sample
+        print smaller_than_1 / sample
+        print smaller_than_2 / sample
+        print smaller_than_3 / sample
+        print smaller_than_5 / sample
+        print big_inaccurate / big_val
+
         # #print features importance
-        f = []
+        # f = []
         # for index in xrange(len(self.forest.feature_importances_)):
         #     f.append((features[index],self.forest.feature_importances_[index]))
         # print(sorted(f, key=lambda x: x[1]))

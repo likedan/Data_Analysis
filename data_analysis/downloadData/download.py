@@ -32,9 +32,8 @@ def downloadStock(stock_name, db):
         entry["_id"] = entry["Date"]
         stock.update({"_id": entry["_id"]}, entry ,upsert=True)
     stock.update({"_id": "last_updated_time"}, {"date": (date.today() - timedelta(days = 1)).strftime('%Y-%m-%d')} ,upsert=True)
-    print stock_name
-    print len(data)
 
-    
+
+
 for stock_name in stock_list:
     downloadStock(stock_name, db)
