@@ -256,22 +256,22 @@ class MACD:
         for i in xrange(len(will_intersect) - 50):
 
             #calculate the cumulative gain of the next 5 days
-            if i < 5:
+            if i < 1:
                 outcome.append(None)
             else:
                 price_range_o = []
                 price_range_c = []
 
-                for x in xrange(5):
+                for x in xrange(2):
                     price_range_o.append(float(price_data[i-x]["High"]))
                     price_range_c.append(float(price_data[i-x]["Low"]))
 
                 y = np.array(price_range_o)
-                x = np.arange(5)
+                x = np.arange(2)
                 slope1, intercept, r_value, p_value, std_err = stats.linregress(x, y)
 
                 y = np.array(price_range_c)
-                x = np.arange(5)
+                x = np.arange(2)
                 slope2, intercept, r_value, p_value, std_err = stats.linregress(x, y)
                 outcome.append((slope1, slope2))
             # if i < 5:
@@ -402,7 +402,7 @@ class MACD:
                         return -1
                     else:
                         return 0
-                if index > 5:
+                if index > 1:
                     day_features["outcome"] = get_outcome_value()
                 else:
                     day_features["outcome"] = None

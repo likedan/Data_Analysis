@@ -13,7 +13,7 @@ with open('downloadData/stockList') as f:
         stock_list.append(stock)
 
 # print stock_list
-macddd = macd.MACD("CMG")
+macddd = macd.MACD("UGAZ")
 macddd.generate_features()
 macddd.train(100)
 macddd.predict(100)
