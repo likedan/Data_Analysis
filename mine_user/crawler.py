@@ -36,7 +36,7 @@ class Crawler:
             data = json.loads(information)
             return data
         except Exception as e:
-            self.get_json(url)
+            return self.get_json(url)
 
     #     self.login()
     #
