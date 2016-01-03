@@ -2,7 +2,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+import json
+import time
+import database
 from global_variables import *
 class Crawler:
 
@@ -10,11 +12,29 @@ class Crawler:
         self.driver = webdriver.Firefox()#Phantom
         self.driver.set_window_size(1500, 1500)
         self.driver.get("http://xueqiu.com/")
+        self.db = database.Database()
 
-    def check_unit_existance(self):
-        self.driver.get("http://xueqiu.com/cubes/rank/summary.json?symbol=ZH100008")
-        information = submitContainer.find_element_by_xpath('/body/pre').text
-        print information
+    def check_unit_existance(self, start, end):
+        for num in xrange(start, end):
+            string = str(num)
+            while len(string) < 6:
+                string = "0" + string
+            url = "http://xueqiu.com/cubes/rank/summary.json?symbol=ZH" + string
+            data = self.get_json(url)
+            if "success" in data:
+                print "trash"
+            else:
+                print data
+                self.db.add_unit_info(data)
+    def get_json(self, url):
+        time.sleep(1)
+        try:
+            self.driver.get(url)
+            information = self.driver.find_element_by_xpath('//body/pre').text
+            data = json.loads(information)
+            return data
+        except Exception as e:
+            self.get_json(url)
 
     #     self.login()
     #

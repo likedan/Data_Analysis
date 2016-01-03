@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 import time
-import database
 import crawler
 from multiprocessing import Process
 
-my_crawler = crawler.Crawler()
-my_crawler.check_unit_existance()
+def crawl(start, end):
+    my_crawler = crawler.Crawler()
+    info = my_crawler.check_unit_existance(start, end)
 
-# p = Process(target=mineUser, args=(userID, database))
-# p.start()
-#
-# p1 = Process(target=minePin, args=(pinID, database))
-# p1.start()
+for x in xrange(5):
+    p = Process(target=crawl, args=(x * 200000, (x+1)*200000))
+    p.start()
