@@ -9,6 +9,7 @@ from pymongo import MongoClient
 from sklearn import ensemble
 from sklearn import neighbors
 from sklearn import tree
+from sklearn import svm
 import sys
 
 global discount_for_lost
@@ -21,8 +22,9 @@ class MACD:
         self.length = length
         client = MongoClient('127.0.0.1', 27017)
         self.db = client['stock_historical_data']
-        self.features = client['stock_features']
         self.calculate_macd()
+        self.features = client['stock_features']
+        self.forest = []
 
     def calculate_macd(self):
         self.stock_price = []
@@ -54,7 +56,7 @@ class MACD:
         plt.plot(self.macdsignal, color='b')
         plt.show()
 
-    def generate_features(self):
+    def generate_features(self, day_length):
 
         buy_score = 0
 
@@ -141,8 +143,6 @@ class MACD:
             else:
                 refuse_intersect.append(0)
 
-
-
             #calculate the cumulative gain of the next 3 days  local min and local max
             if i < 3:
                 local_min.append(0)
@@ -179,27 +179,31 @@ class MACD:
 
         for i in xrange(len(will_intersect) - 50):
             #calculate the cumulative gain of the next 5 days
-            if i < 2:
+            if i < day_length:
                 outcome.append(None)
             else:
-                price_range_o = []
-                price_range_c = []
-
-                for x in xrange(2):
-                    price_range_o.append(float(price_data[i-x]["High"]))
-                    price_range_c.append(float(price_data[i-x]["Low"]))
-
+                price_range_o = [float(price_data[i]["Close"]),float(price_data[i-1]["Open"])]
                 y = np.array(price_range_o)
                 x = np.arange(2)
-                slope1, intercept, r_value, p_value, std_err = stats.linregress(x, y)
-                slope1 = slope1 / float(price_data[i]["Close"]) * 100
-
-                y = np.array(price_range_c)
-                x = np.arange(2)
-                slope2, intercept, r_value, p_value, std_err = stats.linregress(x, y)
-                slope2 = slope2 / float(price_data[i]["Close"]) * 100
-                outcome.append((slope1, slope2))
-
+                slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+                # price_range_o = []
+                # price_range_c = []
+                #
+                # for x in xrange(day_length):
+                #     price_range_o.append(float(price_data[i-x]["High"]))
+                #     price_range_c.append(float(price_data[i-x]["Low"]))
+                #
+                # y = np.array(price_range_o)
+                # x = np.arange(day_length)
+                # slope1, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+                # slope1 = slope1 / float(price_data[i]["Close"]) * 100
+                #
+                # y = np.array(price_range_c)
+                # x = np.arange(day_length)
+                # slope2, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+                #
+                # slope2 = slope2 / float(price_data[i]["Close"]) * 100
+                outcome.append(slope)
             # if i < 5:
             #     outcome.append(None)
             # else:
@@ -255,9 +259,12 @@ class MACD:
                 day_features = {"_id": price_data[index]["Date"]}
 
                 def get_outcome_value():
-                    return outcome[index][0] + outcome[index][1]
+                    if outcome[index] > 0:
+                        return 1
+                    else:
+                        return 0
 
-                if index >= 2:
+                if index >= day_length:
                     day_features["outcome"] = get_outcome_value()
                 else:
                     day_features["outcome"] = None
@@ -403,7 +410,6 @@ class MACD:
                     day_features["last_two_max_compare"] = -1
                 else:
                     day_features["last_two_max_compare"] = 1
-
                 self.features[self.stockID].update({"_id": day_features["_id"]}, day_features, upsert=True)
 
         save_features()
@@ -442,83 +448,58 @@ class MACD:
                     entry_data.append(float(entry[key]))
             train_data.append(entry_data)
 
-        self.forest = ensemble.RandomForestRegressor(n_estimators=10)
-        self.forest.fit(train_data, result)
+        clf = svm.SVC(decision_function_shape='ovo')
+        clf.fit(train_data, result)
+
+            # forest_l = ensemble.RandomForestRegressor(n_estimators=10)
+            # forest_l.fit(train_data, result)
+        self.forest = clf
 
         # self.extra = ensemble.ExtraTreesClassifier()
         # self.extra.fit(train_data, result)
-        #
         # self.KNN = neighbors.KNeighborsClassifier()
         # self.KNN.fit(train_data, result)
 
-
     def predict(self, ending_index = 3):
-        test_list = []
-        for entry in self.features[self.stockID].find().sort("_id",pymongo.DESCENDING):
-            test_list.append(entry)
-        test_list = list(test_list[0:ending_index])
-        train_data = []
-        result = []
-        features = []
-        for key in test_list[0].keys():
-            if key != "_id" and key != "outcome":
-                features.append(key)
-        for entry in test_list:
-            entry_data = []
-            result.append((entry["_id"],entry["outcome"]))
-            for key in features:
-                if not np.isfinite(entry[key]):
-                    entry_data.append(np.finfo(np.float32).max)
-                elif np.isnan(entry[key]):
-                    entry_data.append(0)
-                else:
-                    entry_data.append(float(entry[key]))
-            train_data.append(entry_data)
-        # out_p = self.forest.predict_proba(train_data)
-        out_f = self.forest.predict(train_data)
-        # out_e = self.extra.predict(train_data)
-        # out_k = self.KNN.predict(train_data)
+            test_list = []
+            for entry in self.features[self.stockID].find().sort("_id", pymongo.DESCENDING):
+                test_list.append(entry)
+            test_list = list(test_list[0:ending_index])
+            train_data = []
+            result = []
+            features = []
+            for key in test_list[0].keys():
+                if key != "_id" and key != "outcome":
+                    features.append(key)
+            for entry in test_list:
+                entry_data = []
+                result.append((entry["_id"],entry["outcome"]))
+                for key in features:
+                    if not np.isfinite(entry[key]):
+                        entry_data.append(np.finfo(np.float32).max)
+                    elif np.isnan(entry[key]):
+                        entry_data.append(0)
+                    else:
+                        entry_data.append(float(entry[key]))
+                train_data.append(entry_data)
+            # out_p = self.forest.predict_proba(train_data)
+            out_f = self.forest.predict(train_data)
+            # out_e = self.extra.predict(train_data)
+            # out_k = self.KNN.predict(train_data)
+            print out_f
+            sample = 0.0
+            same_side = 0.0
 
-        sample = 0.0
-        same_side = 0.0
-        smaller_than_1 = 0.0
-        smaller_than_2 = 0.0
-        smaller_than_3 = 0.0
-        smaller_than_5 = 0.0
+            big_val = 0.0
+            big_inaccurate = 0.0
 
-        big_val = 0.0
-        big_inaccurate = 0.0
+            for index in xrange(len(out_f)):
+                if result[index] != None:
+                    sample = sample + 1
+                    if result[index][1] == out_f[index]:
+                        same_side = same_side + 1
 
-        for index in xrange(len(out_f)):
-            if result[index][1] != None:
-                if abs(float(result[index][1]) - float(out_f[index])) <= 1:
-                    smaller_than_1 = smaller_than_1 + 1
-                if abs(float(result[index][1]) - float(out_f[index])) <= 2:
-                    smaller_than_2 = smaller_than_2 + 1
-                if abs(float(result[index][1]) - float(out_f[index])) <= 3:
-                    smaller_than_3 = smaller_than_3 + 1
-                if abs(float(result[index][1]) - float(out_f[index])) <= 5:
-                    smaller_than_5 = smaller_than_5 + 1
-
-                if float(result[index][1]) > 0 and float(out_f[index]) > 0:
-                    same_side = same_side + 1
-                elif float(result[index][1]) < 0 and float(out_f[index]) < 0:
-                    same_side = same_side + 1
-
-                if float(out_f[index]) > 5:
-                    big_val = big_val + 1
-                    if float(result[index][1]) < 0:
-                        big_inaccurate = big_inaccurate + 1
-                sample = sample + 1
-                print str(result[index][0]) + "  " + str(result[index][1])  + "  " + str(out_f[index])
-
-        print same_side / sample
-        print smaller_than_1 / sample
-        print smaller_than_2 / sample
-        print smaller_than_3 / sample
-        print smaller_than_5 / sample
-        print big_inaccurate / big_val
-
+            print same_side / sample
         # #print features importance
         # f = []
         # for index in xrange(len(self.forest.feature_importances_)):

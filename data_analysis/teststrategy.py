@@ -14,7 +14,17 @@ with open('downloadData/stockList') as f:
 
 # print stock_list
 macddd = macd.MACD("CMG")
-# macddd.generate_features()
+macddd.generate_features(1)
+print "done"
+# macddd.generate_features(2)
+# print "done"
+# macddd.generate_features(3)
+# print "done"
+# macddd.generate_features(4)
+# print "done"
+# macddd.generate_features(5)
+# print "done"
+
 macddd.train(150)
 macddd.predict(150)
 # macddd.plot()
