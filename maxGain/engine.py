@@ -5,6 +5,7 @@ from cstock.request import Requester
 from cstock.yahoo_engine import YahooEngine
 import time
 
+
 class Engine:
     def __init__(self):
         self.engine = YahooEngine()
@@ -19,6 +20,7 @@ class Engine:
         for obj in list(reversed(stock_obj))[0:3]:
             highest.append(obj.as_dict()["high"])
         return highest
+
 
 # # add a pin without detail info
 #     def addPinID(self, id):

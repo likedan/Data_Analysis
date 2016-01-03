@@ -6,13 +6,21 @@ from pymongo import MongoClient
 class Database:
     def __init__(self):
         try:
-            client = MongoClient('127.0.0.1', 27017)
+            client = MongoClient('158.69.216.57', 27017)
             print "Connected successfully!!!"
         except pymongo.errors.ConnectionFailure, e:
            print "Could not connect to MongoDB: %s" % e
-        self.db = client['xq']
-        self.data = self.db['unit']
+        self.db = client['extract']
+        self.data = self.db['user_timeline']
 
+    def count_entry(self):
+        num = 0
+        print "start"
+        for person in self.data.find():
+            print "start"
+            if len(person["timeline"]) >= 5:
+                num = num + 1
+                print num
 
 # # add a pin without detail info
 #     def addPinID(self, id):
