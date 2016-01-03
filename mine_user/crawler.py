@@ -2,7 +2,6 @@ from pyvirtualdisplay import Display
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.proxy import *
 
@@ -13,28 +12,29 @@ from global_variables import *
 class Crawler:
 
     def __init__(self):
-<<<<<<< HEAD
         self.display = Display(visible=0, size=(1024, 768))
         self.display.start()
-polipo_proxy = "localhost:8123"
+        polipo_proxy = "localhost:8123"
 
-proxy = Proxy({
-    'proxyType': ProxyType.MANUAL,
-    'httpProxy': polipo_proxy,
-    'ftpProxy' : polipo_proxy,
-    'sslProxy' : polipo_proxy,
-    'noProxy'  : ''
-})
-=======
-        # self.display = Display(visible=0, size=(1024, 768))
-        # self.display.start()
->>>>>>> 557d7248290b74f5a701b1a2caf74f1f813f7356
-        self.driver = webdriver.Firefox()#Phantom
+        proxy = Proxy({
+            'proxyType': ProxyType.MANUAL,
+            'httpProxy': polipo_proxy,
+            'ftpProxy' : polipo_proxy,
+            'sslProxy' : polipo_proxy,
+            'noProxy'  : ''
+        })
+        self.driver = webdriver.Firefox(proxy=proxy)#Phantom
         self.driver.set_window_size(1500, 1500)
         self.driver.get("http://xueqiu.com/")
-        print self.driver.execute_script("return document.documentElement.outerHTML")
-
         self.db = database.Database()
+
+driver = webdriver.Firefox(proxy=proxy)
+driver.get("http://www.scrapinghub.com")
+assert "Scrapinghub" in driver.title
+elem = driver.find_element_by_class_name("portia")
+actions = ActionChains(driver)
+actions.click(on_element=elem)
+actions.perform()
 
     def check_unit_existance(self, start, end):
         for num in xrange(start, end):
