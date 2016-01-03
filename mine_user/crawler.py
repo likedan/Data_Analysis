@@ -1,4 +1,4 @@
-from pyvirtualdisplay import Display
+# from pyvirtualdisplay import Display
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -40,6 +40,7 @@ class Crawler:
             return data
         except Exception as e:
             print e
+            print self.driver.execute_script("return document.documentElement.outerHTML")
             return self.get_json(url)
 
     #     self.login()
