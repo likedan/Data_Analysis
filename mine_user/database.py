@@ -15,7 +15,7 @@ class Database:
 
 # add a pin without detail info
     def add_unit_info(self, info):
-        print info
+        # print info
         if self.data.find_one({"_id": info["symbol"]}) == None:
             self.data.update({"_id": info["symbol"]}, info, upsert=True)
             print "add" + info["symbol"]
