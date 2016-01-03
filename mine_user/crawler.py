@@ -28,14 +28,6 @@ class Crawler:
         self.driver.get("http://xueqiu.com/")
         self.db = database.Database()
 
-driver = webdriver.Firefox(proxy=proxy)
-driver.get("http://www.scrapinghub.com")
-assert "Scrapinghub" in driver.title
-elem = driver.find_element_by_class_name("portia")
-actions = ActionChains(driver)
-actions.click(on_element=elem)
-actions.perform()
-
     def check_unit_existance(self, start, end):
         for num in xrange(start, end):
             string = str(num)
