@@ -3,16 +3,24 @@ import sys
 sys.path.append('chinese_stock_api')
 from cstock.request import Requester
 from cstock.yahoo_engine import YahooEngine
+import time
+
 
 class Engine:
     def __init__(self):
         self.engine = YahooEngine()
         self.requester = Requester(self.engine)
 
-    def getNextThreeDaysHighest(self, time, stock):
-        stock_obj = self.requester.request(stock,("2014-03-04","2014-03-06"))
-        print stock_obj[0].as_dict()
-        print len(stock_obj)
+    def getNextThreeDaysHighest(self, date, stock):
+        data1 = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(date))
+        data2 = time.strftime("%Y-%m-%d", time.localtime(date + 7 * 24*60*60))
+        print data1
+        stock_obj = self.requester.request(stock,(data1,data2))
+        highest = []
+        for obj in list(reversed(stock_obj))[0:3]:
+            highest.append(obj.as_dict()["high"])
+        return highest
+
 
 # # add a pin without detail info
 #     def addPinID(self, id):

@@ -6,21 +6,55 @@ from pymongo import MongoClient
 class Database:
     def __init__(self):
         try:
-            client = MongoClient('158.69.216.57', 27017)
+            client = MongoClient('127.0.0.1', 27017)
             print "Connected successfully!!!"
         except pymongo.errors.ConnectionFailure, e:
            print "Could not connect to MongoDB: %s" % e
-        self.db = client['extract']
-        self.data = self.db['user_timeline']
+        self.db = client['xq']
+        self.data = self.db['unit']
 
-    def count_entry(self):
-        num = 0
-        print "start"
-        for person in self.data.find():
-            print "start"
-            if len(person["timeline"]) >= 5:
-                num = num + 1
-                print num
+        self.extract_db = client['extract']
+        self.extract_users = self.extract_db['users']
+        self.user_timeline = self.extract_db['user_timeline']
+
+    def insertAUserChange(self, userid, data):
+        userid = str(int(userid))
+        userInfo = self.user_timeline.find_one({"_id": userid})
+        if userInfo == None:
+            self.user_timeline.insert_one({"_id": userid})
+            userInfo = {"_id": str(int(userid)), "timeline":{}}
+        record = {}
+        for entry in data["list"]:
+            stockID = entry.keys()[0]
+            record[stockID] = {}
+            record[stockID]["current_price"] = entry[stockID]["current_price"]
+            if entry[stockID]["prev_price"] == None:
+                record[stockID]["isbuy"] = True
+                record[stockID]["amount"] = entry[stockID]["to_value"]
+            else:
+                if entry[stockID]["to_value"] - entry[stockID]["from_value"] > 0:
+                    record[stockID]["isbuy"] = True
+                    record[stockID]["amount"] = entry[stockID]["to_value"] - entry[stockID]["from_value"]
+                else:
+                    record[stockID]["isbuy"] = False
+                    record[stockID]["amount"] = entry[stockID]["from_value"] - entry[stockID]["to_value"]
+                    record[stockID]["prev_price"] = entry[stockID]["prev_price"]
+        userInfo["timeline"][str(int(data["time"]))] = record
+        self.user_timeline.update({'_id': userid}, userInfo)
+
+    def insertAUnit(self, userid, id, slope, covariance, valid):
+        userInfo = self.extract_users.find_one({"_id": userid})
+        if userInfo == None:
+            self.extract_users.insert_one({"_id": userid})
+            userInfo = {"_id": userid, "units": {}}
+
+        if valid:
+            userInfo["units"]["id"] = {"revenue_slope" : slope, "revenue_covariance": covariance, "valid": True}
+            print "insert"
+        else:
+            userInfo["units"]["id"] = {"valid": False}
+        self.extract_users.update({'_id': userid}, userInfo)
+
 
 # # add a pin without detail info
 #     def addPinID(self, id):

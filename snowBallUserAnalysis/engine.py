@@ -1,26 +1,24 @@
 #!/usr/bin/env python
-import pymongo
-import datetime
-from pymongo import MongoClient
+import sys
+sys.path.append('chinese_stock_api')
+from cstock.request import Requester
+from cstock.yahoo_engine import YahooEngine
+import time
 
-class Database:
+class Engine:
     def __init__(self):
-        try:
-            client = MongoClient('158.69.216.57', 27017)
-            print "Connected successfully!!!"
-        except pymongo.errors.ConnectionFailure, e:
-           print "Could not connect to MongoDB: %s" % e
-        self.db = client['extract']
-        self.data = self.db['user_timeline']
+        self.engine = YahooEngine()
+        self.requester = Requester(self.engine)
 
-    def count_entry(self):
-        num = 0
-        print "start"
-        for person in self.data.find():
-            print "start"
-            if len(person["timeline"]) >= 5:
-                num = num + 1
-                print num
+    def getNextThreeDaysHighest(self, date, stock):
+        data1 = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(date))
+        data2 = time.strftime("%Y-%m-%d", time.localtime(date + 7 * 24*60*60))
+        print data1
+        stock_obj = self.requester.request(stock,(data1,data2))
+        highest = []
+        for obj in list(reversed(stock_obj))[0:3]:
+            highest.append(obj.as_dict()["high"])
+        return highest
 
 # # add a pin without detail info
 #     def addPinID(self, id):
