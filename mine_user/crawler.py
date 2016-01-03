@@ -24,7 +24,6 @@ class Crawler:
             if "success" in data:
                 print "trash"
             else:
-                print data
                 self.db.add_unit_info(data)
     def get_json(self, url):
         time.sleep(1)
