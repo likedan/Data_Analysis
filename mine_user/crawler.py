@@ -1,8 +1,11 @@
-# from pyvirtualdisplay import Display
+from pyvirtualdisplay import Display
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.proxy import *
+
 import json
 import time
 import database
@@ -12,9 +15,20 @@ class Crawler:
     def __init__(self):
         self.display = Display(visible=0, size=(1024, 768))
         self.display.start()
+polipo_proxy = "localhost:8123"
+
+proxy = Proxy({
+    'proxyType': ProxyType.MANUAL,
+    'httpProxy': polipo_proxy,
+    'ftpProxy' : polipo_proxy,
+    'sslProxy' : polipo_proxy,
+    'noProxy'  : ''
+})
         self.driver = webdriver.Firefox()#Phantom
         self.driver.set_window_size(1500, 1500)
         self.driver.get("http://xueqiu.com/")
+        print self.driver.execute_script("return document.documentElement.outerHTML")
+
         self.db = database.Database()
 
     def check_unit_existance(self, start, end):
@@ -35,12 +49,15 @@ class Crawler:
         time.sleep(1)
         try:
             self.driver.get(url)
+            print self.driver.execute_script("return document.documentElement.outerHTML")
             information = self.driver.find_element_by_xpath('//body/pre').text
             data = json.loads(information)
             return data
         except Exception as e:
             print e
-            print self.driver.execute_script("return document.documentElement.outerHTML")
+            time.sleep(1)
+            self.driver.get("http://xueqiu.com/")
+
             return self.get_json(url)
 
     #     self.login()
