@@ -23,11 +23,14 @@ class Crawler:
             while len(string) < 6:
                 string = "0" + string
             url = "http://xueqiu.com/cubes/rank/summary.json?symbol=ZH" + string
-            data = self.get_json(url)
-            if "success" in data:
-                print "trash"
+            if self.db.data.find_one({"_id": "ZH"+string}) == None:
+                data = self.get_json(url)
+                if "success" in data:
+                    print "trash"
+                else:
+                    self.db.add_unit_info(data)
             else:
-                self.db.add_unit_info(data)
+                print string + " pass"
     def get_json(self, url):
         time.sleep(1)
         try:
@@ -36,6 +39,7 @@ class Crawler:
             data = json.loads(information)
             return data
         except Exception as e:
+            print e
             return self.get_json(url)
 
     #     self.login()
