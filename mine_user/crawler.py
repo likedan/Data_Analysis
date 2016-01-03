@@ -13,6 +13,7 @@ from global_variables import *
 class Crawler:
 
     def __init__(self):
+<<<<<<< HEAD
         self.display = Display(visible=0, size=(1024, 768))
         self.display.start()
 polipo_proxy = "localhost:8123"
@@ -24,6 +25,10 @@ proxy = Proxy({
     'sslProxy' : polipo_proxy,
     'noProxy'  : ''
 })
+=======
+        # self.display = Display(visible=0, size=(1024, 768))
+        # self.display.start()
+>>>>>>> 557d7248290b74f5a701b1a2caf74f1f813f7356
         self.driver = webdriver.Firefox()#Phantom
         self.driver.set_window_size(1500, 1500)
         self.driver.get("http://xueqiu.com/")
