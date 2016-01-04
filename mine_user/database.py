@@ -20,9 +20,13 @@ class Database:
             self.data.update({"_id": info["symbol"]}, info, upsert=True)
             print "add" + info["symbol"]
 
+    def load_data(self):
+        for entry in self.data.find():
+            self.arr.append(int(entry["_id"][2:]))
+
     def get_greatest_amoung(self, start, end):
         lastGreatest = start
-        for entry in self.data.find():
-            if int(entry["_id"][2:]) > lastGreatest and int(entry["_id"][2:]) < end:
-                lastGreatest = int(entry["_id"][2:])
+        for entry in self.arr:
+            if entry > lastGreatest and entry < end:
+                lastGreatest = entry
         return lastGreatest

@@ -5,6 +5,7 @@ from multiprocessing import Process
 import database
 
 db = database.Database()
+db.load_data()
 print(db.get_greatest_amoung(0,200000))
 print(db.get_greatest_amoung(200000,399999))
 print(db.get_greatest_amoung(400000,599999))
