@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import time
-# import crawler
+import crawler
 from multiprocessing import Process
 import database
 
