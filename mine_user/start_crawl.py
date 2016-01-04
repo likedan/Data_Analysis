@@ -18,7 +18,7 @@ def crawl(start, end):
     my_crawler = crawler.Crawler()
     info = my_crawler.check_unit_existance(start, end)
 
-p = Process(target=crawl, args=(216143, 39999))
+p = Process(target=crawl, args=(216143, 399999))
 p.start()
 # #
 # for x in xrange(5):
