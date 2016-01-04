@@ -23,8 +23,6 @@ class Database:
     def get_greatest_amoung(self, start, end):
         lastGreatest = start
         for entry in self.data.find():
-            print entry["_id"]
-        #     if int(entry["_id"][2:]) > lastGreatest and int(entry["_id"][2:]) < end:
-        #         lastGreatest = int(entry["_id"][2:])
-        #         # print lastGreatest
-        # return lastGreatest
+            if int(entry["_id"][2:]) > lastGreatest and int(entry["_id"][2:]) < end:
+                lastGreatest = int(entry["_id"][2:])
+        return lastGreatest
