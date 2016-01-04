@@ -12,13 +12,13 @@ print(db.get_greatest_amoung(400000,599999))
 print(db.get_greatest_amoung(600000,799999))
 print(db.get_greatest_amoung(800000,999999))
 
-db.print_amoung(0,200000)
+# db.print_amoung(0,200000)
 
 def crawl(start, end):
     my_crawler = crawler.Crawler()
     info = my_crawler.check_unit_existance(start, end)
 
-p = Process(target=crawl, args=(15713, 100000))
+p = Process(target=crawl, args=(216143, 39999))
 p.start()
 # #
 # for x in xrange(5):
