@@ -30,3 +30,9 @@ class Database:
             if entry > lastGreatest and entry < end:
                 lastGreatest = entry
         return lastGreatest
+
+    def print_amoung(self, start, end):
+        lastGreatest = start
+        for entry in self.arr:
+            if entry > start and entry < end:
+                print entry
