@@ -23,8 +23,8 @@ def get_update_message():
 	driver.get("http://stocktwits.com/flourish")
 	updates = driver.find_elements_by_class_name("messageli")
 	messages_T = []
-    for m in updates:
-        body = m.find_element_by_class_name("message-body")
+	for m in updates:
+    	body = m.find_element_by_class_name("message-body")
     	messages_T.append(body.text)
     driver.close()
     display.stop()
