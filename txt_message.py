@@ -6,10 +6,9 @@ from selenium.webdriver.support import expected_conditions as EC
 import os
 import time
 from random import randint
-# from pyvirtualdisplay import Display
+from pyvirtualdisplay import Display
 
 def send_message(message):
-	# Find these values at https://twilio.com/user/account
 	account_sid = "ACd4c3fbbe5af185b06bce7e1032adcd56"
 	auth_token = "4117b759bae2e5d74ea414b6290fe237"
 	client = TwilioRestClient(account_sid, auth_token) 
@@ -17,8 +16,8 @@ def send_message(message):
 
 
 def get_update_message():
-	# display = Display(visible=0, size=(1024, 768))
-	# display.start()
+	display = Display(visible=0, size=(1024, 768))
+	display.start()
 	driver = webdriver.Firefox()
 	driver.get("http://stocktwits.com/flourish")
 	updates = driver.find_elements_by_class_name("messageli")
@@ -28,7 +27,7 @@ def get_update_message():
 		time = m.find_element_by_class_name("message-date")
 		messages_T.append((body.text, time.text))
 	driver.close()
-	# display.stop()
+	display.stop()
 	print "got message"
 	return messages_T
 
