@@ -19,8 +19,8 @@ def send_message(message):
 def get_update_message():
 	display = Display(visible=0, size=(1024, 768))
 	display.start()
-    driver = webdriver.Firefox()
-    driver.set_window_size(1000, 1000)
+	driver = webdriver.Firefox()
+	driver.set_window_size(1000, 1000)
     driver.get("http://stocktwits.com/flourish")
     updates = driver.find_elements_by_class_name("messageli")
     messages_T = []
