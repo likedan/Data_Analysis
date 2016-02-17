@@ -24,12 +24,12 @@ def get_update_message():
 	updates = driver.find_elements_by_class_name("messageli")
 	messages_T = []
 	for m in updates:
-    	body = m.find_element_by_class_name("message-body")
-    	messages_T.append(body.text)
-    driver.close()
-    display.stop()
-    print "got message"
-    return messages_T
+		body = m.find_element_by_class_name("message-body")
+		messages_T.append(body.text)
+	driver.close()
+	display.stop()
+	print "got message"
+	return messages_T
 
 Messages = get_update_message()
 
