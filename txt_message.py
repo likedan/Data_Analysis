@@ -21,8 +21,8 @@ def get_update_message():
 	display.start()
 	driver = webdriver.Firefox()
 	driver.get("http://stocktwits.com/flourish")
-    updates = driver.find_elements_by_class_name("messageli")
-    messages_T = []
+	updates = driver.find_elements_by_class_name("messageli")
+	messages_T = []
     for m in updates:
         body = m.find_element_by_class_name("message-body")
     	messages_T.append(body.text)
