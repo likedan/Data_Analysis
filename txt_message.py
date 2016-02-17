@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import os
 import time
 from random import randint
-from pyvirtualdisplay import Display
+# from pyvirtualdisplay import Display
 
 def send_message(message):
 	# Find these values at https://twilio.com/user/account
@@ -17,21 +17,25 @@ def send_message(message):
 
 
 def get_update_message():
-	display = Display(visible=0, size=(1024, 768))
-	display.start()
+	# display = Display(visible=0, size=(1024, 768))
+	# display.start()
 	driver = webdriver.Firefox()
 	driver.get("http://stocktwits.com/flourish")
 	updates = driver.find_elements_by_class_name("messageli")
 	messages_T = []
 	for m in updates:
 		body = m.find_element_by_class_name("message-body")
-		messages_T.append(body.text)
+		time = m.find_element_by_class_name("message-date")
+		messages_T.append((body.text, time.text))
 	driver.close()
-	display.stop()
+	# display.stop()
 	print "got message"
 	return messages_T
 
-Messages = get_update_message()
+Messages = {}
+temp = get_update_message()
+for m in temp:
+	Messages[m[0]] = m[1]
 
 while True:
 	try:
@@ -39,9 +43,9 @@ while True:
 	    time.sleep(float(num))
 	    new_messages = get_update_message()
 	    for m in new_messages:
-	    	if not m in Messages:
+	    	if not m[0] in Messages:
 	    		print "new message"
-	    		send_message(m)
-	    Messages = new_messages
+	    		Messages[m[0]] = m[1]
+	    		send_message(m[1]+ "  " +m[0])
 	except Exception as e:
    		send_message("server down: " + str(e))
