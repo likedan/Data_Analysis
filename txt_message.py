@@ -48,3 +48,7 @@ while True:
 	    		send_message(m[1]+ "  " +m[0])
 	except Exception as e:
    		send_message("server down: " + str(e))
+   		Messages = {}
+   		temp = get_update_message()
+   		for m in temp:
+   			Messages[m[0]] = m[1]
