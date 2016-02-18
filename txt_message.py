@@ -27,7 +27,7 @@ def get_update_message():
 		body = m.find_element_by_class_name("message-body")
 		time = m.find_element_by_class_name("message-date")
 		messages_T.append((body.text, time.text))
-	driver.close()
+	driver.quit()
 	display.stop()
 	print "got message"
 	return messages_T
