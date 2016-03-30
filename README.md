@@ -1,2 +1,0 @@
-# PythonXueqiu
-Stock analysis application

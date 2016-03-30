@@ -1,4 +1,0 @@
-include *.txt *.md *.xml
-recursive-include docs *.txt *.md
-prune fabfile
-prune tools

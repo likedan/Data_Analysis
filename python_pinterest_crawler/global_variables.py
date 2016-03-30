@@ -1,4 +1,0 @@
-LOGIN_EMAIL = "likedan5@gmail.com"
-LOGIN_PASSWORD = "likedan5"
-
-MAXIMUM_MINE_OBJECT = 100000
