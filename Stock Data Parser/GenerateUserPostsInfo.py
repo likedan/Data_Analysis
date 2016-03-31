@@ -24,7 +24,7 @@ class User:
             indent=4)
 
 posts = []
-with open('dgaz.json', encoding="utf8") as f:
+with open('../data/dgaz.json', encoding="utf8") as f:
     for line in f:
         posts.append(json.loads(line))
 
@@ -51,7 +51,7 @@ for post in posts:
     
     user.originPostID.append(post['id'])
     users[userid] = user
-    if(post['conversation']['replies'] > 30 or post['total_likes'] > 15):
+    if(post['conversation']['replies'] > 1 or post['total_likes'] > 1):
         value[post['id']] = post['body']
 
 for _id, user in users.items():
@@ -64,7 +64,7 @@ for _id, user in users.items():
 
 with open('output_dgaz.json', 'w') as out:
     for user in users.values():
-        if(user.avgReplies > 5 and user.numOfPosts >= 5 and user.avgLikes > 3):
+        if(user.avgReplies > 1 and user.numOfPosts >= 2 and user.avgLikes > 1):
             out.write(user.to_JSON())
             out.write('\n')
 
