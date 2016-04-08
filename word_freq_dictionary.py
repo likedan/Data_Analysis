@@ -21,6 +21,7 @@ for filename in filenames:
 			#stemmed_word = stemmer.stem('word')
 			if (len(word) > 0):
 				if (word[0] != '$'):
+					word = re.sub('www\..+','',word)
 					word = word.translate(translator).lower()
 					word = re.sub(r'\n|\r|\t|[^\x00-\x7F]+','',word)
 					#word = re.sub(r'[^\x00-\x7F]+',' ', word)
