@@ -8,8 +8,7 @@ data = {}
 with open(sys.argv[1]) as data_file:    
     data = json.load(data_file)
     for word in data.keys():
-        lower_case_word = word.lower()
-        words.append(lower_case_word)
+        words.append(word)
     words = set(words)
 
 print "finish loading source file"
@@ -26,15 +25,16 @@ with open(sys.argv[2], "r") as ins:
         	if len(diction) % 100 == 0:
         		print len(diction)
 
-non_exist_words = []
-
-            tup = (array[0], data[array[0]])
-            non_exist_words.append(tup)
-
-non_exist_words.sort(key=lambda tup: tup[1])
-
+non_exist_words = words - set(diction.keys())
+non_exist_words_tup = []
 for w in non_exist_words:
+    tup = (w, data[w])
+    non_exist_words_tup.append(tup)
+
+non_exist_words_tup.sort(key=lambda tup: tup[1])
+
+for w in non_exist_words_tup:
     print w
 
-with open(sys.argv[3], 'w+') as outfile:
-        json.dump(diction, outfile)
+# with open(sys.argv[3], 'w+') as outfile:
+#         json.dump(diction, outfile)
