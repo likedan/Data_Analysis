@@ -2,6 +2,7 @@
 
 import json
 import string
+import re
 #from nltk.stem import PorterStemmer
 
 #stemmer=PorterStemmer()
@@ -20,7 +21,10 @@ for filename in filenames:
 			#stemmed_word = stemmer.stem('word')
 			if (len(word) > 0):
 				if (word[0] != '$'):
-					word = word.translate(translator)
+					word = word.translate(translator).lower()
+					word = re.sub(r'\n|\r|\t|[^\x00-\x7F]+','',word)
+					#word = re.sub(r'[^\x00-\x7F]+',' ', word)
+					word = re.sub('http.+','',word)
 					if (len(word) > 0):
 						if(word not in word_dictionary.keys()):
 							word_dictionary[word] = 0
