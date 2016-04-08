@@ -36,5 +36,5 @@ non_exist_words_tup.sort(key=lambda tup: tup[1])
 for w in non_exist_words_tup:
     print w
 
-# with open(sys.argv[3], 'w+') as outfile:
-#         json.dump(diction, outfile)
+with open(sys.argv[3], 'w+') as outfile:
+        json.dump(diction, outfile)
