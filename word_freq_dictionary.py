@@ -21,15 +21,15 @@ for filename in filenames:
 			if (len(word) > 0):
 				if (word[0] != '$'):
 					word = word.translate(translator)
-					print(word)
-					if(word not in word_dictionary.keys()):
-						word_dictionary[word] = 0
-					word_dictionary[word] = word_dictionary[word]+1
+					if (len(word) > 0):
+						if(word not in word_dictionary.keys()):
+							word_dictionary[word] = 0
+						word_dictionary[word] = word_dictionary[word]+1
 
 
-					if(word not in big_dictionary.keys()):
-						big_dictionary[word] = 0
-					big_dictionary[word] = big_dictionary[word]+1
+						if(word not in big_dictionary.keys()):
+							big_dictionary[word] = 0
+						big_dictionary[word] = big_dictionary[word]+1
 	with open('output_' + filename + '.json', 'w') as fp:
 		json.dump(word_dictionary, fp)
 with open('bigoutput.json', 'w') as fp:
