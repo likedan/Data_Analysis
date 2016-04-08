@@ -15,7 +15,6 @@ print "finish loading source file"
 print words
 print len(words)
 
-
 with open(sys.argv[2], "r") as ins:
     for line in ins:
         line = line[:-1]

@@ -70,7 +70,7 @@ if __name__ == "__main__":
         cluster_to_words  = find_word_clusters(labels_array, cluster_labels)
 
         for c in cluster_to_words:
-            if len(cluster_to_words[c]) > 1 and len(cluster_to_words[c]) < 20:
+            if len(cluster_to_words[c]) > 2 and len(cluster_to_words[c]):
                 print cluster_to_words[c]
                 for word in cluster_to_words[c]:
                     del vectors[word]
