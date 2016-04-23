@@ -25,6 +25,7 @@ doji_arr, doji_index = candleStickScanner.scan_doji(stock_opening, stock_closing
 
 dragon_arr, dragon_index = candleStickScanner.scan_dragonfly_doji(stock_opening, stock_closing, stock_high, stock_low, doji_arr)
 
-positive, negative = resultTester.test_next_one_day_price(stock_opening, stock_closing, dragon_index, True, False)
+# positive, negative = resultTester.test_next_one_day_price(stock_opening, stock_closing, dragon_index, True, False)
+positive, negative = resultTester.test_next_day_closing_price(stock_closing, dragon_index)
 
 drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_doji_test_result, (positive, negative), "Dragon")
