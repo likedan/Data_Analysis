@@ -5,7 +5,7 @@ from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ohlc
 import sys
 
 def download_data_from_file(symbol_file_name = 'AMEX.txt', 
-	date1 = (2011, 1, 1), date2 = datetime.now().timetuple()[:3],
+	date1 = (2000, 1, 1), date2 = datetime.now().timetuple()[:3],
 	**keyword_parameters):
 	symbol_list = []
 	with open(symbol_file_name, 'rb') as symbolFile:
@@ -29,4 +29,4 @@ def download_data_from_file(symbol_file_name = 'AMEX.txt',
 		writer = csv.writer(symbolFile)
 		writer.writerow(symbol_list)
 
-download_data_from_file(symbol_file_name = sys.args[1], date1 = sys.args[2])
+download_data_from_file(symbol_file_name = sys.argv[1])
