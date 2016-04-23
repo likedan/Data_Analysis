@@ -1,7 +1,0 @@
-pymongo==3.0.3
-selenium==2.48.0
-wheel==0.24.0
-
-— to run
-
-python startCrawl.py
