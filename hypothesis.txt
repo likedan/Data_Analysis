@@ -1,0 +1,3 @@
+1. Dragonfly: next day closing price higher than opening price
+
+2. Gravestone: next day opening price higher than today closing price

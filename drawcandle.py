@@ -3,16 +3,20 @@ from matplotlib.dates import DateFormatter, WeekdayLocator,\
     DayLocator, MONDAY
 from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ohlc
 
+#dataType   Index of Doji   [Int]
 def show_doji(quotes, ax, data, name):
 	for index in data:
 		ax.text(quotes[index][0], quotes[index][1], name)
 
+#dataType   Tuple of Doji Array  ([Int],[Int])
 def show_doji_test_result(quotes, ax, data, name):
 	for index in data[0]:
 		ax.text(quotes[index][0], quotes[index][1], name, color='blue')
 	for index in data[1]:
 		ax.text(quotes[index][0], quotes[index][1], name, color='red')
 
+
+# for additional_function   pass in a function above
 def draw_candle_stick(stock_id, start_date, end_date, additional_function, data, name):
 
 	mondays = WeekdayLocator(MONDAY)        # major ticks on the mondays
@@ -41,7 +45,7 @@ def draw_candle_stick(stock_id, start_date, end_date, additional_function, data,
 	ax.xaxis_date()
 	ax.autoscale_view()
 	plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
-
+	plt.title(stock_id)
 	# fig.savefig('picture/img.png')   # save the figure to file
 	# plt.close(fig)
 
