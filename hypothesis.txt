@@ -2,4 +2,4 @@
 
 2. Gravestone: next day opening price higher than today closing price
 
-3. Morning Star: next day opening price higher than today closing price
+3. Morning Star: next day opening price or closing price higher than today closing price

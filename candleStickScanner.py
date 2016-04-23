@@ -75,6 +75,8 @@ def scan_stars(opening, closing, high, low, is_bullish):
 				return False
 			if abs(closing[middle_index + 1] - opening[middle_index + 1]) < average_movement * ratio_factor:
 				return False
+			if abs(closing[middle_index] - opening[middle_index]) > average_movement:
+				return False
 			return True
 
 		if not is_valid_trend():
@@ -85,8 +87,8 @@ def scan_stars(opening, closing, high, low, is_bullish):
 			# no overlap
 			if opening[middle_index + 1] > closing[middle_index] and closing[middle_index - 1] > closing[middle_index]:
 
-				# 3 bars valid direction
-				if opening[middle_index - 1] > closing[middle_index - 1] and opening[middle_index + 1] < closing[middle_index + 1] and opening[middle_index] < closing[middle_index]:
+				# 2 bars valid direction
+				if opening[middle_index - 1] > closing[middle_index - 1] and opening[middle_index + 1] < closing[middle_index + 1]:
 					star_arr.append(1)
 					star_index.append(index)
 				else:
@@ -97,8 +99,8 @@ def scan_stars(opening, closing, high, low, is_bullish):
 			# no overlap
 			if opening[middle_index + 1] < opening[middle_index] and closing[middle_index - 1] < opening[middle_index]:
 
-				# 3 bars valid direction
-				if opening[middle_index - 1] < closing[middle_index - 1] and opening[middle_index + 1] > closing[middle_index + 1] and opening[middle_index] > closing[middle_index]:
+				# 2 bars valid direction
+				if opening[middle_index - 1] < closing[middle_index - 1] and opening[middle_index + 1] > closing[middle_index + 1]:
 					star_arr.append(1)
 					star_index.append(index)
 				else:
