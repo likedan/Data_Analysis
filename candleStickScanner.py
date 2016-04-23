@@ -1,15 +1,4 @@
-from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ohlc
-# (Year, month, day) tuples suffice as args for quotes_historical_yahoo
-date1 = (2016, 1, 1)
-date2 = (2016, 4, 22)
-stock_n = "IBM"
-quotes = quotes_historical_yahoo_ohlc(stock_n, date1, date2)
-#(?,open,high,low,close,vol)
-
-stock_opening = [quotes[i][1] for i in xrange(len(quotes))]
-stock_high = [quotes[i][2] for i in xrange(len(quotes))]
-stock_low = [quotes[i][3] for i in xrange(len(quotes))]
-stock_closing = [quotes[i][4] for i in xrange(len(quotes))]
+from matplotlib.finance import candlestick_ohlc
 
 def scan_doji(opening, closing, high, low):
 	ratio_factor = 0.125
@@ -52,15 +41,3 @@ def scan_gravestone_doji(opening, closing, high, low, doji_arr):
 			else:
 				gravestone_doji_arr[index] = 0
 	return (gravestone_doji_arr, gravestone_doji_index)
-
-
-doji_arr, doji_index = scan_doji(stock_opening, stock_closing, stock_high, stock_low)
-print doji_index
-
-dragonfly_arr, dragonfly_index = scan_gravestone_doji(stock_opening, stock_closing, stock_high, stock_low, doji_arr)
-
-# import drawcandle
-
-import drawcandle
-
-drawcandle.draw_candle_stick(stock_n, date1, date2, drawcandle.show_dragonfly_doji, dragonfly_index)

@@ -9,7 +9,7 @@ def show_doji(quotes, ax, data, name):
 	for index in data:
 		ax.text(quotes[index][0], quotes[index][1], name)
 
-def draw_candle_stick(stock_id, start_date, end_date, additional_function, data):
+def draw_candle_stick(stock_id, start_date, end_date, additional_function, data, name):
 
 	mondays = WeekdayLocator(MONDAY)        # major ticks on the mondays
 	alldays = DayLocator()              # minor ticks on the days
@@ -30,7 +30,7 @@ def draw_candle_stick(stock_id, start_date, end_date, additional_function, data)
 	ax.xaxis.set_major_formatter(weekFormatter)
 
 	if additional_function != None:
-		additional_function(quotes, ax, data)
+		additional_function(quotes, ax, data, name)
 	#plot_day_summary(ax, quotes, ticksize=3)
 	candlestick_ohlc(ax, quotes, width=0.6)
 
