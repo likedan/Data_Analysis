@@ -3,46 +3,46 @@ import helper
 def scan_doji(opening, closing, high, low):
 	ratio_factor = 0.125
 	doji_arr = []
-	middle_index = []
+	doji_index = []
 	if not (len(opening) == len(closing) == len(high) == len(low)):
 		raise Exception('scan_doji input inconsistent length') 
 	for index in xrange(len(opening)):
 		if abs(opening[index] - closing[index]) < abs(high[index] - low[index]) * ratio_factor:
 			doji_arr.append(1)
-			middle_index.append(index)
+			doji_index.append(index)
 		else:
 			doji_arr.append(0)
-	return (doji_arr, middle_index)
+	return (doji_arr, doji_index)
 
 
 def scan_dragonfly_doji(opening, closing, high, low, doji_arr):
 	ratio_factor = 0.2
 	dragonfly_doji_arr = doji_arr
-	dragonfly_middle_index = []
+	dragonfly_doji_index = []
 	if not (len(opening) == len(closing) == len(high) == len(low) == len(doji_arr)):
 		raise Exception('scan_dragonfly_doji input inconsistent length') 
 	for index in xrange(len(doji_arr)):
 		if doji_arr[index] == 1:
 			if closing[index] > abs(high[index] - low[index]) * (1 - ratio_factor) + low[index] and opening[index] > abs(high[index] - low[index]) * (1 - ratio_factor) + low[index]:
-				dragonfly_middle_index.append(index)
+				dragonfly_doji_index.append(index)
 			else:
 				dragonfly_doji_arr[index] = 0
-	return (dragonfly_doji_arr, dragonfly_middle_index)
+	return (dragonfly_doji_arr, dragonfly_doji_index)
 
 
 def scan_gravestone_doji(opening, closing, high, low, doji_arr):
 	ratio_factor = 0.2
 	gravestone_doji_arr = doji_arr
-	gravestone_middle_index = []
+	gravestone_doji_index = []
 	if not (len(opening) == len(closing) == len(high) == len(low) == len(doji_arr)):
 		raise Exception('scan_gravestone_doji input inconsistent length') 
 	for index in xrange(len(doji_arr)):
 		if doji_arr[index] == 1:
 			if closing[index] < abs(high[index] - low[index]) * ratio_factor + low[index] and opening[index] < abs(high[index] - low[index]) * ratio_factor + low[index]:
-				gravestone_middle_index.append(index)
+				gravestone_doji_index.append(index)
 			else:
 				gravestone_doji_arr[index] = 0
-	return (gravestone_doji_arr, gravestone_middle_index)
+	return (gravestone_doji_arr, gravestone_doji_index)
 
 
 def scan_stars(opening, closing, high, low, is_bullish):
@@ -52,7 +52,7 @@ def scan_stars(opening, closing, high, low, is_bullish):
 	star_arr = [0, 0]
 	star_index = []
 	if not (len(opening) == len(closing) == len(high) == len(low)):
-		raise Exception('scan_abandoned_baby input inconsistent length')
+		raise Exception('scan_stars input inconsistent length')
 
 	#index of the 3rd bar 
 	for index in xrange(2, len(opening)):
@@ -110,4 +110,23 @@ def scan_stars(opening, closing, high, low, is_bullish):
 
 	return (star_arr, star_index)
 
-
+def scan_inverted_hammer(opening, closing, high, low):
+	head_ratio = 0.08
+	length_ratio = 0.3
+	hammer_arr = []
+	hammer_index = []
+	if not (len(opening) == len(closing) == len(high) == len(low)):
+		raise Exception('scan_hammer input inconsistent length') 
+		
+	for index in xrange(len(opening)):
+		length = high[index] - low[index]
+		if opening[index] < low[index] + length_ratio * length and closing[index] < low[index] + length_ratio * length:
+			#inverted hammer
+			if opening[index] < low[index] + head_ratio * length or closing[index] < low[index] + head_ratio * length:
+				hammer_arr.append(1)
+				hammer_index.append(index)
+			else:
+				hammer_arr.append(0)
+		else:
+			hammer_arr.append(0)
+	return (hammer_arr, hammer_index)
