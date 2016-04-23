@@ -5,10 +5,11 @@ from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ohlc
 
 
 
-def show_doji(quotes, ax):
-	ax.text(quotes[10][0], quotes[10][1],'Doji')
+def show_doji(quotes, ax, data, name):
+	for index in data:
+		ax.text(quotes[index][0], quotes[index][1], name)
 
-def draw_candle_stick(stock_id, start_date, end_date, additional_function):
+def draw_candle_stick(stock_id, start_date, end_date, additional_function, data):
 
 	mondays = WeekdayLocator(MONDAY)        # major ticks on the mondays
 	alldays = DayLocator()              # minor ticks on the days
@@ -29,7 +30,7 @@ def draw_candle_stick(stock_id, start_date, end_date, additional_function):
 	ax.xaxis.set_major_formatter(weekFormatter)
 
 	if additional_function != None:
-		additional_function(quotes, ax)
+		additional_function(quotes, ax, data)
 	#plot_day_summary(ax, quotes, ticksize=3)
 	candlestick_ohlc(ax, quotes, width=0.6)
 
