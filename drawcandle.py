@@ -3,11 +3,15 @@ from matplotlib.dates import DateFormatter, WeekdayLocator,\
     DayLocator, MONDAY
 from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ohlc
 
-
-
 def show_doji(quotes, ax, data, name):
 	for index in data:
 		ax.text(quotes[index][0], quotes[index][1], name)
+
+def show_doji_test_result(quotes, ax, data, name):
+	for index in data[0]:
+		ax.text(quotes[index][0], quotes[index][1], name, color='blue')
+	for index in data[1]:
+		ax.text(quotes[index][0], quotes[index][1], name, color='red')
 
 def draw_candle_stick(stock_id, start_date, end_date, additional_function, data, name):
 

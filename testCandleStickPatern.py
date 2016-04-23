@@ -9,9 +9,9 @@ import resultTester
 import helper
 
 # (Year, month, day) tuples suffice as args for quotes_historical_yahoo
-date1 = (2015, 1, 1)
+date1 = (2011, 1, 1)
 date2 = (2016, 4, 22)
-stock_n = "AAPL"
+stock_n = "CMG"
 quotes = quotes_historical_yahoo_ohlc(stock_n, date1, date2)
 #(?,open,high,low,close,vol)
 
@@ -24,9 +24,6 @@ doji_arr, doji_index = candleStickScanner.scan_doji(stock_opening, stock_closing
 
 dragonfly_arr, dragonfly_index = candleStickScanner.scan_dragonfly_doji(stock_opening, stock_closing, stock_high, stock_low, doji_arr)
 
-average_movement = helper.get_average_movement(stock_opening, stock_closing)
-print average_movement
+positive, negative = resultTester.test_next_one_day_price(stock_opening, stock_closing, dragonfly_index, True)
 
-print resultTester.test_next_one_day_price(stock_opening, stock_closing, dragonfly_index, average_movement, True)
-
-drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_doji, dragonfly_index, "Dragon")
+drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_doji_test_result, (positive,negative), "Dragon")

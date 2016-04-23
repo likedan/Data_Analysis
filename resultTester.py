@@ -1,10 +1,10 @@
+import helper
 
 #determine in the following day after pattern occur, the price went up or down.   based on next day opening and closing
-def test_next_one_day_price(opening, closing, index_arr, average_movement, is_up):
+def test_next_one_day_price(opening, closing, index_arr, is_up):
 
-	positive = 0
-	negative = 0
-
+	positive = []
+	negative = []
 	if not is_up:
 		#swap
 		opening, closing = closing, opening
@@ -18,9 +18,18 @@ def test_next_one_day_price(opening, closing, index_arr, average_movement, is_up
 			index_arr.remove(max_index)
 
 		for index in index_arr:
+			am_frame = 10
+			start = index - am_frame
+			end = index + am_frame
+			if start < 0:
+				start = 0
+			if end >= len(opening):
+				end = len(opening) - 1
+
+			average_movement = helper.get_average_movement(opening[start:end], closing[start:end])
 			if opening[index + 1] < closing[index + 1] and closing[index + 1] - opening[index + 1] > average_movement:
-				positive += 1
+				positive.append(index)
 			else:
-				negative += 1
+				negative.append(index)
 
 	return [positive, negative]
