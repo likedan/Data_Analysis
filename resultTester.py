@@ -61,6 +61,8 @@ def test_next_day_opening_price(opening, closing, index_arr):
 				positive.append(index)
 			else:
 				negative.append(index)
+	return [positive, negative]
+
 
 #determine in the following day closing price is higher than today closing price.   based on today closing and next day closing
 def test_next_day_closing_price(closing, index_arr):
