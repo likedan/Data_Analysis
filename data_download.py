@@ -2,6 +2,8 @@ import csv
 from datetime import datetime
 from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ohlc
 
+import sys
+
 def download_data_from_file(symbol_file_name = 'AMEX.txt', 
 	date1 = (2011, 1, 1), date2 = datetime.now().timetuple()[:3],
 	**keyword_parameters):
@@ -22,9 +24,9 @@ def download_data_from_file(symbol_file_name = 'AMEX.txt',
 						writer.writerow(quotes)
 					except Exception:
 						print symbol, "write failed"
-	with open(symbol_file_name + '_updated', 'w') as symbolFile:
+
+	with open(symbol_file_name[0:-4] + '_updated.txt', 'w') as symbolFile:
 		writer = csv.writer(symbolFile)
 		writer.writerow(symbol_list)
 
-
-download_data_from_file()
+download_data_from_file(symbol_file_name = sys.args[1], date1 = sys.args[2])
