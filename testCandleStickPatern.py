@@ -27,12 +27,10 @@ dragon_arr, dragon_index = candleStickScanner.scan_dragonfly_doji(stock_opening,
 
 star_arr, star_index = candleStickScanner.scan_stars(stock_opening, stock_closing, stock_high, stock_low, True)
 
-hammer_arr, hammer_index = candleStickScanner.scan_hammer(stock_opening, stock_closing, stock_high, stock_low)
-
-invert_hammer_arr, invert_hammer_index = candleStickScanner.scan_bullish_hammer(stock_opening, stock_closing, stock_high, stock_low, hammer_arr)
+invert_hammer_arr, invert_hammer_index = candleStickScanner.scan_inverted_hammer(stock_opening, stock_closing, stock_high, stock_low)
 # positive, negative = resultTester.test_next_one_day_price(stock_opening, stock_closing, dragon_index, True, False)
 # positive, negative = resultTester.test_next_day_closing_price(stock_closing, dragon_index)
-positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, star_index)
+# positive, negative = resultTester.test_next_day_opening_price(stock_opening, stock_closing, star_index)
 
-drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_test_result, (positive, negative), "Hammer")
-# drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_result, invert_hammer_index, "Hammer")
+# drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_test_result, (positive, negative), "Star")
+drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_result, invert_hammer_index, "IHammer")
