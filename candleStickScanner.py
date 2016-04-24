@@ -140,7 +140,7 @@ def scan_hammer(opening, closing, high, low):
 	return (hammer_arr, hammer_index)
 
 
-def scan_inverted_hammer(opening, closing, high, low, hammer_arr):
+def scan_bullish_hammer(opening, closing, high, low, hammer_arr, is_inverted = None):
 
 	inverted_hammer_arr = hammer_arr
 	inverted_hammer_index = []
@@ -160,11 +160,21 @@ def scan_inverted_hammer(opening, closing, high, low, hammer_arr):
 				continue
 
 			length = high[index] - low[index]
-			if closing[index] < low[index] + 0.5 * length and opening[index] < low[index] + 0.5 * length:
+
+			if is_inverted != None:
+				if is_inverted:
+					if closing[index] < low[index] + 0.5 * length and opening[index] < low[index] + 0.5 * length:
+						inverted_hammer_arr[index] = 1
+						inverted_hammer_index.append(index)
+					else:
+						inverted_hammer_arr[index] = 0
+				else:
+					if closing[index] > low[index] + 0.5 * length and opening[index] > low[index] + 0.5 * length:
+						inverted_hammer_arr[index] = 1
+						inverted_hammer_index.append(index)
+					else:
+						inverted_hammer_arr[index] = 0
+			else:
 				inverted_hammer_arr[index] = 1
 				inverted_hammer_index.append(index)
-			else:
-				inverted_hammer_arr[index] = 0
-
-
 	return (inverted_hammer_arr, inverted_hammer_index)
