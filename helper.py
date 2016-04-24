@@ -26,9 +26,4 @@ def get_data_from_file(symbol):
 		return ans
 
 def get_local_symbol_list(symbol_file_name = 'symbols_updated.txt'):
-	if not os.path.exists(symbol_file_name):
-		raise Exception('Symbol file not exist. You may want to download first')
-	with open(symbol_file_name, 'rb') as symbolList:
-		reader = csv.reader(symbolList)
-		for row in reader:
-			return row
+	return map(lambda x: x[0:-4], os.listdir('historical_data'))
