@@ -35,6 +35,6 @@ bullish_hammer_arr, bullish_hammer_index = candleStickScanner.scan_bullish_hamme
 # positive, negative = resultTester.test_next_day_closing_price(stock_closing, dragon_index)
 positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, bullish_hammer_index)
 
-drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_test_result, (positive, negative), "Hammer")
+drawCandle.draw_candle_stick_with_saved_data(stock_n, 600, drawCandle.show_test_result, (positive, negative), "Hammer")
 # drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_result, hammer_index, "Hammer")
 

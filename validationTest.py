@@ -19,7 +19,7 @@ net_gain_total = []
 
 for s in symbols:
 	try:
-		quotes = helper.get_data_from_file(s)
+		quotes = helper.get_data_from_file(s, latest = 300)
 	except Exception as e:
 		print e
 		continue
@@ -38,8 +38,9 @@ for s in symbols:
 		hammer_arr, hammer_index = candleStickScanner.scan_hammer(stock_opening, stock_closing, stock_high, stock_low)
 		bullish_hammer_arr, bullish_hammer_index = candleStickScanner.scan_bullish_hammer(stock_opening, stock_closing, stock_high, stock_low, hammer_arr)
 		if len(bullish_hammer_index) != 0:
-			positive, negative = resultTester.test_next_day_closing_price(stock_closing, bullish_hammer_index)
+			positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, bullish_hammer_index)
 
+			drawCandle.draw_candle_stick_with_saved_data(s, 300, drawCandle.show_test_result, (positive, negative), "Hammer")
 			positive_total += positive 
 			negative_total += negative
 
@@ -76,16 +77,13 @@ for s in symbols:
 			positive_total += positive 
 			negative_total += negative
 
-	test_net_gain_bullilsh_hammer(net_gain_total)
-	print ('Testing ', s, sum(net_gain_total))
+	# test_net_gain_bullilsh_hammer(net_gain_total)
+	# print ('Testing ', s, sum(net_gain_total))
 
-	# test_bullish_hammer(positive_total, negative_total)
-	# print ('Testing ', s, len(positive_total), len(negative_total))
+	test_bullish_hammer(positive_total, negative_total)
+	print ('Testing ', s, len(positive_total), len(negative_total))
 
-	# drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_test_result, (positive, negative), "Hammer")
-	# drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_result, hammer_index, "Hammer")
-
-print sum(net_gain_total) / len(net_gain_total)
+# print sum(net_gain_total) / len(net_gain_total)
 
 # print len(positive_total)
 # print len(negative_total)
