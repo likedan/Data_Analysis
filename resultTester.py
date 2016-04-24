@@ -42,6 +42,38 @@ def test_next_one_day_price(opening, closing, index_arr, should_up, should_above
 
 	return [positive, negative]
 
+#probability of 4 senario:   based on today closing next day opening
+#following day opening price and closing price both higher than today's closing price.
+#following day opening price and closing price both lower than today's closing price.
+#following day opening price higher than today's closing price.
+#following day closing price both higher than today's closing price.
+def test_next_day_opening_and_closing_price_percentage_test(opening, closing, index_arr):
+
+	category1 = []
+	category2 = []
+	category3 = []
+	category4 = []
+
+	max_index = max(index_arr)
+	if not ((len(opening) == len(closing)) and max_index < len(opening)):
+		raise Exception('test_next_day_opening_price input inconsistent length') 
+	else:
+		#remove last redundant
+		if max_index + 1 == len(opening):
+			index_arr.remove(max_index)
+
+		for index in index_arr:
+			if opening[index + 1] > closing[index] and closing[index + 1] > closing[index]:
+				category1.append(index)
+			elif opening[index + 1] > closing[index]:
+				category2.append(index)
+			elif closing[index + 1] > closing[index]:
+				category3.append(index)
+			else:
+				category4.append(index)
+
+	return [category1, category2, category3, category4]
+
 #determine in the following day opening price or closing price is higher than today's closing price.   based on today closing next day opening
 def test_next_day_opening_and_closing_price(opening, closing, index_arr):
 
