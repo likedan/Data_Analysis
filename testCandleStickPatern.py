@@ -27,7 +27,9 @@ dragon_arr, dragon_index = candleStickScanner.scan_dragonfly_doji(stock_opening,
 
 star_arr, star_index = candleStickScanner.scan_stars(stock_opening, stock_closing, stock_high, stock_low, True)
 
-invert_hammer_arr, invert_hammer_index = candleStickScanner.scan_inverted_hammer(stock_opening, stock_closing, stock_high, stock_low)
+hammer_arr, hammer_index = candleStickScanner.scan_hammer(stock_opening, stock_closing, stock_high, stock_low)
+
+invert_hammer_arr, invert_hammer_index = candleStickScanner.scan_inverted_hammer(stock_opening, stock_closing, stock_high, stock_low, hammer_arr)
 # positive, negative = resultTester.test_next_one_day_price(stock_opening, stock_closing, dragon_index, True, False)
 # positive, negative = resultTester.test_next_day_closing_price(stock_closing, dragon_index)
 # positive, negative = resultTester.test_next_day_opening_price(stock_opening, stock_closing, star_index)

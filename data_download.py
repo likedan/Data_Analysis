@@ -19,7 +19,7 @@ def download_data_from_file(symbol_file_name = 'AMEX.txt',
 			else:
 				symbol_list.append(symbol)
 				with open(''.join(('historical_data/', symbol, '.csv')), 'w') as dataFile:
-					writer = csv.writer(dataFile)
+					writer = csv.writer(dataFile, delimiter='\n')
 					try:
 						writer.writerow(quotes)
 					except Exception:

@@ -110,14 +110,14 @@ def scan_stars(opening, closing, high, low, is_bullish):
 
 	return (star_arr, star_index)
 
-def scan_inverted_hammer(opening, closing, high, low):
-	head_ratio = 0.08
-	length_ratio = 0.3
+def scan_hammer(opening, closing, high, low):
+	head_ratio = 0.125
+	length_ratio = 0.4
 	hammer_arr = []
 	hammer_index = []
 	if not (len(opening) == len(closing) == len(high) == len(low)):
 		raise Exception('scan_hammer input inconsistent length') 
-		
+
 	for index in xrange(len(opening)):
 		length = high[index] - low[index]
 		if opening[index] < low[index] + length_ratio * length and closing[index] < low[index] + length_ratio * length:
@@ -127,6 +127,44 @@ def scan_inverted_hammer(opening, closing, high, low):
 				hammer_index.append(index)
 			else:
 				hammer_arr.append(0)
+		elif opening[index] > low[index] + (1 - length_ratio) * length and closing[index] > low[index] + (1 - length_ratio) * length:
+			#hammer
+			if opening[index] > low[index] + (1 - head_ratio) * length or closing[index] > low[index] + (1 - head_ratio) * length:
+				hammer_arr.append(1)
+				hammer_index.append(index)
+			else:
+				hammer_arr.append(0)
 		else:
 			hammer_arr.append(0)
+
 	return (hammer_arr, hammer_index)
+
+
+def scan_inverted_hammer(opening, closing, high, low, hammer_arr):
+
+	inverted_hammer_arr = hammer_arr
+	inverted_hammer_index = []
+	if not (len(opening) == len(closing) == len(high) == len(low) == len(hammer_arr)):
+		raise Exception('scan_hammer input inconsistent length') 
+	
+		#first unidentifiable
+	inverted_hammer_arr[0] = 0
+	inverted_hammer_arr[1] = 0
+
+
+	for index in xrange(2, len(hammer_arr)):
+		if hammer_arr[index] == 1:
+			#valid downtrend
+			if not (closing[index - 1] < opening[index - 1] and closing[index - 2] < opening[index - 2] and closing[index - 2] > closing[index - 1]):
+				inverted_hammer_arr[index] = 0
+				continue
+
+			length = high[index] - low[index]
+			if closing[index] < low[index] + 0.5 * length and opening[index] < low[index] + 0.5 * length:
+				inverted_hammer_arr[index] = 1
+				inverted_hammer_index.append(index)
+			else:
+				inverted_hammer_arr[index] = 0
+
+
+	return (inverted_hammer_arr, inverted_hammer_index)
