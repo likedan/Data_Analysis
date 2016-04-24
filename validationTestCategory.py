@@ -16,7 +16,7 @@ category_total = []
 
 for s in symbols:
 	try:
-		quotes = helper.get_data_from_file(s, latest = 800)
+		quotes = helper.get_data_from_file(s, latest = 100)
 	except Exception as e:
 		print e
 		continue
@@ -28,12 +28,22 @@ for s in symbols:
 	stock_high = [quotes[i][2] for i in xrange(len(quotes))]
 	stock_low = [quotes[i][3] for i in xrange(len(quotes))]
 	stock_closing = [quotes[i][4] for i in xrange(len(quotes))]
+	stock_vol = [quotes[i][5] for i in xrange(len(quotes))]
 
 	def test_strike(category_total):
 		strike_arr, strike_index = candleStickScanner.scan_three_line_strike(stock_opening, stock_closing, stock_high, stock_low)
 		if len(strike_index) != 0:
 			cat_arr = resultTester.test_next_day_opening_and_closing_price_category_test(stock_opening, stock_closing, strike_index)
 			category_total.append(cat_arr) 
+
+	def test_hlv(category_total):
+		lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
+		lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(lhv_arr)
+
+		if len(lhv_con_index) != 0:
+			cat_arr = resultTester.test_next_day_opening_and_closing_price_category_test(stock_opening, stock_closing, lhv_con_index)
+			category_total.append(cat_arr) 
+
 
 	def test_bullish_harami(category_total):
 		strike_arr, strike_index = candleStickScanner.scan_bullish_harami(stock_opening, stock_closing, stock_high, stock_low)
@@ -55,7 +65,7 @@ for s in symbols:
 		category_total.append(cat_arr) 
 
 
-	test_bullish_harami(category_total)
+	test_hlv(category_total)
 
 	if len(category_total) > 0:
 		np_cat= np.array(category_total)
