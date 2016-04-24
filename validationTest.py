@@ -11,6 +11,8 @@ import drawCandle
 
 symbols = helper.get_local_symbol_list()
 
+positive_total = []
+negative_total = []
 for s in symbols:
 	try:
 		quotes = helper.get_data_from_file(s)
@@ -35,12 +37,15 @@ for s in symbols:
 	# positive, negative = resultTester.test_next_day_closing_price(stock_closing, dragon_index)
 	positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, bullish_hammer_index)
 
-	print positive 
-	print negative
+	positive_total += positive 
+	negative_total += negative
 	# drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_test_result, (positive, negative), "Hammer")
 	# drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_result, hammer_index, "Hammer")
 
 	print('Testing ', s)
 
 
+print len(positive_total)
+print len(negative_total)
 
+print negative_total
