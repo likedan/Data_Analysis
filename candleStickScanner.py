@@ -177,4 +177,5 @@ def scan_bullish_hammer(opening, closing, high, low, hammer_arr, is_inverted = N
 			else:
 				inverted_hammer_arr[index] = 1
 				inverted_hammer_index.append(index)
+				
 	return (inverted_hammer_arr, inverted_hammer_index)
