@@ -17,7 +17,7 @@ negative_total = []
 
 for s in symbols:
 	try:
-		quotes = helper.get_data_from_file(s, latest = 300)
+		quotes = helper.get_data_from_file(s, latest = 200)
 	except Exception as e:
 		print e
 		continue

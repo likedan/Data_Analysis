@@ -16,7 +16,7 @@ net_gain_total = []
 
 for s in symbols:
 	try:
-		quotes = helper.get_data_from_file(s, latest = 30)
+		quotes = helper.get_data_from_file(s, latest = 100)
 	except Exception as e:
 		print e
 		continue
@@ -28,6 +28,7 @@ for s in symbols:
 	stock_high = [quotes[i][2] for i in xrange(len(quotes))]
 	stock_low = [quotes[i][3] for i in xrange(len(quotes))]
 	stock_closing = [quotes[i][4] for i in xrange(len(quotes))]
+	stock_vol = [quotes[i][5] for i in xrange(len(quotes))]
 
 	def bulllish_hammer_test_gain1(net_gain_total):
 		hammer_arr, hammer_index = candleStickScanner.scan_hammer(stock_opening, stock_closing, stock_high, stock_low)
@@ -45,12 +46,28 @@ for s in symbols:
 			net_gain = resultTester.test_gain_1(stock_opening, stock_closing, lhv_con_index)
 			net_gain_total += net_gain
 
+	def lhv_test_gain2(net_gain_total):
+		lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
+		lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(lhv_arr)
+
+		if len(lhv_con_index) != 0:
+			net_gain = resultTester.test_gain_2(stock_opening, stock_closing, stock_high, lhv_con_index)
+			net_gain_total += net_gain
+
+	def lhv_test_gain3(net_gain_total):
+		lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
+		lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(lhv_arr)
+
+		if len(lhv_con_index) != 0:
+			net_gain = resultTester.test_gain_3(stock_opening, stock_closing, lhv_con_index)
+			net_gain_total += net_gain
+
 	def overall_test_gain1(net_gain_total):
 		index_arr = [index for index in xrange(2, len(stock_opening) - 1)]
 		net_gain = resultTester.test_gain_1(stock_opening, stock_closing, index_arr)
 		net_gain_total += net_gain
 
-	overall_test_gain1(net_gain_total)
+	lhv_test_gain1(net_gain_total)
 	print ('Testing ', s, sum(net_gain_total))
 
 
