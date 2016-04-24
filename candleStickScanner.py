@@ -213,3 +213,25 @@ def scan_three_line_strike(opening, closing, high, low):
 			strike_arr.append(0)
 
 	return (strike_arr, strike_index)
+
+
+def scan_bullish_harami(opening, closing, high, low):
+
+	harami_arr = []
+	harami_index = []
+	if not (len(opening) == len(closing) == len(high) == len(low)):
+		raise Exception('scan_hammer input inconsistent length') 
+	
+	#first unidentifiable
+	harami_arr.append(0)
+	harami_arr.append(0)
+	harami_arr.append(0)
+
+	for index in xrange(3, len(opening)):
+		if closing[index - 2] < closing[index - 3] and closing[index - 1] < closing[index - 2] and opening[index] < closing[index] and opening[index - 1] > closing[index - 1] and closing[index] < opening[index - 1] and opening[index] > closing[index - 1] and high[index] < high[index - 1] and low[index] > low[index - 1]:
+			harami_arr.append(1)
+			harami_index.append(index)
+		else:
+			harami_arr.append(0)
+
+	return (harami_arr, harami_index)
