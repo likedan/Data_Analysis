@@ -178,3 +178,38 @@ def scan_bullish_hammer(opening, closing, high, low, hammer_arr, is_inverted = N
 				inverted_hammer_index.append(index)
 
 	return (inverted_hammer_arr, inverted_hammer_index)
+
+def scan_three_line_strike(opening, closing, high, low):
+
+	strike_arr = []
+	strike_index = []
+	if not (len(opening) == len(closing) == len(high) == len(low)):
+		raise Exception('scan_hammer input inconsistent length') 
+	
+	#first unidentifiable
+	for index in xrange(3):
+		strike_arr.append(0)
+
+	for index in xrange(3, len(opening)):
+		#valid downtrend
+		valid_trend = True
+		for prev in xrange(3):
+			if closing[index - 3 + prev] > opening[index - 3 + prev]:
+				valid_trend = False
+
+		for prev in xrange(2):
+			if closing[index - 3 + prev] < closing[index - 2 + prev]:
+				valid_trend = False
+
+		if opening[index] > closing[index - 1]:
+			valid_trend = False
+		if closing[index] < opening[index - 3]:
+			valid_trend = False	
+			
+		if valid_trend:
+			strike_arr.append(1)
+			strike_index.append(index)
+		else:
+			strike_arr.append(0)
+
+	return (strike_arr, strike_index)

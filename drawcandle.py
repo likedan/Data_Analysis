@@ -48,16 +48,7 @@ def draw_candle_stick(stock_id, start_date, end_date, additional_function, data,
 	ax.autoscale_view()
 	plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
 	plt.title(stock_id)
-
-	if not os.path.exists('image_data'):
-		os.makedirs('image_data')
-
-	fig.set_size_inches(27, 10)
-	image_name = stock_id + ".png"
-	fig.savefig(image_name, dpi=300)   # save the figure to file
-	plt.close(fig)
-
-	# plt.show()
+	plt.show()
 
 
 # for additional_function   pass in a function above

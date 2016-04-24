@@ -16,7 +16,7 @@ net_gain_total = []
 
 for s in symbols:
 	try:
-		quotes = helper.get_data_from_file(s, latest = 300)
+		quotes = helper.get_data_from_file(s, latest = 150)
 	except Exception as e:
 		print e
 		continue
@@ -29,7 +29,7 @@ for s in symbols:
 	stock_low = [quotes[i][3] for i in xrange(len(quotes))]
 	stock_closing = [quotes[i][4] for i in xrange(len(quotes))]
 
-	def test_bullilsh_hammer(net_gain_total):
+	def bulllish_hammer_test_gain1(net_gain_total):
 		hammer_arr, hammer_index = candleStickScanner.scan_hammer(stock_opening, stock_closing, stock_high, stock_low)
 		bullish_hammer_arr, bullish_hammer_index = candleStickScanner.scan_bullish_hammer(stock_opening, stock_closing, stock_high, stock_low, hammer_arr)
 		if len(bullish_hammer_index) != 0:
@@ -37,7 +37,12 @@ for s in symbols:
 			net_gain = resultTester.test_gain_1(stock_opening, stock_closing, bullish_hammer_index)
 			net_gain_total += net_gain
 
-	test_bullilsh_hammer(net_gain_total)
+	def overall_test_gain1(net_gain_total):
+		index_arr = [index for index in xrange(2, len(stock_opening) - 1)]
+		net_gain = resultTester.test_gain_1(stock_opening, stock_closing, index_arr)
+		net_gain_total += net_gain
+
+	overall_test_gain1(net_gain_total)
 	print ('Testing ', s, sum(net_gain_total))
 
 

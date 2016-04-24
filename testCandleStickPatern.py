@@ -10,7 +10,7 @@ import helper
 import drawCandle
 
 # (Year, month, day) tuples suffice as args for quotes_historical_yahoo
-date1 = (2014, 1, 1)
+date1 = (2013, 12, 1)
 date2 = (2016, 4, 22)
 stock_n = sys.argv[1]
 quotes = quotes_historical_yahoo_ohlc(stock_n, date1, date2)
@@ -22,19 +22,20 @@ stock_high = [quotes[i][2] for i in xrange(len(quotes))]
 stock_low = [quotes[i][3] for i in xrange(len(quotes))]
 stock_closing = [quotes[i][4] for i in xrange(len(quotes))]
 
-doji_arr, doji_index = candleStickScanner.scan_doji(stock_opening, stock_closing, stock_high, stock_low)
+# doji_arr, doji_index = candleStickScanner.scan_doji(stock_opening, stock_closing, stock_high, stock_low)
 
-dragon_arr, dragon_index = candleStickScanner.scan_dragonfly_doji(stock_opening, stock_closing, stock_high, stock_low, doji_arr)
+# dragon_arr, dragon_index = candleStickScanner.scan_dragonfly_doji(stock_opening, stock_closing, stock_high, stock_low, doji_arr)
 
-star_arr, star_index = candleStickScanner.scan_stars(stock_opening, stock_closing, stock_high, stock_low, True)
+# star_arr, star_index = candleStickScanner.scan_stars(stock_opening, stock_closing, stock_high, stock_low, True)
 
-hammer_arr, hammer_index = candleStickScanner.scan_hammer(stock_opening, stock_closing, stock_high, stock_low)
-bullish_hammer_arr, bullish_hammer_index = candleStickScanner.scan_bullish_hammer(stock_opening, stock_closing, stock_high, stock_low, hammer_arr)
+# hammer_arr, hammer_index = candleStickScanner.scan_hammer(stock_opening, stock_closing, stock_high, stock_low)
+# bullish_hammer_arr, bullish_hammer_index = candleStickScanner.scan_bullish_hammer(stock_opening, stock_closing, stock_high, stock_low, hammer_arr)
 
 # positive, negative = resultTester.test_next_one_day_price(stock_opening, stock_closing, dragon_index, True, False)
 # positive, negative = resultTester.test_next_day_closing_price(stock_closing, dragon_index)
-positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, bullish_hammer_index)
+# positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, bullish_hammer_index)
+strike_arr, strike_index = candleStickScanner.scan_three_line_strike(stock_opening, stock_closing, stock_high, stock_low)
 
-drawCandle.draw_candle_stick_with_saved_data(stock_n, 600, drawCandle.show_test_result, (positive, negative), "Hammer")
-# drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_result, hammer_index, "Hammer")
+# drawCandle.draw_candle_stick_with_saved_data(stock_n, 600, drawCandle.show_result, strike_index, "Strike")
+drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_result, strike_index, "S")
 
