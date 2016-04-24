@@ -5,3 +5,4 @@
 3. Morning Star: next day opening price or closing price higher than today closing price
 
 4. Bearish Hammer: next day opening price or closing price higher than today closing price
+x
