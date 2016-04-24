@@ -11,9 +11,9 @@ def show_result(quotes, ax, data, name):
 #dataType   Tuple of Doji Array  ([Int],[Int])
 def show_test_result(quotes, ax, data, name):
 	for index in data[0]:
-		ax.text(quotes[index][0], quotes[index][1], name, color='blue')
+		ax.text(quotes[index][0], quotes[index][1], name, color='blue', rotation=45)
 	for index in data[1]:
-		ax.text(quotes[index][0], quotes[index][1], name, color='red')
+		ax.text(quotes[index][0], quotes[index][1], name, color='red', rotation=45)
 
 
 # for additional_function   pass in a function above
@@ -46,8 +46,10 @@ def draw_candle_stick(stock_id, start_date, end_date, additional_function, data,
 	ax.autoscale_view()
 	plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
 	plt.title(stock_id)
-	# fig.savefig('img1.png')   # save the figure to file
-	# plt.close(fig)
 
-	plt.show()
+	fig.set_size_inches(27, 10)
+	fig.savefig('img1.png', dpi=300)   # save the figure to file
+	plt.close(fig)
+
+	# plt.show()
 

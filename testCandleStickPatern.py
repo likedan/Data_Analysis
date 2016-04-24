@@ -14,6 +14,7 @@ date1 = (2014, 1, 1)
 date2 = (2016, 4, 22)
 stock_n = sys.argv[1]
 quotes = quotes_historical_yahoo_ohlc(stock_n, date1, date2)
+print len(quotes)
 #(?,open,high,low,close,vol)
 
 stock_opening = [quotes[i][1] for i in xrange(len(quotes))]
@@ -27,10 +28,12 @@ dragon_arr, dragon_index = candleStickScanner.scan_dragonfly_doji(stock_opening,
 
 star_arr, star_index = candleStickScanner.scan_stars(stock_opening, stock_closing, stock_high, stock_low, True)
 
-invert_hammer_arr, invert_hammer_index = candleStickScanner.scan_inverted_hammer(stock_opening, stock_closing, stock_high, stock_low)
+hammer_arr, hammer_index = candleStickScanner.scan_hammer(stock_opening, stock_closing, stock_high, stock_low)
+bullish_hammer_arr, bullish_hammer_index = candleStickScanner.scan_bullish_hammer(stock_opening, stock_closing, stock_high, stock_low, hammer_arr)
+
 # positive, negative = resultTester.test_next_one_day_price(stock_opening, stock_closing, dragon_index, True, False)
 # positive, negative = resultTester.test_next_day_closing_price(stock_closing, dragon_index)
-positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, hammer_index)
+positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, bullish_hammer_index)
 
 drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_test_result, (positive, negative), "Hammer")
 # drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_result, hammer_index, "Hammer")
