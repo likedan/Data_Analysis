@@ -10,16 +10,13 @@ import helper
 import drawCandle
 
 
-
-
-
-
-
-
 symbols = helper.get_local_symbol_list()
 
 positive_total = []
 negative_total = []
+
+net_gain_total = []
+
 for s in symbols:
 	try:
 		quotes = helper.get_data_from_file(s)
@@ -41,10 +38,18 @@ for s in symbols:
 		hammer_arr, hammer_index = candleStickScanner.scan_hammer(stock_opening, stock_closing, stock_high, stock_low)
 		bullish_hammer_arr, bullish_hammer_index = candleStickScanner.scan_bullish_hammer(stock_opening, stock_closing, stock_high, stock_low, hammer_arr)
 		if len(bullish_hammer_index) != 0:
-			positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, bullish_hammer_index)
+			positive, negative = resultTester.test_next_day_closing_price(stock_closing, bullish_hammer_index)
 
 			positive_total += positive 
 			negative_total += negative
+
+	def test_net_gain_bullilsh_hammer(net_gain_total):
+		hammer_arr, hammer_index = candleStickScanner.scan_hammer(stock_opening, stock_closing, stock_high, stock_low)
+		bullish_hammer_arr, bullish_hammer_index = candleStickScanner.scan_bullish_hammer(stock_opening, stock_closing, stock_high, stock_low, hammer_arr)
+		if len(bullish_hammer_index) != 0:
+
+			net_gain = resultTester.test_gain_1(stock_opening, stock_closing, bullish_hammer_index)
+			net_gain_total += net_gain
 
 	def test_star(positive_total, negative_total):
 		star_arr, star_index = candleStickScanner.scan_stars(stock_opening, stock_closing, stock_high, stock_low, True)	
@@ -62,22 +67,27 @@ for s in symbols:
 			positive_total += positive 
 			negative_total += negative
 
-	test_grave(positive_total, negative_total)
-	print ('Testing ', s, len(positive_total), len(negative_total))
+	def test_dragonfly(positive_total, negative_total):
+		doji_arr, doji_index = candleStickScanner.scan_doji(stock_opening, stock_closing, stock_high, stock_low)
+		dragonfly_arr, dragonfly_index = candleStickScanner.scan_dragonfly_doji(stock_opening, stock_closing, stock_high, stock_low, doji_arr)
+		if len(dragonfly_index) != 0:
+			positive, negative = resultTester.test_next_day_closing_price(stock_closing, dragonfly_index)
 
-	# hammer_arr, hammer_index = candleStickScanner.scan_hammer(stock_opening, stock_closing, stock_high, stock_low)
-	# bullish_hammer_arr, bullish_hammer_index = candleStickScanner.scan_bullish_hammer(stock_opening, stock_closing, stock_high, stock_low, hammer_arr)
-	# # positive, negative = resultTester.test_next_one_day_price(stock_opening, stock_closing, dragon_index, True, False)
-	# # positive, negative = resultTester.test_next_day_closing_price(stock_closing, dragon_index)
-	# if len(bullish_hammer_index) != 0:
-	# 	positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, bullish_hammer_index)
+			positive_total += positive 
+			negative_total += negative
 
-	# 	positive_total += positive 
-	# 	negative_total += negative
+	test_net_gain_bullilsh_hammer(net_gain_total)
+	print ('Testing ', s, sum(net_gain_total))
+
+	# test_bullish_hammer(positive_total, negative_total)
+	# print ('Testing ', s, len(positive_total), len(negative_total))
+
 	# drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_test_result, (positive, negative), "Hammer")
 	# drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_result, hammer_index, "Hammer")
 
-print len(positive_total)
-print len(negative_total)
+print sum(net_gain_total) / len(net_gain_total)
+
+# print len(positive_total)
+# print len(negative_total)
 
 # print negative_total

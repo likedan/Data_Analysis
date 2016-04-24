@@ -107,5 +107,23 @@ def test_next_day_closing_price(closing, index_arr):
 
 	return [positive, negative]
 
+#determine in the gain of following operation, sell at opeining if opening is higher, else sell at closing
+def test_gain_1(opening, closing, index_arr):
 
+	net_gains = []
+
+	max_index = max(index_arr)
+	if not ((len(opening) == len(closing)) and max_index < len(opening)):
+		raise Exception('test_next_day_opening_price input inconsistent length') 
+	else:
+		#remove last redundant
+		if max_index + 1 == len(opening):
+			index_arr.remove(max_index)
+
+		for index in index_arr:
+			if opening[index + 1] > closing[index]:
+				net_gains.append((opening[index + 1] - closing[index]) / closing[index])
+			else:
+				net_gains.append((closing[index + 1] - closing[index]) / closing[index])
+	return net_gains
 

@@ -4,4 +4,4 @@
 
 3. Morning Star: next day opening price or closing price higher than today closing price   result 98130, 50896  65.84%
 
-4. Bearish Hammer: next day opening price or closing price higher than today closing price  result 255070,121881  67.67%
+4. Bearish Hammer: next day opening price or closing price higher than today closing price  both  result 255070,121881  67.67%
