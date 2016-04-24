@@ -151,7 +151,6 @@ def scan_bullish_hammer(opening, closing, high, low, hammer_arr, is_inverted = N
 	inverted_hammer_arr[0] = 0
 	inverted_hammer_arr[1] = 0
 
-
 	for index in xrange(2, len(hammer_arr)):
 		if hammer_arr[index] == 1:
 			#valid downtrend
@@ -177,5 +176,5 @@ def scan_bullish_hammer(opening, closing, high, low, hammer_arr, is_inverted = N
 			else:
 				inverted_hammer_arr[index] = 1
 				inverted_hammer_index.append(index)
-				
+
 	return (inverted_hammer_arr, inverted_hammer_index)
