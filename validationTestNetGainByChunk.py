@@ -16,19 +16,19 @@ net_gain_total = [[] for x in xrange(9)]
 
 for s in symbols:
 	try:
-		quotes = helper.get_data_from_file(s, latest = 1000)
+		quotes = helper.get_data_from_file(s, latest = 2000)
 	except Exception as e:
 		print e
 		continue
 
-	if len(quotes) < 1000:
+	if len(quotes) < 2000:
 		continue
 
 	partitions = []
 
 	for i in xrange(9):
 		print i
-		partitions.append(quotes[i*100:(i+2)*100])
+		partitions.append(quotes[i*200:(i+2)*200])
 
 	for i in xrange(9):
 		stock_opening = [partitions[i][j][1] for j in xrange(len(partitions[i]))]
@@ -74,7 +74,7 @@ for s in symbols:
 			net_gain = resultTester.test_gain_1(stock_opening, stock_closing, index_arr)
 			net_gain_total[i] += net_gain
 
-		lhv_test_gain1(net_gain_total)
+		overall_test_gain1(net_gain_total)
 
 		print ('Testing ', s, sum(net_gain_total[i]))
 
