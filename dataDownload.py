@@ -35,29 +35,6 @@ def download_data_from_file(symbol_file_name = 'symbols.txt',
 		writer.writerow(symbol_list)
 
 
-def get_data_from_file(symbol):
-	filename = os.path.join('historical_data', symbol + '.csv')
-	if not os.path.exists(filename):
-		raise Exception('Symbol file not exist')
-		return
-
-	with open(filename, 'rb') as quoteFile:
-		ans = []
-		reader = csv.reader(quoteFile, delimiter=',', quotechar='\n')
-		for row in reader:
-			ans.append(tuple(map(float, row)))
-		return ans
-
-def get_local_symbol_list(symbol_file_name = 'symbols_updated.txt'):
-	if not os.path.exists(symbol_file_name):
-		raise Exception('Symbol file not exist. You may want to download first')
-	with open(symbol_file_name, 'rb') as symbolList:
-		reader = csv.reader(symbolList)
-		for row in reader:
-			return row
-
-
-
-#download_data_from_file()
+download_data_from_file()
 #print(get_data_from_file("AAPL"))
 #print(get_local_symbol_list())
