@@ -4,7 +4,7 @@ from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ohlc
 import sys, os
 
 def download_data_from_file(symbol_file_name = 'NASDAQ.txt', 
-	date1 = (2011, 1, 1), date2 = datetime.now().timetuple()[:3],
+	date1 = (2000, 1, 1), date2 = datetime.now().timetuple()[:3],
 	**keyword_parameters):
 	symbol_list = []
 	if not os.path.exists('historical_data'):
@@ -20,16 +20,18 @@ def download_data_from_file(symbol_file_name = 'NASDAQ.txt',
 			else:
 				symbol_list.append(symbol)
 				with open(''.join(('historical_data/', symbol, '.csv')), 'w') as dataFile:
-					writer = csv.writer(dataFile)
+					writer = csv.writer(dataFile, delimiter='\n')
 					try:
 						for row in quotes:
 							writer.writerow(row)
 					except Exception:
 						print symbol, "write failed"
+
 	with open(symbol_file_name[0:-4] + '_updated.txt', 'w') as symbolFile:
 		writer = csv.writer(symbolFile)
 		writer.writerow(symbol_list)
 
+<<<<<<< HEAD:dataDownload.py
 def get_data_from_file(symbol):
 	filename = ''.join(('historical_data/', symbol, '.csv'))
 	if not os.path.exists(filename):
