@@ -37,8 +37,8 @@ stock_vol = [quotes[i][5] for i in xrange(len(quotes))]
 # positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, bullish_hammer_index)
 # strike_arr, strike_index = candleStickScanner.scan_bullish_harami(stock_opening, stock_closing, stock_high, stock_low)
 lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
-lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(lhv_arr)
-positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, lhv_index)
+lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(stock_opening, stock_closing, lhv_arr)
+positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, lhv_con_index)
 
 drawCandle.draw_candle_stick_with_saved_data(stock_n, 581, drawCandle.show_test_result, (positive, negative), "L")
 # drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_result, lhv_index, "L")

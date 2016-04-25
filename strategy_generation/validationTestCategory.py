@@ -45,7 +45,7 @@ for s in symbols:
 
 	def test_hlv_con(category_total):
 		lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
-		lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(lhv_arr)
+		lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(stock_opening, stock_closing, lhv_arr)
 
 		if len(lhv_con_index) != 0:
 			cat_arr = resultTester.test_next_day_opening_and_closing_price_category_test(stock_opening, stock_closing, lhv_con_index)

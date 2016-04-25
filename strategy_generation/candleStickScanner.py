@@ -260,7 +260,7 @@ def scan_low_with_huge_vol(opening, closing, high, low, vol):
 
 	return (lhw_arr, lhw_index)
 
-def scan_low_with_huge_vol_consecutive(lhw_arr):
+def scan_low_with_huge_vol_consecutive(opening, closing, lhw_arr, separate_by_price_moving_range = False):
 	lhw_index = []
 	for index in reversed(xrange(1, len(lhw_arr))):
 		if lhw_arr[index] == 1 and lhw_arr[index - 1] == 1:
@@ -271,6 +271,25 @@ def scan_low_with_huge_vol_consecutive(lhw_arr):
 				remove -= 1
 		else:
 			lhw_arr[index] = 0
+
+	if separate_by_price_moving_range:
+		temp_lhw_index = []
+
+		for index in lhw_index:
+
+			am_frame = 10
+			start = index - am_frame
+			if start < 0:
+				start = 0
+
+			average_movement = helper.get_average_movement(opening[start: index], closing[start: index])
+			if abs(closing[index] - opening[index]) < average_movement:
+				#wrong
+				lhw_arr[index] = 0
+			else:
+				temp_lhw_index.append(index)
+
+		lhw_index = temp_lhw_index
 
 	return (lhw_arr, lhw_index)
 

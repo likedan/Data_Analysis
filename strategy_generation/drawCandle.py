@@ -15,7 +15,7 @@ def show_test_result(quotes, ax, data, name):
 	for index in data[0]:
 		ax.text(quotes[index][0], quotes[index][1], name, color='blue')
 	for index in data[1]:
-		ax.text(quotes[index][0], quotes[index][1], name, color='red')
+		ax.text(quotes[index][0], quotes[index][1], name, color='green')
 
 
 # for additional_function   pass in a function above
