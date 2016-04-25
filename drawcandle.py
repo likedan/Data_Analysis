@@ -13,9 +13,9 @@ def show_result(quotes, ax, data, name):
 #dataType   Tuple of Doji Array  ([Int],[Int])
 def show_test_result(quotes, ax, data, name):
 	for index in data[0]:
-		ax.text(quotes[index][0], quotes[index][1], name, color='blue', rotation=45)
+		ax.text(quotes[index][0], quotes[index][1], name, color='blue')
 	for index in data[1]:
-		ax.text(quotes[index][0], quotes[index][1], name, color='red', rotation=45)
+		ax.text(quotes[index][0], quotes[index][1], name, color='red')
 
 
 # for additional_function   pass in a function above

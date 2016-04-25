@@ -29,6 +29,19 @@ for s in symbols:
 	stock_high = [quotes[i][2] for i in xrange(len(quotes))]
 	stock_low = [quotes[i][3] for i in xrange(len(quotes))]
 	stock_closing = [quotes[i][4] for i in xrange(len(quotes))]
+	stock_vol = [quotes[i][5] for i in xrange(len(quotes))]
+
+
+	def test_hlv(positive_total, negative_total):
+		lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
+		lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(lhv_arr)
+
+		if len(lhv_con_index) != 0:
+			positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, lhv_con_index)
+			positive_total += positive 
+			negative_total += negative
+			drawCandle.draw_candle_stick_with_saved_data(s, 581, drawCandle.show_test_result, (positive, negative), "L")
+
 
 	def test_bullish_hammer(positive_total, negative_total):
 
@@ -80,7 +93,7 @@ for s in symbols:
 			positive_total += positive 
 			negative_total += negative
 
-	test_bullish_hammer_low_reach(positive_total, negative_total)
+	test_hlv(positive_total, negative_total)
 	print ('Testing ', s, len(positive_total), len(negative_total))
 
 

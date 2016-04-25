@@ -42,8 +42,8 @@ for s in symbols:
 		lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
 		lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(lhv_arr)
 
-		if len(lhv_con_index) != 0:
-			net_gain = resultTester.test_gain_1(stock_opening, stock_closing, lhv_con_index)
+		if len(lhv_index) != 0:
+			net_gain = resultTester.test_gain_1(stock_opening, stock_closing, lhv_index)
 			net_gain_total += net_gain
 
 	def lhv_test_gain2(net_gain_total):
@@ -67,7 +67,7 @@ for s in symbols:
 		net_gain = resultTester.test_gain_1(stock_opening, stock_closing, index_arr)
 		net_gain_total += net_gain
 
-	bulllish_hammer_test_gain1(net_gain_total)
+	lhv_test_gain1(net_gain_total)
 	print ('Testing ', s, sum(net_gain_total))
 
 
