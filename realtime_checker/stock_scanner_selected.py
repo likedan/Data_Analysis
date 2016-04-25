@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import candleStickScanner
 import dataDownload
 import threading
+import time
 
 symbols = helper.get_selected_symbol_list()
 history_length = 50
@@ -40,3 +41,5 @@ while True:
 
 		if lhv_con_arr[-1] == 1:
 			drawCandle.draw_candle_stick_with_today(s, date1, date2, quotes, additional_function=drawCandle.show_result, data=lhv_con_index, name="L")
+
+		time.sleep(5)
