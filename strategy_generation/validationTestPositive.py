@@ -42,7 +42,7 @@ for s in symbols:
 			positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, lhv_con_index)
 			positive_total += positive 
 			negative_total += negative
-			if len(negative) > 2:
+			if len(negative) >= 1 and len(positive) >= 3:
 				drawCandle.draw_candle_stick_with_saved_data(s, date_length, drawCandle.show_test_result, (positive, negative), "L")
 
 

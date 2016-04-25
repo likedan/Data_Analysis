@@ -10,8 +10,8 @@ import helper
 import drawCandle
 
 # (Year, month, day) tuples suffice as args for quotes_historical_yahoo
-date1 = (2014, 1, 1)
-date2 = (2016, 4, 22)
+date1 = (2016, 1, 1)
+date2 = (2016, 4, 26)
 stock_n = sys.argv[1]
 quotes = quotes_historical_yahoo_ohlc(stock_n, date1, date2)
 print len(quotes)
@@ -38,8 +38,12 @@ stock_vol = [quotes[i][5] for i in xrange(len(quotes))]
 # strike_arr, strike_index = candleStickScanner.scan_bullish_harami(stock_opening, stock_closing, stock_high, stock_low)
 lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
 lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(stock_opening, stock_closing, lhv_arr)
-positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, lhv_con_index)
+if len(lhv_con_index) > 0:
+	positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, lhv_con_index)
 
-drawCandle.draw_candle_stick_with_saved_data(stock_n, 581, drawCandle.show_test_result, (positive, negative), "L")
-# drawCandle.draw_candle_stick(stock_n, date1, date2, drawCandle.show_result, lhv_index, "L")
+	# drawCandle.draw_candle_stick_with_saved_data(stock_n, len(quotes), drawCandle.show_test_result, (positive, negative), "L")
+	drawCandle.draw_candle_stick(stock_n, date1, date2, additional_function=drawCandle.show_result, data=lhv_index, name="L")
+else:
+	drawCandle.draw_candle_stick(stock_n, date1, date2)
+
 

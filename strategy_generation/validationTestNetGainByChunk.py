@@ -27,7 +27,6 @@ for s in symbols:
 	partitions = []
 
 	for i in xrange(9):
-		print i
 		partitions.append(quotes[i*200:(i+2)*200])
 
 	for i in xrange(9):
@@ -77,6 +76,8 @@ for s in symbols:
 		lhv_test_gain1(net_gain_total)
 
 		print ('Testing ', s, sum(net_gain_total[i]))
+
+	print "Separator: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
 
 for i in xrange(9):
 	print sum(net_gain_total[i]) / len(net_gain_total[i])
