@@ -40,7 +40,7 @@ for s in symbols:
 			positive, negative = resultTester.test_next_day_opening_and_closing_price(stock_opening, stock_closing, lhv_con_index)
 			positive_total += positive 
 			negative_total += negative
-			drawCandle.draw_candle_stick_with_saved_data(s, 581, drawCandle.show_test_result, (positive, negative), "L")
+			drawCandle.draw_candle_stick_with_saved_data(s, 200, drawCandle.show_test_result, (positive, negative), "L")
 
 
 	def test_bullish_hammer(positive_total, negative_total):
