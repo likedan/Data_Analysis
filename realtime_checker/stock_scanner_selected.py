@@ -5,14 +5,12 @@ from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ohlc
 from datetime import datetime, timedelta
 import candleStickScanner
 import dataDownload
+import threading
 
+symbols = helper.get_selected_symbol_list()
 history_length = 50
 date1 = (datetime.now() - timedelta(days=history_length, hours=0)).timetuple()[:3]
 date2 = datetime.now().timetuple()[:3]
-
-dataDownload.download_data_from_file(date1=date1,date2=date2)
-
-symbols = helper.get_local_symbol_list()
 
 while True:
 	for s in symbols:
@@ -23,7 +21,7 @@ while True:
 			if datetime.now().weekday() == 1:
 				#is monday
 				quote_with_date = ((quotes[-1][0] + 3), stock_opening, stock_high, stock_low, stock_closing, stock_vol)
-			print quote_with_date
+			print str(quote_with_date)
 			quotes.append(quote_with_date)
 
 
