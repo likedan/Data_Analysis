@@ -30,7 +30,7 @@ def scan_stocks(date1, date2, symbols, thread_num):
 				if datetime.now().weekday() == 1:
 					#is monday
 					quote_with_date = ((quotes[-1][0] + 3), stock_opening, stock_high, stock_low, stock_closing, stock_vol)
-				print "Thread"+thread_num + ":   " + str(quote_with_date)
+				print "Thread"+thread_num + ":   " + s
 				quotes.append(quote_with_date)
 
 
@@ -45,7 +45,7 @@ def scan_stocks(date1, date2, symbols, thread_num):
 			stock_vol = [quotes[i][5] for i in xrange(len(quotes))]
 
 			lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
-			lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(stock_opening, stock_closing, lhv_arr)
+			lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(stock_opening, stock_closing, lhv_arr, separate_by_price_moving_range=True)
 
 			if lhv_con_arr[-1] == 1:
 				drawCandle.draw_candle_stick_with_today(s, date1, date2, quotes, additional_function=drawCandle.show_result, data=lhv_con_index, name="L")
