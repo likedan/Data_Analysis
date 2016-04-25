@@ -48,14 +48,12 @@ def draw_one_day_candle_stick(stock_id = "AAPL", name = "", additional_function 
 
 
 # for additional_function   pass in a function above
-def draw_candle_stick_with_today(stock_id, start_date, end_date, additional_function = None, data = None, name = ""):
+def draw_candle_stick_with_today(stock_id, start_date, end_date, quotes, additional_function = None, data = None, name = ""):
 
 	mondays = WeekdayLocator(MONDAY)        # major ticks on the mondays
 	alldays = DayLocator()              # minor ticks on the days
 	weekFormatter = DateFormatter('%b %d')  # e.g., Jan 12
 	dayFormatter = DateFormatter('%d')      # e.g., 12
-
-	quotes = quotes_historical_yahoo_ohlc(stock_id, start_date, end_date)
 
 	#(?,open,high,low,close,vol)
 
@@ -70,7 +68,6 @@ def draw_candle_stick_with_today(stock_id, start_date, end_date, additional_func
 
 	if additional_function != None:
 		additional_function(quotes, ax, data, name)
-	#plot_day_summary(ax, quotes, ticksize=3)
 	candlestick_ohlc(ax, quotes, width=0.6)
 
 	ax.xaxis_date()
@@ -80,6 +77,8 @@ def draw_candle_stick_with_today(stock_id, start_date, end_date, additional_func
 
 	if not os.path.exists('image_data'):
 		os.makedirs('image_data')
+
+	print "hhhhhhhhhhhhhhhhhhhh"
 
 	fig.set_size_inches(20, 8)
 	image_name = stock_id + ".png"

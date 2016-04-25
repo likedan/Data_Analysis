@@ -7,16 +7,8 @@ from string import Template
 import requests
 import sys, os
 
-def get_local_symbol_list(symbol_file_name = 'symbols.txt'):
-
-    if not os.path.exists(symbol_file_name):
-        raise Exception('Symbol file not exist')
-
-    with open(symbol_file_name, "r") as ins:
-        symbol_array = []
-        for line in ins:
-            symbol_array.append(line.split("\t")[0])
-        return symbol_array
+def get_local_symbol_list(symbol_file_name = 'symbols_updated.txt'):
+    return map(lambda x: x[0:-4], os.listdir('historical_data'))
 
 def get_today_quote(symbol='GOOG'):
     api = Template('http://chartapi.finance.yahoo.com/instrument/1.0/$symbol/chartdata;type=quote;range=1d/csv')

@@ -34,6 +34,5 @@ def download_data_from_file(symbol_file_name = 'symbols.txt',
 		writer = csv.writer(symbolFile)
 		writer.writerow(symbol_list)
 
-download_data_from_file()
 #print(get_data_from_file("AAPL"))
 #print(get_local_symbol_list())
