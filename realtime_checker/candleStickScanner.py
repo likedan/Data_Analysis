@@ -25,9 +25,13 @@ def scan_low_with_huge_vol(opening, closing, high, low, vol):
 
 def scan_low_with_huge_vol_consecutive(opening, closing, lhw_arr, separate_by_price_moving_range = False):
 	lhw_index = []
-	for index in xrange(1, len(lhw_arr)):
+	for index in reversed(xrange(1, len(lhw_arr))):
 		if lhw_arr[index] == 1 and lhw_arr[index - 1] == 1:
 			lhw_index.append(index)
+			remove = index - 1
+			while lhw_arr[remove] == 1 and remove >= 0:
+				lhw_arr[remove] = 0
+				remove -= 1
 		else:
 			lhw_arr[index] = 0
 

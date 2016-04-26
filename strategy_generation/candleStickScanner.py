@@ -267,8 +267,8 @@ def scan_low_with_huge_vol_consecutive(opening, closing, lhw_arr, separate_by_pr
 			lhw_index.append(index)
 			remove = index - 1
 			while lhw_arr[remove] == 1 and remove >= 0:
-				lhw_arr[remove] = 0
 				remove -= 1
+			lhw_arr[remove + 1] = 0
 		else:
 			lhw_arr[index] = 0
 
