@@ -7,7 +7,7 @@ def scan_low_with_huge_vol(opening, closing, high, low, vol):
 	if not (len(opening) == len(closing) == len(high) == len(low) == len(vol)):
 		raise Exception('scan_hammer input inconsistent length') 
 
-	trace_index = 25	
+	trace_index = 15	
 	#first unidentifiable
 	for index in xrange(trace_index):
 		lhw_arr.append(0)
