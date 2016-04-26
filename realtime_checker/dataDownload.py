@@ -22,7 +22,7 @@ def download_data_from_file(symbol_file_name = 'symbols.txt',
 				print symbol, "get failed"
 			else:
 				symbol_list.append(symbol)
-				with open(filename, 'w') as dataFile:
+				with open(filename, 'w+') as dataFile:
 					writer = csv.writer(dataFile)
 					try:
 						for row in quotes:

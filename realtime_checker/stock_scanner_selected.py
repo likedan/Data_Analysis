@@ -19,7 +19,7 @@ while True:
 			quotes = helper.get_data_from_file(s)
 			stock_opening, stock_high, stock_low, stock_closing, stock_vol = helper.get_today_total(symbol=s)
 			quote_with_date = ((quotes[-1][0] + 1), stock_opening, stock_high, stock_low, stock_closing, stock_vol)
-			if datetime.now().weekday() == 1:
+			if datetime.now().weekday() == 0:
 				#is monday
 				quote_with_date = ((quotes[-1][0] + 3), stock_opening, stock_high, stock_low, stock_closing, stock_vol)
 			print str(quote_with_date)
