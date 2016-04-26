@@ -252,7 +252,7 @@ def scan_low_with_huge_vol(opening, closing, high, low, vol):
 	vol_ratio = 1.5
 	for index in xrange(trace_index, len(opening)):
 		#new low with big vol
-		if min(low[index - trace_index: index]) >= low[index] and min(closing[index - trace_index: index]) >= closing[index] and vol[index] > vol_ratio * sum(vol[index - trace_index: index - 1]) / trace_index and closing[index] < opening[index]:
+		if min(low[index - trace_index: index]) >= low[index] and min(closing[index - trace_index: index]) >= closing[index] and vol[index] > vol_ratio * sum(vol[index - trace_index: index - 1]) / trace_index and closing[index] < opening[index]:# and sum(vol[index - trace_index: index - 1]) / trace_index > 200000:
 			lhw_arr.append(1)
 			lhw_index.append(index)
 		else:

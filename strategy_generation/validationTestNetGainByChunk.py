@@ -46,7 +46,7 @@ for s in symbols:
 
 		def lhv_test_gain1(net_gain_total):
 			lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
-			lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(stock_opening, stock_closing,lhv_arr)
+			lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(stock_opening, stock_closing, lhv_arr, separate_by_price_moving_range = True)
 
 			if len(lhv_con_index) != 0:
 				net_gain = resultTester.test_gain_1(stock_opening, stock_closing, lhv_con_index)
@@ -60,12 +60,12 @@ for s in symbols:
 				net_gain = resultTester.test_gain_2(stock_opening, stock_closing, stock_high, lhv_con_index)
 				net_gain_total[i] += net_gain
 
-		def lhv_test_gain3(net_gain_total):
+		def lhv_test_gain4(net_gain_total):
 			lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
-			lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(lhv_arr)
+			lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(stock_opening, stock_closing, lhv_arr, separate_by_price_moving_range = True)
 
 			if len(lhv_con_index) != 0:
-				net_gain = resultTester.test_gain_3(stock_opening, stock_closing, lhv_con_index)
+				net_gain = resultTester.test_gain_4(stock_opening, stock_closing, lhv_con_index)
 				net_gain_total[i] += net_gain
 
 		def overall_test_gain1(net_gain_total):
@@ -73,7 +73,7 @@ for s in symbols:
 			net_gain = resultTester.test_gain_1(stock_opening, stock_closing, index_arr)
 			net_gain_total[i] += net_gain
 
-		lhv_test_gain1(net_gain_total)
+		lhv_test_gain4(net_gain_total)
 
 		print ('Testing ', s, sum(net_gain_total[i]))
 
