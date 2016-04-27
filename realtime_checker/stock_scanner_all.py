@@ -13,7 +13,7 @@ date2 = datetime.now().timetuple()[:3]
 
 symbols = helper.get_local_symbol_list()
 
-for s in symbols:
+for s in reversed(symbols):
 	try:
 		quotes = helper.get_data_from_file(s)
 		stock_opening, stock_high, stock_low, stock_closing, stock_vol = helper.get_today_total(symbol=s)
