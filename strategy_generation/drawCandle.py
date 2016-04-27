@@ -1,7 +1,9 @@
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter, WeekdayLocator,\
     DayLocator, MONDAY
-from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ohlc
+from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ohlc, volume_overlay3
+import matplotlib
 import helper
 import os
 
@@ -46,6 +48,15 @@ def draw_candle_stick(stock_id, start_date, end_date, additional_function = None
 
 	ax.xaxis_date()
 	ax.autoscale_view()
+
+	ax_vol = ax.twinx()
+	volume_overlay3(ax_vol, quotes)
+	ax_vol.relim()
+	ax_vol.autoscale_view(scaley= True)
+	ax_vol.set_xlim(quotes[0][0], quotes[-1][0])
+
+
+
 	plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
 	plt.title(stock_id)
 	plt.show()
@@ -79,8 +90,19 @@ def draw_candle_stick_with_saved_data(stock_id, latest, additional_function = No
 
 	ax.xaxis_date()
 	ax.autoscale_view()
+
+
 	plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
 	plt.title(stock_id)
+
+	ax_vol = ax.twinx()
+	ax_vol.set_position(matplotlib.transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
+	ax_vol.bar(quotes[0], quotes[-1], color='g', width = 1, align="center")
+	yticks = ax_vol.get_yticks()
+	ax_vol.set_yticks(yticks[::3])
+
+
+
 
 	if not os.path.exists('image_data'):
 		os.makedirs('image_data')
