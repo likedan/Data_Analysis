@@ -30,7 +30,7 @@ def download_data_from_file(symbol_file_name = 'symbols.txt',
 					except Exception:
 						print symbol, "write failed"
 
-	with open(symbol_file_name[0:-4] + '_updated.txt', 'w') as symbolFile:
+	with open(symbol_file_name[0:-4] + '_updated.txt', 'w+') as symbolFile:
 		writer = csv.writer(symbolFile)
 		writer.writerow(symbol_list)
 

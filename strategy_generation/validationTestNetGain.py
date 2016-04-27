@@ -90,3 +90,6 @@ for s in symbols:
 print sum(net_gain_total) / len(net_gain_total)
 
 print len(net_gain_total)
+plt.hist(net_gain_total)
+plt.yscale('log', nonposy='clip')
+plt.show()

@@ -1,7 +1,7 @@
 import csv
-from datetime import datetime
 from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ohlc
 import sys, os
+from datetime import datetime, timedelta
 
 def download_data_from_file(symbol_file_name = 'symbols.txt', 
 	date1 = (2000, 1, 1), date2 = datetime.now().timetuple()[:3],
@@ -12,10 +12,10 @@ def download_data_from_file(symbol_file_name = 'symbols.txt',
 	with open(symbol_file_name, 'rb') as symbolFile:
 		reader = csv.reader(symbolFile, delimiter='\t')
 		for row in reader:
+
 			symbol = row[0]
 			filename = os.path.join('historical_data', symbol + '.csv')
-			if os.path.exists(filename):
-				continue
+
 			try:
 				quotes = quotes_historical_yahoo_ohlc(symbol, date1, date2)
 			except Exception:
@@ -30,9 +30,15 @@ def download_data_from_file(symbol_file_name = 'symbols.txt',
 					except Exception:
 						print symbol, "write failed"
 
-	with open(symbol_file_name[0:-4] + '_updated.txt', 'w') as symbolFile:
+	with open(symbol_file_name[0:-4] + '_updated.txt', 'w+') as symbolFile:
 		writer = csv.writer(symbolFile)
 		writer.writerow(symbol_list)
 
+
+history_length = 50
+date1 = (datetime.now() - timedelta(days=history_length, hours=0)).timetuple()[:3]
+date2 = datetime.now().timetuple()[:3]
+
+download_data_from_file(date1=date1,date2=date2)
 #print(get_data_from_file("AAPL"))
 #print(get_local_symbol_list())

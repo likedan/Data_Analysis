@@ -20,13 +20,20 @@ def get_today_quote(symbol='GOOG'):
     if not res.status_code == requests.codes.ok:
         raise Exception("Yahoo API failed")
         return []
-    data = map(lambda ln: ln.split(','), res.content.split('\n')[17:-2])
+
+    data = map(lambda ln: ln.split(','), res.content.split('\n')[17:-1])
     data = map(lambda arr: map(float, arr), data)
-    time,stock_closing,stock_high,stock_low,stock_opening,stock_vol = zip(*data)
+
+    if len(data) == 0:
+        raise Exception(symbol + " failed")
+
+    time,stock_closing,stock_high,stock_low,stock_opening,stock_vol = list(np.transpose(np.array(data)))
     time = map(lambda t: date2num(datetime.fromtimestamp(t)), time)
 
+
     graph_data = [time, stock_opening, stock_high, stock_low, stock_closing, stock_vol]
-    graph_data = zip(*graph_data)
+    graph_data = list(np.transpose(np.array(graph_data)))
+
 
     return (stock_opening, stock_high, stock_low, stock_closing, stock_vol, graph_data)
 
