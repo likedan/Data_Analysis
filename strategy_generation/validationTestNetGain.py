@@ -90,6 +90,12 @@ for s in symbols:
 print sum(net_gain_total) / len(net_gain_total)
 
 print len(net_gain_total)
-plt.hist(net_gain_total)
+
+bin_list = []
+for x in xrange(-100,100):
+	bin_list.append(float(x)/100.0)
+print bin_list
+
+plt.hist(net_gain_total,bins=tuple(bin_list))
 plt.yscale('log', nonposy='clip')
 plt.show()
