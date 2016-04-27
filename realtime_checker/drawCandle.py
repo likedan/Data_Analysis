@@ -78,8 +78,6 @@ def draw_candle_stick_with_today(stock_id, start_date, end_date, quotes, additio
 	if not os.path.exists('image_data'):
 		os.makedirs('image_data')
 
-	print "hhhhhhhhhhhhhhhhhhhh"
-
 	fig.set_size_inches(20, 8)
 	image_name = stock_id + ".png"
 	fig.savefig(os.path.join("image_data",image_name), dpi=300)   # save the figure to file
