@@ -3,7 +3,7 @@ from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ohlc
 import sys, os
 from datetime import datetime, timedelta
 
-def download_data_from_file(symbol_file_name = 'symbols.txt', 
+def download_data_from_file(override=False, symbol_file_name = 'symbols.txt', 
 	date1 = (2000, 1, 1), date2 = datetime.now().timetuple()[:3],
 	**keyword_parameters):
 	symbol_list = []
@@ -15,7 +15,8 @@ def download_data_from_file(symbol_file_name = 'symbols.txt',
 
 			symbol = row[0]
 			filename = os.path.join('historical_data', symbol + '.csv')
-
+			if os.path.exists(filename) and override:
+				continue
 			try:
 				quotes = quotes_historical_yahoo_ohlc(symbol, date1, date2)
 			except Exception:
@@ -39,6 +40,9 @@ history_length = 50
 date1 = (datetime.now() - timedelta(days=history_length, hours=0)).timetuple()[:3]
 date2 = datetime.now().timetuple()[:3]
 
-download_data_from_file(date1=date1,date2=date2)
+if len(sys.argv) == 2 and argv[1] == "override":
+	download_data_from_file(override=True,date1=date1,date2=date2)
+else:
+	download_data_from_file(override=False,date1=date1,date2=date2)
 #print(get_data_from_file("AAPL"))
 #print(get_local_symbol_list())
