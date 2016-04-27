@@ -16,6 +16,7 @@ def download_data_from_file(override=False, symbol_file_name = 'symbols.txt',
 			symbol = row[0]
 			filename = os.path.join('historical_data', symbol + '.csv')
 			if os.path.exists(filename) and override:
+				symbol_list.append(symbol)
 				continue
 			try:
 				quotes = quotes_historical_yahoo_ohlc(symbol, date1, date2)
