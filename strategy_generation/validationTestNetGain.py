@@ -88,7 +88,7 @@ for s in symbols:
 		net_gain = resultTester.test_gain_4(stock_opening, stock_closing, index_arr)
 		net_gain_total += net_gain
 
-	overall_test_gain4(net_gain_total)
+	lhv_test_gain4(net_gain_total)
 	print ('Testing ', s, sum(net_gain_total))
 
 

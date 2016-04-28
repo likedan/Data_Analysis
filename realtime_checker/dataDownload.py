@@ -41,7 +41,7 @@ history_length = 50
 date1 = (datetime.now() - timedelta(days=history_length, hours=0)).timetuple()[:3]
 date2 = datetime.now().timetuple()[:3]
 
-if len(sys.argv) == 2 and argv[1] == "override":
+if len(sys.argv) == 2 and sys.argv[1] == "override":
 	download_data_from_file(override=True,date1=date1,date2=date2)
 else:
 	download_data_from_file(override=False,date1=date1,date2=date2)
