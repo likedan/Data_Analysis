@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import lxml.html
 from DefaultVariables import *
+import os, sys
 
 class Crawler:
 
@@ -27,21 +28,38 @@ class Crawler:
 
     def get_stock_list_with_url(self, url):
         stock_symbol_dict = {}
+        delay = 5
         self.driver.get(url)
-        # container = self.driver.find_element_by_css_selector('.qm_data.qm_maintext')
-        source = lxml.html.fromstring(self.driver.page_source)
 
-        def add_rows(class_key):
-            for row in source.xpath('.//table[@class="qm_data qm_maintext"]//tbody//tr[@class="'+ class_key +'"]'):
-                stock_symbol = row.xpath('.//td/text()')[0]
-                if stock_symbol.isalpha():
+        try:
+            WebDriverWait(self.driver, delay).until(lambda the_driver: the_driver.find_element_by_class_name('qm_cycle').is_displayed())
+        finally:
+            source = lxml.html.fromstring(self.driver.page_source)
+
+            def add_rows(class_key):
+                for row in source.xpath('.//table[@class="qm_data qm_maintext"]//tbody//tr[@class="'+ class_key +'"]'):
+                    stock_symbol = row.xpath('.//td/text()')[0]
                     stock_url = row.xpath('.//a[@class="qm"]')[0].attrib['href']
                     stock_symbol_dict[stock_symbol] = stock_url
 
-        add_rows("qm_main")
-        add_rows("qm_cycle")
+            add_rows("qm_main")
+            add_rows("qm_cycle")
 
-        return stock_symbol_dict
+            return stock_symbol_dict
+
+    def historical_data_exists(self, stock_url):
+
+        delay = 5
+        full_url = DEFAULT_SITE_URL + os.path.join(stock_url, PRICE_HISTORY_SUFFIX)
+        print full_url
+        self.driver.get(full_url)
+        try:
+            WebDriverWait(self.driver, delay).until(lambda the_driver: the_driver.find_element_by_class_name('qm_history_startMonth').is_displayed())
+            return True
+        except Exception as e:
+            print "timeout"
+            return False            
+        
 
     def quit(self):
         self.driver.quit()
