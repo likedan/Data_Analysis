@@ -1,4 +1,4 @@
-DEFAULT_SITE_URL = "http://www.investorpoint.com/stock/"
+DEFAULT_SITE_URL = "http://www.investorpoint.com"
 
 STOCK_MARKET_URLS = {
     "AMEX": "http://www.investorpoint.com/exchange/AMX-NYSE+Alternext+-+formerly+AMEX/equity/",
