@@ -18,3 +18,9 @@ class Database:
         for item in self.symbol_list.find():
             result_dict[item["symbol"]] = item["url"]
         return result_dict
+
+    def get_alpha_stock_dict(self):
+        result_dict = {}
+        for item in self.symbol_list.find({"isalpha": True}):
+            result_dict[item["symbol"]] = item["url"]
+        return result_dict
