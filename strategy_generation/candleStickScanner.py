@@ -1,7 +1,7 @@
 import helper
 
 def scan_doji(opening, closing, high, low):
-	ratio_factor = 0.125
+	ratio_factor = 0.15
 	doji_arr = []
 	doji_index = []
 	if not (len(opening) == len(closing) == len(high) == len(low)):
@@ -326,4 +326,44 @@ def scan_low_with_huge_vol_consecutive_three(opening, closing, lhw_arr, separate
 
 	return (lhw_arr, lhw_index)
 
+def scan_high_moving_range(opening, closing):
+	ratio_factor = 1.5
+	range_arr = []
+	range_index = []
+	for index in xrange(len(opening)):
 
+		am_frame = 10
+		start = index - am_frame
+		if start < 0:
+			range_arr.append(0)
+			continue
+
+		average_movement = helper.get_average_movement(opening[start: index], closing[start: index])
+		if abs(closing[index] - opening[index]) < average_movement * ratio_factor:
+			#wrong
+			range_arr.append(0)
+		else:
+			range_arr.append(1)
+			range_index.append(index)
+
+
+	return (range_arr, range_index)
+
+def scan_high_relative_volume(vol):
+	ratio_factor = 1.5
+	vol_arr = []
+	vol_index = []
+	for index in xrange(10, len(opening)):
+		am_frame = 10
+		start = index - am_frame
+		if start < 0:
+			start = 0
+
+		average = sum(vol[start: index]) / am_frame
+		if average * ratio_factor > vol[index]:
+			#wrong
+			vol_arr.append(0)
+		else:
+			vol_arr.append(1)
+			vol_index.append(index)
+	return (vol_arr, vol_index)

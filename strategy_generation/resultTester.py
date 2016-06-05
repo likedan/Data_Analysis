@@ -239,6 +239,28 @@ def test_gain_4(opening, closing, index_arr):
 	return net_gains
 
 
+
+def test_gain_5(opening, closing, index_arr):
+
+	net_gains = []
+
+	max_index = max(index_arr)
+	if not ((len(opening) == len(closing)) and max_index < len(opening)):
+		raise Exception('test_next_day_opening_price input inconsistent length') 
+	else:
+		#remove last redundant
+		if max_index + 2 >= len(opening):
+			index_arr.remove(max_index)
+			if len(index_arr) > 0:
+				max_index = max(index_arr)
+				if max_index + 2 >= len(opening):
+					index_arr.remove(max_index)
+
+		for index in index_arr:
+			net_gains.append((opening[index + 2] - opening[index + 1]) / opening[index +1])
+	return net_gains
+
+
 #determine if the gain of following operation, sell at closing    with cutoff 
 
 def test_gain_4_with_cutoff(opening, closing, high, index_arr, cutoff):

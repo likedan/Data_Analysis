@@ -38,6 +38,25 @@ for s in symbols:
 			net_gain = resultTester.test_gain_1(stock_opening, stock_closing, bullish_hammer_index)
 			net_gain_total += net_gain
 
+	def lhvd_test_gain4(net_gain_total):
+		lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
+		doji_arr, doji_index = candleStickScanner.scan_doji(stock_opening, stock_closing, stock_high, stock_low)
+		range_arr, range_index = candleStickScanner.scan_high_moving_range(stock_opening, stock_closing)
+
+		trade_arr = []
+		trade_index = []
+
+		for index in xrange(1, len(lhv_arr)):
+			if lhv_arr[index - 1] == 1 and lhv_arr[index] == 1 and doji_arr[index] == 1 and range_arr[index - 1] == 1:
+				trade_arr.append(1)
+				trade_index.append(index)
+			else:
+				trade_arr.append(0)
+
+		if len(trade_index) != 0:
+			net_gain = resultTester.test_gain_4(stock_opening, stock_closing, trade_index)
+			net_gain_total += net_gain
+
 	def lhv_three_test_gain1(net_gain_total):
 		lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
 		lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive_three(stock_opening, stock_closing, lhv_arr)
@@ -78,6 +97,15 @@ for s in symbols:
 			net_gain = resultTester.test_gain_4(stock_opening, stock_closing, lhv_con_index)
 			net_gain_total += net_gain
 
+	def lhv_test_gain5(net_gain_total):
+		lhv_arr, lhv_index = candleStickScanner.scan_low_with_huge_vol(stock_opening, stock_closing, stock_high, stock_low, stock_vol)
+		lhv_con_arr, lhv_con_index = candleStickScanner.scan_low_with_huge_vol_consecutive(stock_opening, stock_closing, lhv_arr, separate_by_price_moving_range = True)
+
+		if len(lhv_con_index) != 0:
+			net_gain = resultTester.test_gain_5(stock_opening, stock_closing, lhv_con_index)
+			net_gain_total += net_gain
+
+
 	def overall_test_gain1(net_gain_total):
 		index_arr = [index for index in xrange(2, len(stock_opening) - 1)]
 		net_gain = resultTester.test_gain_1(stock_opening, stock_closing, index_arr)
@@ -88,7 +116,7 @@ for s in symbols:
 		net_gain = resultTester.test_gain_4(stock_opening, stock_closing, index_arr)
 		net_gain_total += net_gain
 
-	lhv_test_gain4(net_gain_total)
+	lhv_test_gain5(net_gain_total)
 	print ('Testing ', s, sum(net_gain_total))
 
 
