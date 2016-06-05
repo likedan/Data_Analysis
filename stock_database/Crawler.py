@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+import lxml.html
 from DefaultVariables import *
 
 class Crawler:
@@ -28,13 +28,13 @@ class Crawler:
     def get_stock_list_with_url(self, url):
         stock_symbol_dict = {}
         self.driver.get(url)
-        container = self.driver.find_element_by_css_selector('.qm_data.qm_maintext')
-        rows = container.find_elements_by_class_name('qm_main') + container.find_elements_by_class_name('qm_cycle')
-        for stock_container in rows:
-            stock_symbol = stock_container.find_element_by_xpath('td[1]').text
-            stock_url_container = stock_container.find_element_by_xpath('td[2]')
-            stock_url = stock_url_container.find_element_by_class_name("qm").get_attribute("href")
+        # container = self.driver.find_element_by_css_selector('.qm_data.qm_maintext')
+        root = lxml.html.fromstring(self.driver.page_source)
+        for row in root.xpath('.//table[@class="qm_data qm_maintext"]//tbody//tr[@class="qm_main"]'):
+            stock_symbol = row.xpath('.//td/text()')[0]
+            stock_url = row.xpath('.//a[@class="qm"]')[0].attrib['href']
             stock_symbol_dict[stock_symbol] = stock_url
+
         return stock_symbol_dict
 
     def quit(self):
