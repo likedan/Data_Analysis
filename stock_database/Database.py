@@ -11,5 +11,10 @@ class Database:
         except pymongo.errors.ConnectionFailure, e:
            print "Could not connect to MongoDB: %s" % e
         self.db = client['Stock_Database']
-        self.full_symbols_list = self.db['full_symbol_list']
-        self.alphabet_symbols_list = self.db['alphabet_symbol_list']
+        self.symbol_list = self.db['symbol_list']
+
+    def get_full_stock_dict(self):
+        result_dict = {}
+        for item in self.symbol_list.find():
+            result_dict[item["symbol"]] = item["url"]
+        return result_dict

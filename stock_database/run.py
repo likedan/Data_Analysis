@@ -1,5 +1,6 @@
 from Crawler import Crawler
 from DefaultVariables import *
+from Database import Database
 
 crawler = Crawler()
 
@@ -12,11 +13,18 @@ for stock_market in STOCK_MARKET_URLS.keys():
 
     full_stock_dict.update(stock_dict)
 
-stock_only_alphabet = {}
+# database_insert = []
+# for key in full_stock_dict.keys():
+#     database_insert.append({"symbol":key, "url": full_stock_dict[key]})
+# print database_insert
+db = Database()
+db.symbol_list.insert_many(database_insert)
 
-for key in full_stock_dict.keys():
-    if key.isalpha():
-        stock_only_alphabet[key] = full_stock_dict[key]
+# stock_only_alphabet = {}
+
+# for key in full_stock_dict.keys():
+#     if key.isalpha():
+#         stock_only_alphabet[key] = full_stock_dict[key]
 
 # for key in full_stock_dict.keys():
 #     print key
