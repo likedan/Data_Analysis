@@ -29,11 +29,17 @@ class Crawler:
         stock_symbol_dict = {}
         self.driver.get(url)
         # container = self.driver.find_element_by_css_selector('.qm_data.qm_maintext')
-        root = lxml.html.fromstring(self.driver.page_source)
-        for row in root.xpath('.//table[@class="qm_data qm_maintext"]//tbody//tr[@class="qm_main"]'):
-            stock_symbol = row.xpath('.//td/text()')[0]
-            stock_url = row.xpath('.//a[@class="qm"]')[0].attrib['href']
-            stock_symbol_dict[stock_symbol] = stock_url
+        source = lxml.html.fromstring(self.driver.page_source)
+
+        def add_rows(class_key):
+            for row in source.xpath('.//table[@class="qm_data qm_maintext"]//tbody//tr[@class="'+ class_key +'"]'):
+                stock_symbol = row.xpath('.//td/text()')[0]
+                if stock_symbol.isalpha():
+                    stock_url = row.xpath('.//a[@class="qm"]')[0].attrib['href']
+                    stock_symbol_dict[stock_symbol] = stock_url
+
+        add_rows("qm_main")
+        add_rows("qm_cycle")
 
         return stock_symbol_dict
 
