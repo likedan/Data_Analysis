@@ -47,7 +47,7 @@ class Crawler:
 
             return stock_symbol_dict
 
-    def historical_data_exists(self, stock_url):
+    def download_historical_data(self, stock_url):
 
         delay = 5
         full_url = DEFAULT_SITE_URL + os.path.join(stock_url, PRICE_HISTORY_SUFFIX)
@@ -55,10 +55,18 @@ class Crawler:
         self.driver.get(full_url)
         try:
             WebDriverWait(self.driver, delay).until(lambda the_driver: the_driver.find_element_by_class_name('qm_history_startMonth').is_displayed())
-            return True
+            
+            day_input = self.driver.find_element_by_class_name('qm_history_startDay')
+            day_input.clear()
+            day_input.send_keys("1")
+
+            year_input = self.driver.find_element_by_class_name('qm_history_startYear')
+            year_input.clear()
+            year_input.send_keys("2000")
+            self.driver.find_element_by_class_name('qm_history_startMonth').send_keys("Jan")
+            # self.driver.find_element_by_class_name('qm_historyTab_GoButton').click()
         except Exception as e:
-            print "timeout"
-            return False            
+            print "no stock data"
         
 
     def quit(self):

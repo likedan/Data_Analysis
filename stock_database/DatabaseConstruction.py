@@ -16,6 +16,9 @@ def generate_full_stock_list():
 
     database_insert = []
     for key in full_stock_dict.keys():
-        database_insert.append({"symbol":key, "url": full_stock_dict[key]})
+        if key.isalpha():
+            database_insert.append({"symbol":key, "url": full_stock_dict[key], "isalpha": True})
+        else:
+            database_insert.append({"symbol":key, "url": full_stock_dict[key], "isalpha": False})
     db = Database()
     db.symbol_list.insert_many(database_insert)

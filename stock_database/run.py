@@ -15,8 +15,8 @@ crawler = Crawler()
 db = Database()
 alpha_stock_dict = db.get_alpha_stock_dict()
 
-for key in alpha_stock_dict.keys():
-    print crawler.historical_data_exists(full_stock_dict[key])
+for key in alpha_stock_dict.keys()[0:2]:
+    crawler.download_historical_data(alpha_stock_dict[key])
 
 
 # delisted_stocks = ["AYE","COMS","SE","ADCT","ACS","ACV","ABS","AL","ANG","AW","AH","AT","ANR","AZA","AGC","AM","APCC","ASO","ANDW","BUD","ABI","ACK"]
