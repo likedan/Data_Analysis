@@ -48,17 +48,17 @@ class Crawler:
             return stock_symbol_dict
 
     def download_historical_data(self, stock_url):
-
-        delay = 10
-        def download_page(page):
-            full_url_page_1 = DEFAULT_SITE_URL + os.path.join(stock_url, PRICE_HISTORY_SUFFIX) + TIMEFRAME_URL + page
-            print full_url_page_1
-            self.driver.get(full_url_page_1)
+        page_num = 2500
+        default_num = 21
+        delay = 8
+        stock_price_data = []
+        def download_page(full_url):
+            print full_url
+            self.driver.get(full_url)
             try:
                 WebDriverWait(self.driver, delay).until(lambda the_driver: the_driver.find_element_by_class_name('qm_maintext').is_displayed())
                 source = lxml.html.fromstring(self.driver.page_source)
 
-                stock_price_data = []
                 def add_rows(class_key):
                     for row in source.xpath('.//table[@class="qm_history_historyContent"]//tbody//tr[@class="' + class_key + '"]'):
                         one_day_data = {}
@@ -81,11 +81,19 @@ class Crawler:
             except Exception as e:
                 print "no stock data"
                 print e
-        download_page("1")
-        download_page("2")
+        download_page(DEFAULT_SITE_URL + os.path.join(stock_url, PRICE_HISTORY_SUFFIX) + TIMEFRAME_URL + "1")
+        if len(stock_price_data) >= page_num:
+            download_page(DEFAULT_SITE_URL + os.path.join(stock_url, PRICE_HISTORY_SUFFIX) + TIMEFRAME_URL + "2")
+        elif len(stock_price_data) == default_num:
 
-
-
+            #url is deprecated,  get the new one
+            new_url = self.driver.current_url
+            stock_price_data = []
+            print new_url
+            download_page(new_url + TIMEFRAME_URL[1:] + "1")
+            if len(stock_price_data) >= page_num:
+                download_page(new_url + TIMEFRAME_URL[1:] + "2")
+        return stock_price_data
 
 
     def quit(self):

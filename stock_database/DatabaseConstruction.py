@@ -2,7 +2,7 @@ from Crawler import Crawler
 from DefaultVariables import *
 from Database import Database
 
-def generate_full_stock_list():
+def download_full_stock_list():
     crawler = Crawler()
 
     full_stock_dict = {}
@@ -22,3 +22,5 @@ def generate_full_stock_list():
             database_insert.append({"symbol":key, "url": full_stock_dict[key], "isalpha": False})
     db = Database()
     db.symbol_list.insert_many(database_insert)
+
+download_full_stock_list()
