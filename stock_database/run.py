@@ -4,14 +4,6 @@ from Database import Database
 
 crawler = Crawler()
 
-# for stock_market in STOCK_MARKET_URLS.keys():
-#     print stock_market
-#     stock_dict = crawler.get_stock_list_with_url(STOCK_MARKET_URLS[stock_market])
-#     if len(stock_dict) == 0:
-#         raise Exception('No Stock Found!')
-
-#     full_stock_dict.update(stock_dict)
-
 db = Database()
 alpha_stock_dict = db.get_alpha_stock_dict()
 
@@ -21,11 +13,11 @@ for key in alpha_stock_dict.keys():
     if "isValid" in stock_info:
         print "skip: " + stock_info["symbol"]
     else:
-        data = crawler.download_historical_data(alpha_stock_dict[key])
+        data = crawler.download_historical_data(key, alpha_stock_dict[key])
         
-        print len(data)
         if len(data) > 0:
-            db.db[key].insert_many(data)
+            for entry in data:
+                db.upsert_stock_data(key, entry)
             stock_info["isValid"] = True
         else:
             stock_info["isValid"] = False

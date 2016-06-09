@@ -40,6 +40,7 @@ class Crawler:
                 for row in source.xpath('.//table[@class="qm_data qm_maintext"]//tbody//tr[@class="'+ class_key +'"]'):
                     stock_symbol = row.xpath('.//td/text()')[0]
                     stock_url = row.xpath('.//a[@class="qm"]')[0].attrib['href']
+                    stock_url = DEFAULT_SITE_URL + stock_url + PRICE_HISTORY_SUFFIX
                     stock_symbol_dict[stock_symbol] = stock_url
 
             add_rows("qm_main")
@@ -47,7 +48,7 @@ class Crawler:
 
             return stock_symbol_dict
 
-    def download_historical_data(self, stock_url):
+    def download_historical_data(self, symbol, stock_url):
         page_num = 2500
         default_num = 21
         delay = 8
@@ -81,9 +82,9 @@ class Crawler:
             except Exception as e:
                 print "no stock data"
                 print e
-        download_page(DEFAULT_SITE_URL + os.path.join(stock_url, PRICE_HISTORY_SUFFIX) + TIMEFRAME_URL + "1")
+        download_page(stock_url + TIMEFRAME_URL + "1")
         if len(stock_price_data) >= page_num:
-            download_page(DEFAULT_SITE_URL + os.path.join(stock_url, PRICE_HISTORY_SUFFIX) + TIMEFRAME_URL + "2")
+            download_page(stock_url + TIMEFRAME_URL + "2")
         elif len(stock_price_data) == default_num:
 
             #url is deprecated,  get the new one

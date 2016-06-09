@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import pymongo
+from pymongo import *
 import datetime
-from pymongo import MongoClient
 
 class Database:
     def __init__(self):
@@ -24,3 +24,7 @@ class Database:
         for item in self.symbol_list.find({"isalpha": True}):
             result_dict[item["symbol"]] = item["url"]
         return result_dict
+
+    def upsert_stock_data(self, symbol, data):
+        data["_id"] = ObjectId(data["date"])
+        self.db[symbol].update({"_id": ObjectId(data["date"])}, data, True)
