@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import pymongo
 from pymongo import *
+from bson.objectid import ObjectId
 import datetime
 
 class Database:
@@ -26,5 +27,4 @@ class Database:
         return result_dict
 
     def upsert_stock_data(self, symbol, data):
-        data["_id"] = ObjectId(data["date"])
-        self.db[symbol].update({"_id": ObjectId(data["date"])}, data, True)
+        self.db[symbol].update({"date": data["date"]}, data, True)

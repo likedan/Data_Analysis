@@ -50,7 +50,8 @@ class Crawler:
 
     def download_historical_data(self, symbol, stock_url):
         page_num = 2500
-        default_num = 21
+        month_max = 30
+        month_min = 10
         delay = 8
         stock_price_data = []
         def download_page(full_url):
@@ -85,15 +86,15 @@ class Crawler:
         download_page(stock_url + TIMEFRAME_URL + "1")
         if len(stock_price_data) >= page_num:
             download_page(stock_url + TIMEFRAME_URL + "2")
-        elif len(stock_price_data) == default_num:
+        elif len(stock_price_data) > month_min and len(stock_price_data) < month_max:
 
             #url is deprecated,  get the new one
             new_url = self.driver.current_url
             stock_price_data = []
             print new_url
-            download_page(new_url + TIMEFRAME_URL[1:] + "1")
+            download_page(new_url + TIMEFRAME_URL + "1")
             if len(stock_price_data) >= page_num:
-                download_page(new_url + TIMEFRAME_URL[1:] + "2")
+                download_page(new_url + TIMEFRAME_URL + "2")
         return stock_price_data
 
 
