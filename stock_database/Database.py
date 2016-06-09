@@ -28,3 +28,8 @@ class Database:
 
     def upsert_stock_data(self, symbol, data):
         self.db[symbol].update({"date": data["date"]}, data, True)
+
+    def update_stock_url(self, symbol, url):
+        info = self.symbol_list.find_one({"symbol": symbol})
+        info["url"] = url
+        self.symbol_list.update({"_id": info["_id"]}, info, True)

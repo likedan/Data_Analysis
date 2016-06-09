@@ -5,10 +5,13 @@ from selenium.webdriver.support import expected_conditions as EC
 import lxml.html
 from DefaultVariables import *
 import os, sys
+from Database import Database
 
 class Crawler:
 
     def __init__(self):
+        self.busy = False
+
         print "init Crawler"
 
         firefox_profile = webdriver.FirefoxProfile()
@@ -49,6 +52,7 @@ class Crawler:
             return stock_symbol_dict
 
     def download_historical_data(self, symbol, stock_url):
+        self.busy = True
         page_num = 2500
         month_max = 30
         month_min = 10
@@ -75,7 +79,11 @@ class Crawler:
                         one_day_data["adj_close"] = row.xpath('.//td/text()')[8]
                         one_day_data["trade_val"] = row.xpath('.//td/text()')[9]
                         one_day_data["trades"] = row.xpath('.//td/text()')[10]
+
+                        #get the actual percentage data
+                        one_day_data["chg_p"] = one_day_data["chg_p"].split(" ")[-1]
                         stock_price_data.append(one_day_data)
+
                 add_rows("qm_cycle qm_historyData_row")
                 add_rows("qm_main qm_historyData_row")
                 print len(stock_price_data)
@@ -90,11 +98,15 @@ class Crawler:
 
             #url is deprecated,  get the new one
             new_url = self.driver.current_url
-            stock_price_data = []
+            db = Database()
+            db.update_stock_url(symbol, new_url)
             print new_url
+
+            stock_price_data = []
             download_page(new_url + TIMEFRAME_URL + "1")
             if len(stock_price_data) >= page_num:
                 download_page(new_url + TIMEFRAME_URL + "2")
+        self.busy = False
         return stock_price_data
 
 

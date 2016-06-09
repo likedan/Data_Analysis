@@ -1,11 +1,25 @@
 from Crawler import Crawler
 from DefaultVariables import *
 from Database import Database
+import threading
+import time
 
-crawler = Crawler()
+crawler_list = [Crawler() for x in range(2)]
 
 db = Database()
 alpha_stock_dict = db.get_alpha_stock_dict()
+
+def crawl_data(crawler, symbol, url, stock_info):
+
+    data = crawler.download_historical_data(symbol, url)
+    
+    if len(data) > 0:
+        for entry in data:
+            db.upsert_stock_data(symbol, entry)
+        stock_info["isValid"] = True
+    else:
+        stock_info["isValid"] = False
+    db.symbol_list.update({"_id": stock_info["_id"]}, stock_info, True)
 
 for key in alpha_stock_dict.keys():
 
@@ -13,15 +27,17 @@ for key in alpha_stock_dict.keys():
     if "isValid" in stock_info:
         print "skip: " + stock_info["symbol"]
     else:
-        data = crawler.download_historical_data(key, alpha_stock_dict[key])
-        
-        if len(data) > 0:
-            for entry in data:
-                db.upsert_stock_data(key, entry)
-            stock_info["isValid"] = True
-        else:
-            stock_info["isValid"] = False
-        db.symbol_list.update({"_id": stock_info["_id"]}, stock_info, True)
+        print stock_info["symbol"]
+        crawlers_busy = True
+        while crawlers_busy:
+            for crawler in crawler_list:
+                if not crawler.busy:
+                    t = threading.Thread(target=crawl_data, args=(crawler, key, alpha_stock_dict[key], stock_info, ))
+                    t.start()
+                    crawlers_busy = False
+                    break
+            if crawlers_busy:
+                time.sleep(1)
 
 # delisted_stocks = ["AYE","COMS","SE","ADCT","ACS","ACV","ABS","AL","ANG","AW","AH","AT","ANR","AZA","AGC","AM","APCC","ASO","ANDW","BUD","ABI","ACK"]
 
