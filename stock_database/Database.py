@@ -7,11 +7,11 @@ import datetime
 class Database:
     def __init__(self):
         try:
-            client = MongoClient('127.0.0.1', 27017)
-            print "Connected successfully!!!"
+            self.client = MongoClient('127.0.0.1', 27017)
+            print "Connected successfully"
         except pymongo.errors.ConnectionFailure, e:
            print "Could not connect to MongoDB: %s" % e
-        self.db = client['Stock_Database']
+        self.db = self.client['Stock_Database']
         self.symbol_list = self.db['symbol_list']
 
     def get_full_stock_dict(self):
@@ -27,9 +27,17 @@ class Database:
         return result_dict
 
     def upsert_stock_data(self, symbol, data):
-        self.db[symbol].update({"date": data["date"]}, data, True)
+        try:
+            self.db[symbol].update({"date": data["date"]}, data, True)
+        except Exception as e:
+            print data
+            print e
+            print "!!!!!!!!!!!!!!!!!!!!"
 
     def update_stock_url(self, symbol, url):
         info = self.symbol_list.find_one({"symbol": symbol})
         info["url"] = url
         self.symbol_list.update({"_id": info["_id"]}, info, True)
+
+    def close(self):
+        self.client.close()

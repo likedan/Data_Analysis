@@ -56,10 +56,11 @@ class Crawler:
         page_num = 2500
         month_max = 30
         month_min = 10
-        delay = 8
+        delay = 30
+        status = ""
+
         stock_price_data = []
         def download_page(full_url):
-            print full_url
             self.driver.get(full_url)
             try:
                 WebDriverWait(self.driver, delay).until(lambda the_driver: the_driver.find_element_by_class_name('qm_maintext').is_displayed())
@@ -86,11 +87,9 @@ class Crawler:
 
                 add_rows("qm_cycle qm_historyData_row")
                 add_rows("qm_main qm_historyData_row")
-                print len(stock_price_data)
 
             except Exception as e:
-                print "no stock data"
-                print e
+                pass
         download_page(stock_url + TIMEFRAME_URL + "1")
         if len(stock_price_data) >= page_num:
             download_page(stock_url + TIMEFRAME_URL + "2")
@@ -100,12 +99,12 @@ class Crawler:
             new_url = self.driver.current_url
             db = Database()
             db.update_stock_url(symbol, new_url)
-            print new_url
 
             stock_price_data = []
             download_page(new_url + TIMEFRAME_URL + "1")
             if len(stock_price_data) >= page_num:
                 download_page(new_url + TIMEFRAME_URL + "2")
+
         self.busy = False
         return stock_price_data
 
