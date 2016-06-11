@@ -15,7 +15,6 @@ class Crawler:
         print "init Crawler"
 
         firefox_profile = webdriver.FirefoxProfile()
-        firefox_profile.set_preference("browser.download.folderList",2)
         firefox_profile.set_preference("javascript.enabled", False)
         self.driver = webdriver.Firefox(firefox_profile=firefox_profile)
         # options = []

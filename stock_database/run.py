@@ -6,42 +6,43 @@ import time
 
 crawler_list = [Crawler() for x in range(4)]
 
-db = Database()
-alpha_stock_dict = db.get_alpha_stock_dict()
+database = Database()
+alpha_stock_dict = database.get_alpha_stock_dict()
 
-def crawl_data(crawler, symbol, url, stock_info):
-
-    data = crawler.download_historical_data(symbol, url)
-    if len(data) > 0:
-        for entry in data:
-            db.upsert_stock_data(symbol, entry)
-        stock_info["isValid"] = True
-    else:
-        stock_info["isValid"] = False
-    db.symbol_list.update({"_id": stock_info["_id"]}, stock_info, True)
-    db.close()
-    print symbol + " " + str(len(data))
-
-
+symbol_queue = []
 for key in alpha_stock_dict.keys():
+    symbol_queue.append(key)
+
+lock = threading.Lock()
+
+def crawl_data(crawler):
+
+    db = Database()
 
     stock_info = db.symbol_list.find_one({"symbol": key})
     if "isValid" in stock_info:
         print "skip: " + stock_info["symbol"]
     else:
-        crawlers_busy = True
-        while crawlers_busy:
-            for crawler in crawler_list:
-                if not crawler.busy:
-                    t = threading.Thread(target=crawl_data, args=(crawler, key, alpha_stock_dict[key], stock_info, ))
-                    t.start()
-                    crawlers_busy = False
-                    break
-            if crawlers_busy:
-                time.sleep(1)
+        while len(symbol_queue) > 0:
 
-# delisted_stocks = ["AYE","COMS","SE","ADCT","ACS","ACV","ABS","AL","ANG","AW","AH","AT","ANR","AZA","AGC","AM","APCC","ASO","ANDW","BUD","ABI","ACK"]
+            lock = threading.Lock()
+            lock.acquire()
+            symbol = symbol_queue[-1]
+            del symbol_queue[-1]
+            lock.release()
 
-# for s in delisted_stocks:
-#     if not (s in full_stock_dict):
-#         print s
+            url = alpha_stock_dict[symbol]
+
+            data = crawler.download_historical_data(symbol, url)
+            if len(data) > 0:
+                for entry in data:
+                    db.upsert_stock_data(symbol, entry)
+                stock_info["isValid"] = True
+            else:
+                stock_info["isValid"] = False
+            db.symbol_list.update({"_id": stock_info["_id"]}, stock_info, True)
+            print symbol + " " + str(len(data))
+
+for crawler in crawler_list:
+    t = threading.Thread(target=crawl_data, args=(crawler, ))
+    t.start()
