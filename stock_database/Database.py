@@ -8,7 +8,6 @@ class Database:
     def __init__(self):
         try:
             self.client = MongoClient('127.0.0.1', 27017)
-            print "Connected successfully"
         except pymongo.errors.ConnectionFailure, e:
            print "Could not connect to MongoDB: %s" % e
         self.db = self.client['Stock_Database']

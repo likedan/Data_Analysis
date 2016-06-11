@@ -11,7 +11,6 @@ class Crawler:
 
     def __init__(self):
         self.busy = False
-
         print "init Crawler"
 
         firefox_profile = webdriver.FirefoxProfile()
@@ -55,13 +54,14 @@ class Crawler:
         page_num = 2500
         month_max = 30
         month_min = 10
-        delay = 30
+        delay = 20
         status = ""
 
         stock_price_data = []
+
         def download_page(full_url):
-            self.driver.get(full_url)
             try:
+                self.driver.get(full_url)
                 WebDriverWait(self.driver, delay).until(lambda the_driver: the_driver.find_element_by_class_name('qm_maintext').is_displayed())
                 source = lxml.html.fromstring(self.driver.page_source)
 
@@ -88,7 +88,9 @@ class Crawler:
                 add_rows("qm_main qm_historyData_row")
 
             except Exception as e:
-                pass
+                print e
+                print full_url
+                
         download_page(stock_url + TIMEFRAME_URL + "1")
         if len(stock_price_data) >= page_num:
             download_page(stock_url + TIMEFRAME_URL + "2")
