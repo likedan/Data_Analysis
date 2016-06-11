@@ -4,7 +4,7 @@ from Database import Database
 import threading
 import time
 
-crawler_list = [Crawler() for x in range(4)]
+crawler_list = [Crawler() for x in range(2)]
 
 database = Database()
 alpha_stock_dict = database.get_alpha_stock_dict()
@@ -19,18 +19,17 @@ def crawl_data(crawler):
 
     db = Database()
 
-    stock_info = db.symbol_list.find_one({"symbol": key})
-    if "isValid" in stock_info:
-        print "skip: " + stock_info["symbol"]
-    else:
-        while len(symbol_queue) > 0:
+    while len(symbol_queue) > 0:
 
-            lock = threading.Lock()
-            lock.acquire()
-            symbol = symbol_queue[-1]
-            del symbol_queue[-1]
-            lock.release()
+        lock.acquire()
+        symbol = symbol_queue[-1]
+        symbol_queue.remove(symbol)
+        lock.release()
 
+        stock_info = db.symbol_list.find_one({"symbol": symbol})
+        if "isValid" in stock_info:
+            print "skip: " + stock_info["symbol"]
+        else:
             url = alpha_stock_dict[symbol]
 
             data = crawler.download_historical_data(symbol, url)
