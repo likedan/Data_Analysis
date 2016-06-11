@@ -3,6 +3,8 @@ from DefaultVariables import *
 from Database import Database
 import threading
 import time
+from random import randint
+import sys
 
 def step1_download_full_stock_list():
     crawler = Crawler()
@@ -62,15 +64,18 @@ def step2_download_stock_data():
                     for entry in data:
                         db.upsert_stock_data(symbol, entry)
                     stock_info["isValid"] = True
-                else:
-                    stock_info["isValid"] = False
-                db.symbol_list.update({"_id": stock_info["_id"]}, stock_info, True)
+                    db.symbol_list.update({"_id": stock_info["_id"]}, stock_info, True)
                 print symbol + " " + str(len(data))
-                time.sleep(1)
+                # time.sleep(randint(10,30))
 
     for crawler in crawler_list:
         t = threading.Thread(target=crawl_data, args=(crawler, ))
         t.start()
 
-step1_download_full_stock_list()
-step2_download_stock_data()
+if len(sys.argv) == 1:
+    step1_download_full_stock_list()
+    step2_download_stock_data()
+elif sys.argv[1] == "1":
+    step1_download_full_stock_list()
+elif sys.argv[1] == "2":
+    step2_download_stock_data()

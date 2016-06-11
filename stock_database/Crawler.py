@@ -10,7 +10,6 @@ from Database import Database
 class Crawler:
 
     def __init__(self):
-        self.busy = False
         print "init Crawler"
 
         firefox_profile = webdriver.FirefoxProfile()
@@ -60,11 +59,11 @@ class Crawler:
         stock_price_data = []
 
         def download_page(full_url):
+            
             try:
                 self.driver.get(full_url)
                 WebDriverWait(self.driver, delay).until(lambda the_driver: the_driver.find_element_by_class_name('qm_maintext').is_displayed())
                 source = lxml.html.fromstring(self.driver.page_source)
-
                 def add_rows(class_key):
                     for row in source.xpath('.//table[@class="qm_history_historyContent"]//tbody//tr[@class="' + class_key + '"]'):
                         one_day_data = {}
@@ -88,7 +87,7 @@ class Crawler:
                 add_rows("qm_main qm_historyData_row")
 
             except Exception as e:
-                print e
+                print str(e)
                 print full_url
                 
         download_page(stock_url + TIMEFRAME_URL + "1")
@@ -106,7 +105,6 @@ class Crawler:
             if len(stock_price_data) >= page_num:
                 download_page(new_url + TIMEFRAME_URL + "2")
 
-        self.busy = False
         return stock_price_data
 
 
