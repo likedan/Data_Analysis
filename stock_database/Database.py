@@ -8,10 +8,12 @@ class Database:
     def __init__(self):
         try:
             self.client = MongoClient('127.0.0.1', 27017)
+            print "create db instance"
         except pymongo.errors.ConnectionFailure, e:
-           print "Could not connect to MongoDB: %s" % e
+            print "Could not connect to MongoDB: %s" % e
         self.db = self.client['Stock_Database']
         self.symbol_list = self.db['symbol_list']
+        self.raw_data = self.db['raw_data']
 
     def get_full_stock_dict(self):
         result_dict = {}
@@ -26,10 +28,8 @@ class Database:
         return result_dict
 
     def upsert_stock_data(self, symbol, data):
-        try:
-            self.db[symbol].update({"date": data["date"]}, data, True)
+        self.raw_data.update({"symbol": symbol}, {"symbol": symbol, "data": data}, True)
         except Exception as e:
-            print data
             print e
             print "!!!!!!!!!!!!!!!!!!!!"
 

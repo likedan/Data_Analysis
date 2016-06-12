@@ -53,7 +53,7 @@ class Crawler:
         page_num = 2500
         month_max = 30
         month_min = 10
-        delay = 20
+        delay = 8
         status = ""
 
         stock_price_data = []
@@ -97,8 +97,8 @@ class Crawler:
 
             #url is deprecated,  get the new one
             new_url = self.driver.current_url
-            db = Database()
-            db.update_stock_url(symbol, new_url)
+            
+            self.db.update_stock_url(symbol, new_url)
 
             stock_price_data = []
             download_page(new_url + TIMEFRAME_URL + "1")

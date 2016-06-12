@@ -31,7 +31,7 @@ def step1_download_full_stock_list():
 
 def step2_download_stock_data():
 
-    crawler_list = [Crawler() for x in range(4)]
+    crawler_list = [Crawler() for x in range(THREAD_NUMBER)]
 
     database = Database()
     alpha_stock_dict = database.get_alpha_stock_dict()
@@ -45,6 +45,7 @@ def step2_download_stock_data():
     def crawl_data(crawler):
 
         db = Database()
+        crawler.db = db
 
         while len(symbol_queue) > 0:
 
