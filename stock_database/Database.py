@@ -28,7 +28,8 @@ class Database:
         return result_dict
 
     def upsert_stock_data(self, symbol, data):
-        self.raw_data.update({"symbol": symbol}, {"symbol": symbol, "data": data}, True)
+        try:
+            self.raw_data.update({"symbol": symbol}, {"symbol": symbol, "data": data}, True)
         except Exception as e:
             print e
             print "!!!!!!!!!!!!!!!!!!!!"

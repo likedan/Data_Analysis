@@ -40,7 +40,7 @@ def step2_download_stock_data():
     for key in alpha_stock_dict.keys():
         symbol_queue.append(key)
 
-    lock = threading.Lock()
+    lock = threading.RLock()
 
     def crawl_data(crawler):
 
@@ -49,10 +49,9 @@ def step2_download_stock_data():
 
         while len(symbol_queue) > 0:
 
-            lock.acquire()
-            symbol = symbol_queue[-1]
-            symbol_queue.remove(symbol)
-            lock.release()
+            with lock:
+                symbol = symbol_queue[-1]
+                symbol_queue.remove(symbol)
 
             stock_info = db.symbol_list.find_one({"symbol": symbol})
             if "isValid" in stock_info:
@@ -62,8 +61,7 @@ def step2_download_stock_data():
 
                 data = crawler.download_historical_data(symbol, url)
                 if len(data) > 0:
-                    for entry in data:
-                        db.upsert_stock_data(symbol, entry)
+                    db.upsert_stock_data(symbol, data)
                     stock_info["isValid"] = True
                     db.symbol_list.update({"_id": stock_info["_id"]}, stock_info, True)
                 print symbol + " " + str(len(data))
