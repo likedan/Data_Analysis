@@ -1,5 +1,7 @@
+# variables
+CRAWLING_START_YEAR = 1999
 
-# Database
+# database
 DATABASE_NAME = "CurrencyData"
 
 # Urls

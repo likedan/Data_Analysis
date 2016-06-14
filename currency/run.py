@@ -12,4 +12,4 @@ crawler = Crawler(db)
 
 currency_list = db.get_currency_list()
 for currency in currency_list:
-    crawler.download_historical_data(currency["symbol"], currency["time_fragment_list"], directory)
+    crawler.download_historical_data(currency["symbol"], directory)

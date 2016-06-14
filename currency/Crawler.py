@@ -6,6 +6,7 @@ import lxml.html
 from DefaultVariables import *
 import os, sys, os
 from Database import Database
+import datetime
 
 class Crawler:
 
@@ -43,7 +44,7 @@ class Crawler:
             time_fragment_list.append(element.attrib['href'])
         return time_fragment_list
 
-    def download_historical_data(self, symbol, url_list, folder):
+    def download_historical_data(self, symbol, folder):
         self.quit()
 
         directory = os.path.join(folder, symbol)
@@ -57,9 +58,25 @@ class Crawler:
         firefox_profile.set_preference("browser.download.dir", directory)
         self.driver = webdriver.Firefox(firefox_profile=firefox_profile)
 
-        for url in url_list:
-            full_url = DEFAULT_SITE_URL + url
-            self.driver.get(full_url)
+        now = datetime.datetime.now()
+        current_year = now.year
+        current_month = now.month
+
+        had_data = True
+        while had_data and current_year >= CRAWLING_START_YEAR:
+            while had_data and current_month > 0:
+
+                print str(current_year) + " "+ str(current_month)
+
+                current_month -=1
+
+            current_month = 12
+            current_year -= 1
+
+
+        # for year in reversed(range(2000,2016))
+        # full_url = DEFAULT_SITE_URL + url
+        #     self.driver.get(full_url)
     #     delay = 8
     #     status = ""
 
