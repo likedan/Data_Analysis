@@ -9,8 +9,8 @@ def step1_get_currency_list():
 	db = Database()
 	crawler = Crawler(db) 
 	currency_list = crawler.get_currency_list_with_url(DEFAULT_SITE_URL + CURRENCYLIST_URL)
-	currency_list_dict = [{currency_dict} for currency_dict in currency_list]
-	db.currency_list.insert_many(currency_list)
+	currency_list_dict = [{"symbol": currency_dict} for currency_dict in currency_list]
+	db.currency_list.insert_many(currency_list_dict)
 	crawler.quit()
 	db.close()
 
