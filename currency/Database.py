@@ -13,7 +13,6 @@ class Database:
         except pymongo.errors.ConnectionFailure, e:
             print "Could not connect to MongoDB: %s" % e
         self.db = self.client[DATABASE_NAME]
-
         self.currency_list = self.db['currency_list']
 
     def get_currency_list(self):
