@@ -27,7 +27,6 @@ class Crawler:
 
     def get_currency_list_with_url(self, url):
         currency_list = []
-        delay = 5
         self.driver.get(url)
         source = lxml.html.fromstring(self.driver.page_source)
         for row in source.xpath('.//div[@class="page-content"]//table//tbody//tr'):
@@ -36,11 +35,16 @@ class Crawler:
 
         return currency_list
 
-    # def download_historical_data(self, symbol, stock_url):
-    #     self.busy = True
-    #     page_num = 2500
-    #     month_max = 30
-    #     month_min = 10
+    def get_time_fragment_list_with_url(self, url):
+        time_fragment_list = []
+        self.driver.get(url)
+        source = lxml.html.fromstring(self.driver.page_source)
+        for element in (source.xpath('.//div[@class="page-content"]//p')[3]).findall('.//a'):
+            time_fragment_list.append(element.attrib['href'])
+        return time_fragment_list
+
+    # def download_historical_data(self, symbol, url):
+
     #     delay = 8
     #     status = ""
 

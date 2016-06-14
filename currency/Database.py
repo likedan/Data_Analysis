@@ -16,5 +16,9 @@ class Database:
 
         self.currency_list = self.db['currency_list']
 
+    def get_currency_list(self):
+        c_list = [currency for currency in self.currency_list.find()]
+        return c_list
+
     def close(self):
         self.client.close()
