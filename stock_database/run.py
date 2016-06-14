@@ -5,33 +5,29 @@ import threading
 import time
 
 db = Database()
-crawler = Crawler() 
-crawler.db = db 
-alpha_stock_dict = db.get_alpha_stock_dict()
+symbol_file_name = "symbols.txt"
 
-symbol_queue = []
+symbol_list = []
 
-for key in alpha_stock_dict.keys():
-    symbol_queue.append(key)
+with open(symbol_file_name, 'rb') as symbolFile:
+    for row in symbolFile:
+        symbol = row.split("\t")[0]
+        symbol_list.append(symbol)
 
-while len(symbol_queue) > 0:
+symbol_set = set(symbol_list)
 
-    symbol = symbol_queue[-1]
-    symbol_queue.remove(symbol)
+five_letter_stock = []
 
-    stock_info = db.symbol_list.find_one({"symbol": symbol})
-    if "isValid" in stock_info:
-        print "skip: " + stock_info["symbol"]
-    else:
-        url = alpha_stock_dict[symbol]
+db_symbol_list = []
+for x in db.raw_data.find().distinct("symbol"):
+    if len(x) > 4:
+        five_letter_stock.append(x)
+    db_symbol_list.append(x)
+db_symbol_set = set(db_symbol_list)
 
-        data = crawler.download_historical_data(symbol, url)
-        if len(data) > 0:
-            for entry in data:
-                db.upsert_stock_data(symbol, entry)
-            stock_info["isValid"] = True
-        else:
-            stock_info["isValid"] = False
+print symbol_set - db_symbol_set
+print len(symbol_set - db_symbol_set)
 
-        db.symbol_list.update({"_id": stock_info["_id"]}, stock_info, True)
-        print symbol + " " + str(len(data))
+print five_letter_stock
+# for info in db.raw_data.find():
+#     info["raw_data"][""]
