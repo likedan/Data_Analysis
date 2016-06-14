@@ -5,6 +5,7 @@ from pymongo import *
 from bson.objectid import ObjectId
 import datetime
 
+
 class Database:
     def __init__(self):
         try:

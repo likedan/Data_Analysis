@@ -3,12 +3,13 @@ from DefaultVariables import *
 from Database import Database
 import threading
 import time
-import sys
+import time, os, sys
 
 def step1_get_currency_list():
 	db = Database()
 	crawler = Crawler(db) 
 	currency_list = crawler.get_currency_list_with_url(DEFAULT_SITE_URL + CURRENCYLIST_URL)
+	currency_list_dict = [{currency_dict} for currency_dict in currency_list]
 	db.currency_list.insert_many(currency_list)
 	crawler.quit()
 	db.close()
@@ -30,6 +31,8 @@ def step2_get_time_fragment_list():
 	    db.currency_list.update({"symbol": currency["symbol"]}, info, True)
 	crawler.quit()
 	db.close()
+
+
 
 if len(sys.argv) == 1:
 	db = Database()

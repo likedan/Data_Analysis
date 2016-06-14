@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import lxml.html
 from DefaultVariables import *
-import os, sys
+import os, sys, os
 from Database import Database
 
 class Crawler:
@@ -31,7 +31,7 @@ class Crawler:
         source = lxml.html.fromstring(self.driver.page_source)
         for row in source.xpath('.//div[@class="page-content"]//table//tbody//tr'):
             for element in row.xpath('.//td//a'):
-                currency_list.append({"symbol": element.attrib['href'][-6:], "url": element.attrib['href']})
+                currency_list.append(element.attrib['href'][-6:])
 
         return currency_list
 
@@ -43,8 +43,23 @@ class Crawler:
             time_fragment_list.append(element.attrib['href'])
         return time_fragment_list
 
-    # def download_historical_data(self, symbol, url):
+    def download_historical_data(self, symbol, url_list, folder):
+        self.quit()
 
+        directory = os.path.join(folder, symbol)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        firefox_profile = webdriver.FirefoxProfile()
+        firefox_profile.set_preference("javascript.enabled", False)
+        firefox_profile.set_preference("browser.download.folderList", 2)
+        firefox_profile.set_preference("browser.download.manager.showWhenStarting", False)
+        firefox_profile.set_preference("browser.download.dir", directory)
+        self.driver = webdriver.Firefox(firefox_profile=firefox_profile)
+
+        for url in url_list:
+            full_url = DEFAULT_SITE_URL + url
+            self.driver.get(full_url)
     #     delay = 8
     #     status = ""
 
