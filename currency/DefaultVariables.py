@@ -1,5 +1,8 @@
 # variables
-CRAWLING_START_YEAR = 1996
+CRAWLING_START_YEAR = 1998
+THREAD_NUMBER = 3
+
+DOWNLOAD_WAIT_SECOND = 2
 
 # database
 DATABASE_NAME = "CurrencyData"
@@ -9,5 +12,3 @@ DEFAULT_SITE_URL = "http://www.histdata.com"
 CURRENCYLIST_URL = "/download-free-forex-historical-data/?/ascii/tick-data-quotes/"
 
 # file system path
-
-DOWNLOAD_CURRENCY_DATA_PATH = "/Users/kedanli/Desktop"

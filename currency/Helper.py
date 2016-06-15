@@ -2,6 +2,9 @@ from DefaultVariables import *
 import os, sys, os
 import datetime
 
+def get_desktop_dir():
+    return os.getcwd().split("Desktop")[0] + "Desktop"
+
 def run_every_month_until(func):
 
     now = datetime.datetime.now()

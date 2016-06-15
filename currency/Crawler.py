@@ -65,9 +65,8 @@ class Crawler:
             full_url = DEFAULT_SITE_URL + CURRENCYLIST_URL + os.path.join(symbol, str(year), str(month)) 
             self.driver.get(full_url)
             button = self.driver.find_element_by_id('a_file')
-            print button
             button.click()
-            time.sleep(2)
+            time.sleep(DOWNLOAD_WAIT_SECOND)
 
             if year < CRAWLING_START_YEAR:
                 return False
