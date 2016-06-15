@@ -10,4 +10,4 @@ CURRENCYLIST_URL = "/download-free-forex-historical-data/?/ascii/tick-data-quote
 
 # file system path
 
-DOWNLOAD_CURRENCY_DATA_PATH = "/Users/likedan/Desktop"
+DOWNLOAD_CURRENCY_DATA_PATH = "/Users/kedanli/Desktop"
