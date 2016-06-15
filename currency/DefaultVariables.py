@@ -6,7 +6,7 @@ DATABASE_NAME = "CurrencyData"
 
 # Urls
 DEFAULT_SITE_URL = "http://www.histdata.com"
-CURRENCYLIST_URL = "/download-free-forex-data/?/ninjatrader/tick-last-quotes"
+CURRENCYLIST_URL = "/download-free-forex-historical-data/?/ascii/tick-data-quotes/"
 
 # file system path
 

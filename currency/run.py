@@ -11,5 +11,5 @@ if not os.path.exists(directory):
 crawler = Crawler(db)
 
 currency_list = db.get_currency_list()
-for currency in currency_list:
+for currency in currency_list[0:1]:
     crawler.download_historical_data(currency["symbol"], directory)
