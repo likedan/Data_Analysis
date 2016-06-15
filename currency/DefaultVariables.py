@@ -1,5 +1,5 @@
 # variables
-CRAWLING_START_YEAR = 1999
+CRAWLING_START_YEAR = 1996
 
 # database
 DATABASE_NAME = "CurrencyData"

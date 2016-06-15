@@ -14,24 +14,16 @@ def step1_get_currency_list():
 	crawler.quit()
 	db.close()
 
-def step2_get_time_fragment_list():
+def step2_download_zipfiles():
 	db = Database()
+	directory = os.path.join(DOWNLOAD_CURRENCY_DATA_PATH, "CurrencyData")
+	if not os.path.exists(directory):
+	    os.makedirs(directory)
 	crawler = Crawler(db)
 
 	currency_list = db.get_currency_list()
-	currency_time_fragment_list = []
-	for currency in currency_list:
-	    full_url = DEFAULT_SITE_URL + currency["url"]
-	    time_fragment_list = crawler.get_time_fragment_list_with_url(full_url)
-	    currency_time_fragment_list.append({"symbol": currency["symbol"], "list": time_fragment_list})
-
-	for currency in currency_time_fragment_list:
-	    info = db.currency_list.find_one({"symbol": currency["symbol"]})
-	    info["time_fragment_list"] = currency["list"]
-	    db.currency_list.update({"symbol": currency["symbol"]}, info, True)
-	crawler.quit()
-	db.close()
-
+	for currency in currency_list[0:1]:
+	    crawler.download_historical_data(currency["symbol"], directory)
 
 
 if len(sys.argv) == 1:
@@ -40,9 +32,9 @@ if len(sys.argv) == 1:
 		print "Error: database already exist.  start with the proper step"
 	else:
 	    step1_get_currency_list()
-	    step2_get_time_fragment_list()
+	    step2_download_zipfiles()
 
 elif sys.argv[1] == "1":
     step1_get_currency_list()
 elif sys.argv[1] == "2":
-    step2_get_time_fragment_list()
+    step2_download_zipfiles()
