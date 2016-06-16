@@ -21,21 +21,32 @@ def step1_unzip_raw_data():
 	if len(symbol_files) == 0:
 		raise Exception("data directory empty")
 
-	for file_dir in symbol_files:
-		zip_files = [os.path.join(file_dir, folder) for folder in os.listdir(file_dir) if folder[-4:] == ".zip"]
+	def unzip_data(crawler):
 
-		for zip_file in zip_files:
+	    while len(symbol_files) > 0:
 
-			#remove erroneous files
-			if os.path.getsize(zip_file) < 10000:
-				os.remove(zip_file)
-				print zip_file
+	        with lock:
+	            file_dir = symbol_files[0]
+	            symbol_files.remove(file_dir)
 
-			else:
-				directory_to_extract_to = file_dir.replace(RAW_DATA_PATH, DATA_PATH)
-				zip_ref = zipfile.ZipFile(zip_file, 'r')
-				zip_ref.extractall(directory_to_extract_to)
-				zip_ref.close()
+			zip_files = [os.path.join(file_dir, folder) for folder in os.listdir(file_dir) if folder[-4:] == ".zip"]
+
+			for zip_file in zip_files:
+
+				#remove erroneous files
+				if os.path.getsize(zip_file) < 10000:
+					os.remove(zip_file)
+					print zip_file
+
+				else:
+					directory_to_extract_to = file_dir.replace(RAW_DATA_PATH, DATA_PATH)
+					zip_ref = zipfile.ZipFile(zip_file, 'r')
+					zip_ref.extractall(directory_to_extract_to)
+					zip_ref.close()
+
+	for count in range(THREAD_NUMBER):
+	    t = threading.Thread(target=unzip_data, args=())
+	    t.start()
 
 
 if len(sys.argv) == 1:
