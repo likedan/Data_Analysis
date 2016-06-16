@@ -16,7 +16,7 @@ def step1_get_currency_list():
 
 def step2_download_zipfiles():
 	db = Database()
-	directory = os.path.join(DOWNLOAD_CURRENCY_DATA_PATH, "CurrencyData")
+	directory = os.path.join(DOWNLOAD_CURRENCY_DATA_PATH, RAW_DATA_PATH)
 	if not os.path.exists(directory):
 	    os.makedirs(directory)
 	crawler = Crawler(db)
