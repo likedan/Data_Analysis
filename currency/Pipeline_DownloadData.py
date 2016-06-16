@@ -2,7 +2,7 @@ from Crawler import Crawler
 from DefaultVariables import *
 from Database import Database
 import threading
-import time
+import Helper
 import time, os, sys
 
 def step1_get_currency_list():
@@ -15,15 +15,30 @@ def step1_get_currency_list():
 	db.close()
 
 def step2_download_zipfiles():
-	db = Database()
-	directory = os.path.join(DOWNLOAD_CURRENCY_DATA_PATH, RAW_DATA_PATH)
+	desktop_path = Helper.get_desktop_dir()
+	directory = os.path.join(desktop_path, RAW_DATA_PATH)
 	if not os.path.exists(directory):
 	    os.makedirs(directory)
-	crawler = Crawler(db)
 
+	db = Database()
 	currency_list = db.get_currency_list()
-	for currency in currency_list:
-	    crawler.download_historical_data(currency["symbol"], directory)
+	crawler_list = [Crawler(db) for x in range(THREAD_NUMBER)]
+
+	lock = threading.RLock()
+
+	def down_data(crawler):
+
+	    while len(currency_list) > 0:
+
+	        with lock:
+	            currency = currency_list[0]
+	            currency_list.remove(currency)
+
+	        crawler.download_historical_data(currency["symbol"], directory)
+
+	for crawler in crawler_list:
+	    t = threading.Thread(target=down_data, args=(crawler, ))
+	    t.start()
 
 
 if len(sys.argv) == 1:

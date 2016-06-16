@@ -62,7 +62,7 @@ class Crawler:
 
         def download_monthly_data(year, month):
 
-            full_url = DEFAULT_SITE_URL + CURRENCYLIST_URL + os.path.join(symbol, str(year), str(month)) 
+            full_url = DEFAULT_SITE_URL + DATA_DOWNLOAD_URL + os.path.join(symbol, str(year), str(month)) 
             self.driver.get(full_url)
             button = self.driver.find_element_by_id('a_file')
             button.click()
