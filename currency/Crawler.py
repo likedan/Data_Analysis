@@ -55,6 +55,7 @@ class Crawler:
         firefox_profile.set_preference("browser.download.dir", directory)
         self.driver = webdriver.Firefox(firefox_profile=firefox_profile)
 
+        file_num = 0
         def download_monthly_data(year, month):
 
             full_url = DEFAULT_SITE_URL + DATA_DOWNLOAD_URL + os.path.join(symbol, str(year), str(month)) 
@@ -63,7 +64,13 @@ class Crawler:
             button.click()
             time.sleep(DOWNLOAD_WAIT_SECOND)
 
-            if year < CRAWLING_START_YEAR:
+            current_files = os.listdir(folder)
+            if len(current_files) > file_num:
+                file_num = len(os.listdir(folder))
+            else:
+                for file in current_files:
+                    if file[-5:] == ".part":
+                        return True
                 return False
 
             return True
