@@ -8,24 +8,21 @@ import time, os, sys
 desktop_path = Helper.get_desktop_dir()
 directory = os.path.join(desktop_path, "CurrencyData")
 if not os.path.exists(directory):
-    os.makedirs(directory)
+	raise Exception("data directory doesn't exist")
 
-db = Database()
-currency_list = db.get_currency_list()
-crawler_list = [Crawler(db) for x in range(THREAD_NUMBER)]
+symbol_files = [os.path.join(directory, folder) for folder in os.listdir(directory) if len(folder) == 6]
 
-lock = threading.RLock()
+if not os.path.exists(directory):
+	raise Exception("data directory empty")
 
-def down_data(crawler):
+for file_dir in symbol_files:
+	zip_files = [os.path.join(file_dir, folder) for folder in os.listdir(file_dir) if folder[-4:] == ".zip"]
 
-    while len(currency_list) > 0:
+	for zip_file in zip_files:
 
-        with lock:
-            currency = currency_list[0]
-            currency_list.remove(currency)
+		#remove erroneous files
+		if os.path.getsize(zip_file) < 10000:
+			os.remove(zip_file)
+			print zip_file
 
-        crawler.download_historical_data(currency["symbol"], directory)
-
-for crawler in crawler_list:
-    t = threading.Thread(target=down_data, args=(crawler, ))
-    t.start()
+		
