@@ -21,6 +21,8 @@ for file_dir in symbol_files:
 	csv_files = [os.path.join(file_dir, folder) for folder in os.listdir(file_dir) if folder[-4:] == ".csv"]
 
 	for csv_file in csv_files:
-		print csv_file
+		with open(csv_file) as text_file:
+			lines = text_file.read().split(' ')
+			print lines
 
 
