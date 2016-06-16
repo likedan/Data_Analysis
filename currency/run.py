@@ -30,9 +30,10 @@ for file_dir in symbol_files:
 			os.remove(zip_file)
 			print zip_file
 
-		directory_to_extract_to = file_dir.replace(RAW_DATA_PATH, DATA_PATH)
-		zip_ref = zipfile.ZipFile(zip_file, 'r')
-		zip_ref.extractall(directory_to_extract_to)
-		zip_ref.close()
+		else:
+			directory_to_extract_to = file_dir.replace(RAW_DATA_PATH, DATA_PATH)
+			zip_ref = zipfile.ZipFile(zip_file, 'r')
+			zip_ref.extractall(directory_to_extract_to)
+			zip_ref.close()
 
 

@@ -33,7 +33,6 @@ if len(sys.argv) == 1:
 	else:
 	    step1_get_currency_list()
 	    step2_download_zipfiles()
-
 elif sys.argv[1] == "1":
     step1_get_currency_list()
 elif sys.argv[1] == "2":
