@@ -9,31 +9,18 @@ import time, os, sys
 desktop_path = Helper.get_desktop_dir()
 
 if not os.path.exists(os.path.join(desktop_path, DATA_PATH)):
-    os.makedirs(os.path.join(desktop_path, DATA_PATH))
+    raise Exception("data directory doesn't exist")
 
-directory = os.path.join(desktop_path, RAW_DATA_PATH)
-if not os.path.exists(directory):
-	raise Exception("data directory doesn't exist")
-
+directory = os.path.join(desktop_path, DATA_PATH)
 symbol_files = [os.path.join(directory, folder) for folder in os.listdir(directory) if len(folder) == 6]
 
-if not os.path.exists(directory):
+if len(symbol_files) == 0:
 	raise Exception("data directory empty")
 
 for file_dir in symbol_files:
-	zip_files = [os.path.join(file_dir, folder) for folder in os.listdir(file_dir) if folder[-4:] == ".zip"]
+	csv_files = [os.path.join(file_dir, folder) for folder in os.listdir(file_dir) if folder[-4:] == ".csv"]
 
-	for zip_file in zip_files:
-
-		#remove erroneous files
-		if os.path.getsize(zip_file) < 10000:
-			os.remove(zip_file)
-			print zip_file
-
-		else:
-			directory_to_extract_to = file_dir.replace(RAW_DATA_PATH, DATA_PATH)
-			zip_ref = zipfile.ZipFile(zip_file, 'r')
-			zip_ref.extractall(directory_to_extract_to)
-			zip_ref.close()
+	for csv_file in csv_files:
+		print csv_file
 
 

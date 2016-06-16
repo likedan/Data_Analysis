@@ -18,7 +18,7 @@ def step1_unzip_raw_data():
 
 	symbol_files = [os.path.join(directory, folder) for folder in os.listdir(directory) if len(folder) == 6]
 
-	if not os.path.exists(directory):
+	if len(symbol_files) == 0:
 		raise Exception("data directory empty")
 
 	for file_dir in symbol_files:
