@@ -37,21 +37,16 @@ class Crawler:
 
         return currency_list
 
-    def get_time_fragment_list_with_url(self, url):
-        time_fragment_list = []
-        self.driver.get(url)
-        source = lxml.html.fromstring(self.driver.page_source)
-        for element in (source.xpath('.//div[@class="page-content"]//p')[3]).findall('.//a'):
-            time_fragment_list.append(element.attrib['href'])
-        return time_fragment_list
-
     def download_historical_data(self, symbol, folder):
-        self.quit()
+        
 
         directory = os.path.join(folder, symbol)
         if not os.path.exists(directory):
             os.makedirs(directory)
+        else:
+            return
 
+        self.quit()
         firefox_profile = webdriver.FirefoxProfile()
         firefox_profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/octet-stream;application/csv;text/csv;application/vnd.ms-excel;") 
         firefox_profile.set_preference("browser.helperApps.alwaysAsk.force", False)

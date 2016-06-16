@@ -9,8 +9,8 @@ DATABASE_NAME = "CurrencyData"
 
 # Urls
 DEFAULT_SITE_URL = "http://www.histdata.com"
-CURRENCYLIST_URL = "/download-free-forex-data/?/ninjatrader/tick-last-quotes"
-DATA_DOWNLOAD_URL = "/download-free-forex-historical-data/?/ninjatrader/tick-last-quotes"
+CURRENCYLIST_URL = "/download-free-forex-historical-data/?/ascii/tick-data-quotes/"
+DATA_DOWNLOAD_URL = "/download-free-forex-historical-data/?/ninjatrader/tick-last-quotes/"
 
 # file system path
 RAW_DATA_PATH = "RawCurrencyData"
