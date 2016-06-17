@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import lxml.html
 from Database import Database
+from lxml import etree
 
 from DefaultVariables import *
 import Helper
@@ -29,13 +30,17 @@ class Crawler:
 
     def get_currency_list_with_url(self, url):
         currency_list = []
+        time_list = []
         self.driver.get(url)
         source = lxml.html.fromstring(self.driver.page_source)
         for row in source.xpath('.//div[@class="page-content"]//table//tbody//tr'):
+            for element in row.xpath('.//td'):
+                time_list.append(etree.tostring(element).split("<br/>(")[1][:4])
+
             for element in row.xpath('.//td//a'):
                 currency_list.append(element.attrib['href'][-6:])
 
-        return currency_list
+        return currency_list, time_list
 
     def download_historical_data(self, symbol, folder):
         
@@ -55,8 +60,10 @@ class Crawler:
         firefox_profile.set_preference("browser.download.dir", directory)
         self.driver = webdriver.Firefox(firefox_profile=firefox_profile)
 
-        file_num = 0
+        
         def download_monthly_data(year, month):
+
+            prev_file_num = len(os.listdir(directory))
 
             full_url = DEFAULT_SITE_URL + DATA_DOWNLOAD_URL + os.path.join(symbol, str(year), str(month)) 
             self.driver.get(full_url)
@@ -64,11 +71,10 @@ class Crawler:
             button.click()
             time.sleep(DOWNLOAD_WAIT_SECOND)
 
-            current_files = os.listdir(folder)
-            if len(current_files) > file_num:
-                file_num = len(os.listdir(folder))
-            else:
+            current_files = os.listdir(directory)
+            if len(current_files) == prev_file_num:
                 for file in current_files:
+                    print file + " " + str(year) + " " + str(month)
                     if file[-5:] == ".part":
                         return True
                 return False
