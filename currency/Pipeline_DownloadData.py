@@ -35,6 +35,7 @@ def step2_download_zipfiles():
 	            currency_list.remove(currency)
 
 	        crawler.download_historical_data(currency["symbol"], currency["time"], directory)
+	    crawler.quit()
 
 	for crawler in crawler_list:
 	    t = threading.Thread(target=down_data, args=(crawler, ))

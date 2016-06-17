@@ -24,26 +24,30 @@ def step1_unzip_raw_data():
 
 	def unzip_data():
 
-	    while len(symbol_files) > 0:
+		try:
+		    while len(symbol_files) > 0:
 
-	        with lock:
-	            file_dir = symbol_files[0]
-	            symbol_files.remove(file_dir)
+		        with lock:
+		            file_dir = symbol_files[0]
+		            symbol_files.remove(file_dir)
 
-	        zip_files = [os.path.join(file_dir, folder) for folder in os.listdir(file_dir) if folder[-4:] == ".zip"]
+		        zip_files = [os.path.join(file_dir, folder) for folder in os.listdir(file_dir) if folder[-4:] == ".zip"]
 
-	        for zip_file in zip_files:
+		        for zip_file in zip_files:
 
-				#remove erroneous files
-				if os.path.getsize(zip_file) < 10000:
-					os.remove(zip_file)
-					print zip_file
+					#remove erroneous files
+					if os.path.getsize(zip_file) < 10000:
+						os.remove(zip_file)
+						print zip_file
 
-				else:
-					directory_to_extract_to = file_dir.replace(RAW_DATA_PATH, DATA_PATH)
-					zip_ref = zipfile.ZipFile(zip_file, 'r')
-					zip_ref.extractall(directory_to_extract_to)
-					zip_ref.close()
+					else:
+						directory_to_extract_to = file_dir.replace(RAW_DATA_PATH, DATA_PATH)
+						zip_ref = zipfile.ZipFile(zip_file, 'r')
+						zip_ref.extractall(directory_to_extract_to)
+						zip_ref.close()
+		except Exception, e:
+			print file_dir + " error"
+
 
 	for count in range(THREAD_NUMBER):
 	    t = threading.Thread(target=unzip_data, args=())
