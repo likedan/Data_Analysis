@@ -9,7 +9,7 @@ def step1_get_currency_list():
 	db = Database()
 	crawler = Crawler(db) 
 	currency_list, time_list = crawler.get_currency_list_with_url(DEFAULT_SITE_URL + CURRENCYLIST_URL)
-	currency_list_dict = [{"symbol": currency_list[index], "time": time_list[index]} for index in range(len(currency_list))]
+	currency_list_dict = [{"symbol": currency_list[index], "time": int(time_list[index])} for index in range(len(currency_list))]
 	db.currency_list.insert_many(currency_list_dict)
 	crawler.quit()
 	db.close()
@@ -34,7 +34,7 @@ def step2_download_zipfiles():
 	            currency = currency_list[0]
 	            currency_list.remove(currency)
 
-	        crawler.download_historical_data(currency["symbol"], directory)
+	        crawler.download_historical_data(currency["symbol"], currency["time"], directory)
 
 	for crawler in crawler_list:
 	    t = threading.Thread(target=down_data, args=(crawler, ))

@@ -42,7 +42,7 @@ class Crawler:
 
         return currency_list, time_list
 
-    def download_historical_data(self, symbol, folder):
+    def download_historical_data(self, symbol, start_time, folder):
         
 
         directory = os.path.join(folder, symbol)
@@ -63,8 +63,6 @@ class Crawler:
         
         def download_monthly_data(year, month):
 
-            prev_file_num = len(os.listdir(directory))
-
             full_url = DEFAULT_SITE_URL + DATA_DOWNLOAD_URL + os.path.join(symbol, str(year), str(month)) 
             self.driver.get(full_url)
             button = self.driver.find_element_by_id('a_file')
@@ -72,9 +70,8 @@ class Crawler:
             time.sleep(DOWNLOAD_WAIT_SECOND)
 
             current_files = os.listdir(directory)
-            if len(current_files) == prev_file_num:
+            if year < start_time:
                 for file in current_files:
-                    print file + " " + str(year) + " " + str(month)
                     if file[-5:] == ".part":
                         return True
                 return False
