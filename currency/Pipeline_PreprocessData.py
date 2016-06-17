@@ -8,6 +8,7 @@ import time, os, sys
 
 def step1_unzip_raw_data():
 	desktop_path = Helper.get_desktop_dir()
+	lock = threading.RLock()
 
 	if not os.path.exists(os.path.join(desktop_path, DATA_PATH)):
 	    os.makedirs(os.path.join(desktop_path, DATA_PATH))
@@ -21,7 +22,7 @@ def step1_unzip_raw_data():
 	if len(symbol_files) == 0:
 		raise Exception("data directory empty")
 
-	def unzip_data(crawler):
+	def unzip_data():
 
 	    while len(symbol_files) > 0:
 
@@ -29,9 +30,9 @@ def step1_unzip_raw_data():
 	            file_dir = symbol_files[0]
 	            symbol_files.remove(file_dir)
 
-			zip_files = [os.path.join(file_dir, folder) for folder in os.listdir(file_dir) if folder[-4:] == ".zip"]
+	        zip_files = [os.path.join(file_dir, folder) for folder in os.listdir(file_dir) if folder[-4:] == ".zip"]
 
-			for zip_file in zip_files:
+	        for zip_file in zip_files:
 
 				#remove erroneous files
 				if os.path.getsize(zip_file) < 10000:
