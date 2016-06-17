@@ -48,7 +48,24 @@ def step3_verify_data_complete():
 	for currency in currency_list:
 		directory = os.path.join(desktop_path, RAW_DATA_PATH, currency["symbol"])
 		files = os.listdir(directory)
-		print files
+		files = [file[-10: -4] for file in files]
+
+		isValid = True
+		def verify_file(year, month):
+			key = str(year)+str(month)
+			if key in files:
+				files.remove(key)
+				return True
+			else:
+				if year != currency["time"]:
+					isValid = False
+				return False
+
+		Helper.run_every_month_until(verify_file)
+		if not isValid:
+			print "fail in " + currency["symbol"]
+			return
+	print "data is valid"
 
 if len(sys.argv) == 1:
 	db = Database()
