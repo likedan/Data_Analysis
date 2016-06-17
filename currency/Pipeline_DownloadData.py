@@ -40,6 +40,15 @@ def step2_download_zipfiles():
 	    t = threading.Thread(target=down_data, args=(crawler, ))
 	    t.start()
 
+def step3_verify_data_complete():
+	desktop_path = Helper.get_desktop_dir()
+	directory = os.path.join(desktop_path, RAW_DATA_PATH)
+	db = Database()
+	currency_list = db.get_currency_list()
+	for currency in currency_list:
+		directory = os.path.join(desktop_path, RAW_DATA_PATH, currency["symbol"])
+		files = os.listdir(directory)
+		print files
 
 if len(sys.argv) == 1:
 	db = Database()
@@ -48,7 +57,10 @@ if len(sys.argv) == 1:
 	else:
 	    step1_get_currency_list()
 	    step2_download_zipfiles()
+	    step3_verify_data_complete()
 elif sys.argv[1] == "1":
     step1_get_currency_list()
 elif sys.argv[1] == "2":
     step2_download_zipfiles()
+elif sys.argv[1] == "3":
+	step3_verify_data_complete()
