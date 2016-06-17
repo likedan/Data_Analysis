@@ -20,5 +20,9 @@ class Database:
         c_list = [currency for currency in self.currency_list.find()]
         return c_list
 
+    def get_available_currency_list(self):
+        collections = [collection for collection in self.db.collection_names() if self.currency_list.find({"symbol": collection}).count() == 1]
+        return collections
+
     def close(self):
         self.client.close()
