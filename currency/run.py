@@ -4,28 +4,25 @@ from Database import Database
 import Helper
 import threading
 import zipfile
-import time, os, sys
+import time, os, sys, datetime
 
 db = Database()
-print db.get_available_currency_list()
-# for file_dir in symbol_files:
-# 	symbol = file_dir[-6:]
-# 	csv_files = [os.path.join(file_dir, folder) for folder in os.listdir(file_dir) if folder[-4:] == ".csv"]
-# 	print symbol
-# 	day_diction = {}
-# 	for csv_file in csv_files:
-# 		print csv_file
-# 		with open(csv_file) as text_file:
-# 			lines = text_file.readlines()
-# 			for l in lines:
-# 				line = l.split(" ")
-# 				info = line[1].split(';')
-# 				if not (int(line[0]) in day_diction):
-# 					day_diction[int(line[0])] = []
-# 				day_diction[int(line[0])].append([int(info[0]), float(info[1])])
-# 	data = []
-# 	for key in day_diction.keys():
-# 		data.append({"date":key, "timeline": day_diction[key]})
-# 	db.db[symbol].insert_many(data)
+available_currency_list = db.get_available_currency_list()
 
-
+for currency in available_currency_list:
+	data = []
+	count = 0
+	for day in db.db[currency].find():
+		count = count + 1
+		if not ("unix_time" in day):
+			date = str(day["date"])
+			print date
+			unix_time = int(time.mktime(datetime.datetime.strptime(date, "%Y%m%d").timetuple()))
+			timeline_dict = []
+			for tick in day["timeline"]:
+				timeline_dict.append({"raw_time": tick[0], "adjusted_time": int(float(tick[0]) * 86400.0 / LARGEST_DAYTIME), "price": tick[1]})
+			day["timeline"] = timeline_dict
+			day["unix_time"] = unix_time
+			day["timestamp_count"] = len(timeline_dict)
+			db.db[currency].update({"date": day["date"]}, day,False)
+			print count 
