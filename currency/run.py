@@ -17,12 +17,19 @@ symbol_files = [os.path.join(directory, folder) for folder in os.listdir(directo
 if len(symbol_files) == 0:
 	raise Exception("data directory empty")
 
+db = Database()
 for file_dir in symbol_files:
+	symbol = file_dir[-6:]
 	csv_files = [os.path.join(file_dir, folder) for folder in os.listdir(file_dir) if folder[-4:] == ".csv"]
 
+	data = []
 	for csv_file in csv_files:
 		with open(csv_file) as text_file:
 			lines = text_file.read().split(' ')
-			print lines
+			for line in lines:
+				info = line[1].split(';')
+				data.append({"date": int(line[0]), "day_time": int(info[0]), "price":float(info[1])})
+				print info
+	db.db[symbol].insert_many(data)
 
 
