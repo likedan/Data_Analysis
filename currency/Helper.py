@@ -21,8 +21,6 @@ def is_valid_date(date):
         raise Exception("date wrong format")
     if date_n < 19990000 or date_n > (current_year + 1) * 10000:
         raise Exception("date invalid range")
-    if datetime.datetime.strptime(date, "%Y%m%d").isoweekday() == 6:
-        raise Exception("no data Saturday")
     return True
 
 
