@@ -93,7 +93,6 @@ def step3_adjust_daily_data():
 	available_currency_list = db.get_available_currency_list()
 
 	for currency in available_currency_list:
-		data = []
 		count = 0
 		for day in db.db[currency].find():
 			count = count + 1

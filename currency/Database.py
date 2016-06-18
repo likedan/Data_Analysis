@@ -4,7 +4,7 @@ import pymongo
 from pymongo import *
 from bson.objectid import ObjectId
 import datetime
-
+import Helper
 
 class Database:
     def __init__(self):
@@ -23,6 +23,17 @@ class Database:
     def get_available_currency_list(self):
         collections = [collection for collection in self.db.collection_names() if self.currency_list.find({"symbol": collection}).count() == 1]
         return collections
+
+    def get_one_day_stock_data(self, symbol, date):
+
+        date = int(date)
+        Helper.is_valid_symbol(symbol)
+        Helper.is_valid_date(date)
+
+        return self.db[symbol].find_one({"date": date})
+
+    def get_range_stock_date(self, symbol, start, end):
+        pass
 
     def close(self):
         self.client.close()
