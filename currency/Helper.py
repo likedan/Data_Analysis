@@ -26,9 +26,6 @@ def is_valid_date(date):
     return True
 
 
-    
-
-
 def get_desktop_dir():
     return os.getcwd().split("Desktop")[0] + "Desktop"
 

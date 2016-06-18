@@ -33,7 +33,11 @@ class Database:
         return self.db[symbol].find_one({"date": date})
 
     def get_range_stock_date(self, symbol, start, end):
-        pass
+        start = int(start)
+        end = int(end)
+        Helper.is_valid_symbol(symbol)
+        Helper.is_valid_date(start)
+        Helper.is_valid_date(end)
 
     def close(self):
         self.client.close()
