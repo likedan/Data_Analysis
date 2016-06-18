@@ -3,7 +3,7 @@ from DefaultVariables import *
 import pymongo
 from pymongo import *
 from bson.objectid import ObjectId
-import datetime
+import datetime, time
 import Helper
 
 class Database:
@@ -38,6 +38,12 @@ class Database:
         Helper.is_valid_symbol(symbol)
         Helper.is_valid_date(start)
         Helper.is_valid_date(end)
+        start_time = int(time.mktime(datetime.datetime.strptime(str(start), "%Y%m%d").timetuple())) - 100
+        end_time = int(time.mktime(datetime.datetime.strptime(str(end), "%Y%m%d").timetuple())) - 100
+        results = []
+        for day_date in self.db[symbol].find({'unix_time': {'$gte': start_time, '$lt': end_time}}):
+            results.append(day_date)
+        return results
 
     def close(self):
         self.client.close()

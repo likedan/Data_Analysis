@@ -7,4 +7,6 @@ import zipfile
 import time, os, sys, datetime
 
 db = Database()
-print db.get_one_day_stock_data("EURUSD", "20160604")
+data = db.get_range_stock_date("EURUSD", "20160603", "20160607")
+for diction in data:
+	print diction["date"]
