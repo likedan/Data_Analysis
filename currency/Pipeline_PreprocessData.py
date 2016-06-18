@@ -81,7 +81,7 @@ def step2_load_data_into_database():
 					info = line[1].split(';')
 					if not (int(line[0]) in day_diction):
 						day_diction[int(line[0])] = []
-					tick_time = datetime.datetime(line[0][:4], line[0][4:-2], line[0][-2:], info[0][:2], info[0][2:-2], info[0][-2:])
+					tick_time = datetime.datetime(int(line[0][:4]), int(line[0][4:-2]), int(line[0][-2:]), int(info[0][:2]), int(info[0][2:-2]), int(info[0][-2:]))
 					unix_time = int(time.mktime(tick_time.timetuple()))
 					print tick_time
 					print unix_time
