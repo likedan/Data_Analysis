@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.finance import candlestick_ohlc
 
 db = Database()
-data = db.get_range_stock_date("EURUSD", "20140606", "20140610")
+data = db.get_range_stock_date("EURUSD", "20160608", "20160612")
 
 time = []
 last = []
@@ -19,17 +19,18 @@ for diction_index in range(len(data)):
 	minute_Price = data[diction_index]["minute_price"]
 	for index in range(len(minute_Price)):
 		if minute_Price[index]["tick_count"] == 0:
-			if len(time) > 0:
-				time.append(minute_Price[index]["minute_count"] + MINUTES_PER_DAY * diction_index)
-				last.append(last[-1])
-				high.append(last[-1])
-				low.append(last[-1])
+			pass
+			# if len(time) > 0:
+			# 	time.append(minute_Price[index]["minute_count"] + MINUTES_PER_DAY * diction_index)
+			# 	last.append(last[-1])
+			# 	high.append(last[-1])
+			# 	low.append(last[-1])
 		else:
-			time.append(minute_Price[index]["minute_count"] + MINUTES_PER_DAY * diction_index)
+			# time.append(minute_Price[index]["minute_count"] + MINUTES_PER_DAY * diction_index)
 			last.append(minute_Price[index]["last"] * 1000)
 			high.append(minute_Price[index]["high"] * 1000)
 			low.append(minute_Price[index]["low"] * 1000)
-
+time = [x for x in range(len(high))]
 open_data = last[:-1]
 open_data.insert(0, low[0])
 high_data = high
