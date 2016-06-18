@@ -11,36 +11,27 @@ from matplotlib.finance import candlestick_ohlc
 db = Database()
 data = db.get_range_stock_date("EURUSD", "20160608", "20160612")
 
-time = []
+dates = []
 last = []
 high = []
 low = []
+first = []
 for diction_index in range(len(data)):
-	minute_Price = data[diction_index]["minute_price"]
-	for index in range(len(minute_Price)):
-		if minute_Price[index]["tick_count"] == 0:
+	minute_price = data[diction_index]["minute_price"]
+	unix_time = data[diction_index]["unix_time"]
+	for index in range(len(minute_price)):
+		if minute_price[index]["tick_count"] == 0:
 			pass
-			# if len(time) > 0:
-			# 	time.append(minute_Price[index]["minute_count"] + MINUTES_PER_DAY * diction_index)
-			# 	last.append(last[-1])
-			# 	high.append(last[-1])
-			# 	low.append(last[-1])
 		else:
 			# time.append(minute_Price[index]["minute_count"] + MINUTES_PER_DAY * diction_index)
-			last.append(minute_Price[index]["last"] * 1000)
-			high.append(minute_Price[index]["high"] * 1000)
-			low.append(minute_Price[index]["low"] * 1000)
-time = [x for x in range(len(high))]
-open_data = last[:-1]
-open_data.insert(0, low[0])
-high_data = high
-low_data = low
-close_data = last
-dates = time
-
+			last.append(minute_price[index]["last"])
+			high.append(minute_price[index]["high"])
+			low.append(minute_price[index]["low"])
+			first.append(minute_price[index]["first"])
+			dates.append(datetime.datetime.fromtimestamp(unix_time + minute_price[index]["minute_count"] * 60))
 price = []
 for index in range(len(dates)):
-	price.append((dates[index],open_data[index],high_data[index],low_data[index],close_data[index]))
+	price.append((dates[index],start[index],high[index],low[index],last[index]))
 
 #and then following the official example. 
 fig, ax = plt.subplots()

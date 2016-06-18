@@ -3,7 +3,7 @@ from DefaultVariables import *
 import pymongo
 from pymongo import *
 from bson.objectid import ObjectId
-import datetime, time
+import datetime
 import Helper
 
 class Database:
@@ -33,6 +33,7 @@ class Database:
         return self.db[symbol].find_one({"date": date})
 
     def get_range_stock_date(self, symbol, start, end):
+
         start = int(start)
         end = int(end)
         Helper.is_valid_symbol(symbol)
