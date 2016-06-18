@@ -81,34 +81,18 @@ def step2_load_data_into_database():
 					info = line[1].split(';')
 					if not (int(line[0]) in day_diction):
 						day_diction[int(line[0])] = []
-					day_diction[int(line[0])].append([int(info[0]), float(info[1])])
+					tick_time = datetime.datetime(line[0][:4], line[0][4:-2], line[0][-2:], info[0][:2], info[0][2:-2], info[0][-2:])
+					unix_time = int(time.mktime(tick_time.timetuple()))
+					print tick_time
+					print unix_time
+					day_diction[int(line[0])].append({"unix_time": unix_time, "price": float(info[1])})
 		data = []
 		for key in day_diction.keys():
-			data.append({"date":key, "timeline": day_diction[key]})
-		db.db[symbol].insert_many(data)
+			unix_time = int(time.mktime(datetime.datetime.strptime(str(key), "%Y%m%d").timetuple()))
+			data.append({"date":key, "timeline": day_diction[key], "unix_time": unix_time, "timestamp_count": len(day_diction[key])})
+		db.db[symbol].insert_many(data) 
 
-def step3_adjust_daily_data():
-
-	db = Database()
-	available_currency_list = db.get_available_currency_list()
-
-	for currency in available_currency_list:
-		count = 0
-		for day in db.db[currency].find():
-			count = count + 1
-			if not ("unix_time" in day):
-				date = str(day["date"])
-				unix_time = int(time.mktime(datetime.datetime.strptime(date, "%Y%m%d").timetuple()))
-				timeline_dict = []
-				for tick in day["timeline"]:
-					timeline_dict.append({"raw_time": tick[0], "adjusted_time": int(float(tick[0]) * 86400.0 / LARGEST_DAYTIME), "price": tick[1]})
-				day["timeline"] = timeline_dict
-				day["unix_time"] = unix_time
-				day["timestamp_count"] = len(timeline_dict)
-				db.db[currency].update({"date": day["date"]}, day,False)
-				print count 
-
-def step4_generate_minute_data():
+def step3_generate_minute_data():
 
 	db = Database()
 	available_currency_list = db.get_available_currency_list()
@@ -144,4 +128,4 @@ elif sys.argv[1] == "1":
 elif sys.argv[1] == "2":
 	step2_load_data_into_database()
 elif sys.argv[1] == "3":
-	step3_adjust_daily_data() 
+	step3_generate_minute_data() 
