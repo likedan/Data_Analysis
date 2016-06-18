@@ -83,8 +83,7 @@ def step2_load_data_into_database():
 						day_diction[int(line[0])] = []
 					tick_time = datetime.datetime(int(line[0][:4]), int(line[0][4:-2]), int(line[0][-2:]), int(info[0][:2]), int(info[0][2:-2]), int(info[0][-2:]))
 					unix_time = int(time.mktime(tick_time.timetuple()))
-					print tick_time
-					print unix_time
+
 					day_diction[int(line[0])].append({"unix_time": unix_time, "price": float(info[1])})
 		data = []
 		for key in day_diction.keys():
@@ -104,14 +103,15 @@ def step3_generate_minute_data():
 			count = count + 1
 			#if not ("minute_price_high" in day):
 			date = str(day["date"])
-			unix_time = int(time.mktime(datetime.datetime.strptime(date, "%Y%m%d").timetuple()))
-			minute_dict = [{"minute_count": index, "high": 0, "low": 9999, "last": 0, "tick_count": 0} for index in range(0, 1440)]
+			minute_dict = [{"minute_count": index, "first": 0, "high": 0, "low": 9999, "last": 0, "tick_count": 0} for index in range(0, 1440)]
 			for tick in day["timeline"]:
-				current_minute = tick["adjusted_time"] / 60
+				current_minute = (tick["unix_time"] - day["unix_time"]) / 60
 				if tick["price"] > minute_dict[current_minute]["high"]:
 					minute_dict[current_minute]["high"] = tick["price"]
 				if tick["price"] < minute_dict[current_minute]["low"]:
 					minute_dict[current_minute]["low"] = tick["price"]
+				if minute_dict[current_minute]["first"] == 0:
+					minute_dict[current_minute]["first"] = tick["price"]
 				minute_dict[current_minute]["last"] = tick["price"]
 				minute_dict[current_minute]["tick_count"] = minute_dict[current_minute]["tick_count"] + 1
 			day["minute_price"] = minute_dict
