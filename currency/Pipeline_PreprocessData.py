@@ -4,7 +4,7 @@ from Database import Database
 import Helper
 import threading
 import zipfile
-import time, os, sys
+import time, os, sys, datetime
 
 def step1_unzip_raw_data():
 	desktop_path = Helper.get_desktop_dir()
@@ -87,6 +87,28 @@ def step2_load_data_into_database():
 			data.append({"date":key, "timeline": day_diction[key]})
 		db.db[symbol].insert_many(data)
 
+def step3_adjust_daily_data():
+
+	db = Database()
+	available_currency_list = db.get_available_currency_list()
+
+	for currency in available_currency_list:
+		data = []
+		count = 0
+		for day in db.db[currency].find():
+			count = count + 1
+			if not ("unix_time" in day):
+				date = str(day["date"])
+				unix_time = int(time.mktime(datetime.datetime.strptime(date, "%Y%m%d").timetuple()))
+				timeline_dict = []
+				for tick in day["timeline"]:
+					timeline_dict.append({"raw_time": tick[0], "adjusted_time": int(float(tick[0]) * 86400.0 / LARGEST_DAYTIME), "price": tick[1]})
+				day["timeline"] = timeline_dict
+				day["unix_time"] = unix_time
+				day["timestamp_count"] = len(timeline_dict)
+				db.db[currency].update({"date": day["date"]}, day,False)
+				print count 
+
 if len(sys.argv) == 1:
 	if not os.path.exists(os.path.join(Helper.get_desktop_dir(), RAW_DATA_PATH)):
 		print "Error: raw data doesn't exist  run Pipeline_DownloadData"
@@ -96,3 +118,5 @@ elif sys.argv[1] == "1":
     step1_unzip_raw_data()
 elif sys.argv[1] == "2":
 	step2_load_data_into_database()
+elif sys.argv[1] == "3":
+	step3_adjust_daily_data() 
