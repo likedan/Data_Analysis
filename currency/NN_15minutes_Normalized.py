@@ -17,7 +17,9 @@ for diction_index in range(len(data)):
     first = []
     minute_price = data[diction_index]["minute_price"]
     unix_time = data[diction_index]["unix_time"]
-    # for index in range(len(minute_price)):
+    for index in range(len(minute_price)):
+        if minute_price[index]["tick_count"] == 0
+            print minute_price[index]
     #     last.append(minute_price[index]["last"])
     #     high.append(minute_price[index]["high"])
     #     low.append(minute_price[index]["low"])
