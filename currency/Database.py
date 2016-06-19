@@ -24,7 +24,7 @@ class Database:
         collections = [collection for collection in self.db.collection_names() if self.currency_list.find({"symbol": collection}).count() == 1]
         return collections
 
-    def get_one_day_stock_data(self, symbol, date):
+    def get_one_day_currency_data(self, symbol, date):
 
         date = int(date)
         Helper.is_valid_symbol(symbol)
@@ -32,7 +32,7 @@ class Database:
 
         return self.db[symbol].find_one({"date": date})
 
-    def get_range_stock_date(self, symbol, start, end):
+    def get_range_currency_date(self, symbol, start, end):
 
         start = int(start)
         end = int(end)
