@@ -6,7 +6,7 @@ import threading
 import zipfile
 import time, os, sys, datetime
 import numpy as np
-from sknn.mlp import Classifier, Layer
+from sklearn.svm import SVR
 
 def extract_nn10minutes_data(first, high, low, last, occurance_count):
 
@@ -89,11 +89,11 @@ training_set_result = np_training_result[:training_data_num]
 testing_set = np_training_data[training_data_num:]
 testing_result = np_training_result[training_data_num:]
 
-nn = Classifier(layers=[Layer("Sigmoid", units=100), Layer("Rectifier", units=50), Layer("Sigmoid", units=20), Layer("Softmax")],learning_rate=0.05,n_iter=10)
-nn.fit(np_training_data, np_training_result)
+svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
+svr_rbf.fit(np_training_data, np_training_result)
 
 print "start_testing"
-result_proba = nn.predict_proba(testing_set)
+result_proba = svr_rbf.predict(testing_set)
 for index in range(len(result_proba)):
     print str(result_proba[index]) + "  " + str(testing_result[index])
 

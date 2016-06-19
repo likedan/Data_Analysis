@@ -106,6 +106,8 @@ def step3_generate_minute_data():
 			minute_dict = [{"minute_count": index, "first": 0, "high": 0, "low": 9999, "last": 0, "tick_count": 0} for index in range(0, 1440)]
 			for tick in day["timeline"]:
 				current_minute = (tick["unix_time"] - day["unix_time"]) / 60
+				if current_minute >= 1440:
+					continue
 				if tick["price"] > minute_dict[current_minute]["high"]:
 					minute_dict[current_minute]["high"] = tick["price"]
 				if tick["price"] < minute_dict[current_minute]["low"]:
