@@ -82,14 +82,14 @@ for index in range(len(training_result)):
 np_training_result = np.array(np_training_result)
 
 TRAINING_PERCENTAGE = 0.3
-training_data_num = 0.3 * len(training_result)
+training_data_num = int(TRAINING_PERCENTAGE * len(training_result))
 
 training_set = np_training_data[:training_data_num]
 training_set_result = np_training_result[:training_data_num]
 testing_set = np_training_data[training_data_num:]
 testing_result = np_training_result[training_data_num:]
 
-nn = Classifier(layers=[Layer("Sigmoid", units=100), Layer("Rectifier", units=50), Layer("Sigmoid", units=20), Layer("Softmax")],learning_rate=0.05,n_iter=10)
+nn = Classifier(layers=[Layer("Sigmoid", units=1000), Layer("Rectifier", units=200), Layer("Sigmoid", units=50), Layer("Softmax")],learning_rate=0.1,n_iter=10)
 nn.fit(np_training_data, np_training_result)
 
 print "start_testing"

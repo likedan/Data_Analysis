@@ -10,7 +10,7 @@ from sklearn.svm import SVR
 
 def extract_nn10minutes_data(first, high, low, last, occurance_count):
 
-    USE_SLICE_NUM = 11
+    USE_SLICE_NUM = 8
     data = []
     result = []
     min_occurance_count = 4
@@ -72,24 +72,20 @@ np_training_result = []
 for index in range(len(training_result)):
     index_range = max(training_data[index]) - min(training_data[index])
     np_training_data[index] = (np_training_data[index] - min(training_data[index])) / index_range
-    if training_result[index] - training_data[index][-1] > 0:
-        np_training_result.append(1)
-    elif training_result[index] - training_data[index][-1] < 0:
-        np_training_result.append(2)
-    else:
-        np_training_result.append(0)
+    result = (training_result[index] - training_data[index][-1]) / index_range
+    np_training_result.append(result)
 
 np_training_result = np.array(np_training_result)
 
-TRAINING_PERCENTAGE = 0.3
-training_data_num = 0.3 * len(training_result)
+TRAINING_PERCENTAGE = 0.04
+training_data_num = int(TRAINING_PERCENTAGE * len(training_result))
 
 training_set = np_training_data[:training_data_num]
 training_set_result = np_training_result[:training_data_num]
 testing_set = np_training_data[training_data_num:]
 testing_result = np_training_result[training_data_num:]
 
-svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
+svr_rbf = SVR(kernel='poly', C=1e3, degree=3)
 svr_rbf.fit(np_training_data, np_training_result)
 
 print "start_testing"
