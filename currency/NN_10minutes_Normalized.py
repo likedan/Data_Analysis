@@ -10,7 +10,7 @@ from sklearn.neural_network import MLPClassifier
 
 def extract_nn10minutes_data(first, high, low, last, occurance_count):
 
-    USE_SLICE_NUM = 21
+    USE_SLICE_NUM = 16
     data = []
     result = []
     min_occurance_count = 10
@@ -33,7 +33,7 @@ training_result = []
 
 db = Database()
 # available_currency_list = db.get_available_currency_list()
-currency_data = db.get_range_currency_date("EURUSD", "20030601", "20160601")
+currency_data = db.get_range_currency_date("EURUSD", "20160101", "20160601")
 
 training_data = []
 
@@ -95,7 +95,7 @@ testing_result = np_training_result[training_data_num:]
 print np.isnan(training_set).any()
 print "start_training"
 
-nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(50, 20, 10), random_state=1, max_iter=5000)
+nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(50, 20, 10), random_state=100, max_iter=10000)
 nn.fit(training_set, training_set_result)
 
 print "start_testing"

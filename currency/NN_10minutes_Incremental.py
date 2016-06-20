@@ -37,13 +37,13 @@ def extract_nn10minutes_data(minute_data):
         elif len(minute_data[end_index]) < 6 or (not Helper.has_data_among_intervals(minute_data[end_index],[range(5,10),range(15,20),range(25,30),range(35,40),range(45,50),range(55,60)], total_range)):
             computed_interval_data[end_index][10] = Helper.get_data_among_intervals(minute_data[end_index],[range(40,60)], total_range)
             computed_interval_data[end_index][6] = Helper.get_data_among_intervals(minute_data[end_index],[range(18,30),range(48,60)], total_range)
-            computed_interval_data[end_index][3] = Helper.get_data_among_intervals(minute_data[end_index],[range(7,15),range(22,30),range(37,45),range(52,60)], total_range)):
+            computed_interval_data[end_index][3] = Helper.get_data_among_intervals(minute_data[end_index],[range(7,15),range(22,30),range(37,45),range(52,60)], total_range)
             remaining_check[0] = INTERVAL_COUNT[0]
         else:
             computed_interval_data[end_index][10] = Helper.get_data_among_intervals(minute_data[end_index],[range(40,60)], total_range)
             computed_interval_data[end_index][6] = Helper.get_data_among_intervals(minute_data[end_index],[range(18,30),range(48,60)], total_range)
-            computed_interval_data[end_index][3] = Helper.get_data_among_intervals(minute_data[end_index],[range(7,15),range(22,30),range(37,45),range(52,60)], total_range)):
-            computed_interval_data[end_index][1] = Helper.get_data_among_intervals(minute_data[end_index],[range(5,10),range(15,20),range(25,30),range(35,40),range(45,50),range(55,60)], total_range):
+            computed_interval_data[end_index][3] = Helper.get_data_among_intervals(minute_data[end_index],[range(7,15),range(22,30),range(37,45),range(52,60)], total_range)
+            computed_interval_data[end_index][1] = Helper.get_data_among_intervals(minute_data[end_index],[range(5,10),range(15,20),range(25,30),range(35,40),range(45,50),range(55,60)], total_range)
 
         cid = computed_interval_data
         #good data
@@ -67,10 +67,10 @@ training_result = []
 db = Database()
 # available_currency_list = db.get_available_currency_list()
 currency_data = db.get_range_currency_date("EURUSD", "20060101", "20160601")
-
 training_data = []
-
 minute_data = []
+print "start preprocessiong data"
+
 for diction_index in range(len(currency_data)):
     print currency_data[diction_index]["date"]
     minute_price = currency_data[diction_index]["minute_price"]
