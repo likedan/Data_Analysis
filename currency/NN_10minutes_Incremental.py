@@ -54,7 +54,7 @@ def extract_nn10minutes_data(minute_data):
             data.append(info)
             if minute_data[end_index][-1]["price"] > minute_data[end_index + 1][-1]["price"]:
                 result.append(-1)
-            elif minute_data[end_index][-1]["price"] > minute_data[end_index + 1][-1]["price"]:
+            elif minute_data[end_index][-1]["price"] < minute_data[end_index + 1][-1]["price"]:
                 result.append(1)
             else:
                 result.append(0)
@@ -124,18 +124,18 @@ for index in range(len(result_proba)):
 
 print float(succ)/(total)
 
-# testing_set = training_set
-# testing_result = training_set_result
+testing_set = training_set
+testing_result = training_set_result
 
-# result_proba = nn.predict(testing_set)
+result_proba = nn.predict(testing_set)
 
-# total = 0
-# succ = 0
-# for index in range(len(result_proba)):
-#     if result_proba[index] == testing_result[index]:
-#         succ += 1
-#     if testing_result[index] != 0:
-#         total += 1
+total = 0
+succ = 0
+for index in range(len(result_proba)):
+    if result_proba[index] == testing_result[index]:
+        succ += 1
+    if testing_result[index] != 0:
+        total += 1
 
-# print float(succ)/(total)
+print float(succ)/(total)
 
