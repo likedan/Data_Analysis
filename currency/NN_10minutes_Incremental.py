@@ -107,7 +107,7 @@ testing_result = np_training_result[training_data_num:]
 print np.isnan(training_set).any()
 print "start_training"
 
-nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(50, 20, 10), random_state=1, max_iter=500)
+nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(50, 20, 10), random_state=1, max_iter=200)
 nn.fit(training_set, training_set_result)
 
 print "start_testing"
@@ -120,21 +120,22 @@ for index in range(len(result_proba)):
         succ += 1
     if testing_result[index] != 0:
         total += 1
+    print (result_proba[index], testing_result[index])
 
 print float(succ)/(total)
 
-testing_set = training_set
-testing_result = training_set_result
+# testing_set = training_set
+# testing_result = training_set_result
 
-result_proba = nn.predict(testing_set)
+# result_proba = nn.predict(testing_set)
 
-total = 0
-succ = 0
-for index in range(len(result_proba)):
-    if result_proba[index] == testing_result[index]:
-        succ += 1
-    if testing_result[index] != 0:
-        total += 1
+# total = 0
+# succ = 0
+# for index in range(len(result_proba)):
+#     if result_proba[index] == testing_result[index]:
+#         succ += 1
+#     if testing_result[index] != 0:
+#         total += 1
 
-print float(succ)/(total)
+# print float(succ)/(total)
 

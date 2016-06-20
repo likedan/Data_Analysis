@@ -43,6 +43,7 @@ class Database:
         end_time = int(time.mktime(datetime.datetime.strptime(str(end), "%Y%m%d").timetuple()))
         results = []
         for day_date in self.db[symbol].find({'unix_time': {'$gte': start_time, '$lte': end_time}}):
+            print "got"
             results.append(day_date)
         results = sorted(results, key=lambda k: k['unix_time'])
         return results
