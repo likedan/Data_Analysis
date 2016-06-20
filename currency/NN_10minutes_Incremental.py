@@ -4,6 +4,7 @@ from Database import Database
 import Helper
 import threading
 import zipfile
+from copy import deepcopy
 import time, os, sys, datetime
 import numpy as np
 from sklearn.neural_network import MLPClassifier
@@ -26,19 +27,19 @@ def extract_nn10minutes_data(minute_data):
         
         computed_interval_data[end_index] = {}
         if len(minute_data[end_index]) < 1 or minute_data[end_index][-1]["unix_time"] % 60 < 40:
-            remaining_check = INTERVAL_COUNT
+            remaining_check = deepcopy(INTERVAL_COUNT)
         elif len(minute_data[end_index]) < 2 or (not Helper.has_data_among_intervals(minute_data[end_index],[range(18,30),range(48,60)], total_range)):
             computed_interval_data[end_index][10] = Helper.get_data_among_intervals(minute_data[end_index],[range(40,60)], total_range)
-            remaining_check[:-1] = INTERVAL_COUNT[:-1]
+            remaining_check[:-1] = deepcopy(INTERVAL_COUNT[:-1])
         elif len(minute_data[end_index]) < 4 or (not Helper.has_data_among_intervals(minute_data[end_index],[range(7,15),range(22,30),range(37,45),range(52,60)], total_range)):
             computed_interval_data[end_index][10] = Helper.get_data_among_intervals(minute_data[end_index],[range(40,60)], total_range)
             computed_interval_data[end_index][6] = Helper.get_data_among_intervals(minute_data[end_index],[range(18,30),range(48,60)], total_range)
-            remaining_check[:-2] = INTERVAL_COUNT[:-2]
+            remaining_check[:-2] = deepcopy(INTERVAL_COUNT[:-2])
         elif len(minute_data[end_index]) < 6 or (not Helper.has_data_among_intervals(minute_data[end_index],[range(5,10),range(15,20),range(25,30),range(35,40),range(45,50),range(55,60)], total_range)):
             computed_interval_data[end_index][10] = Helper.get_data_among_intervals(minute_data[end_index],[range(40,60)], total_range)
             computed_interval_data[end_index][6] = Helper.get_data_among_intervals(minute_data[end_index],[range(18,30),range(48,60)], total_range)
             computed_interval_data[end_index][3] = Helper.get_data_among_intervals(minute_data[end_index],[range(7,15),range(22,30),range(37,45),range(52,60)], total_range)
-            remaining_check[0] = INTERVAL_COUNT[0]
+            remaining_check[0] = deepcopy(INTERVAL_COUNT[0])
         else:
             computed_interval_data[end_index][10] = Helper.get_data_among_intervals(minute_data[end_index],[range(40,60)], total_range)
             computed_interval_data[end_index][6] = Helper.get_data_among_intervals(minute_data[end_index],[range(18,30),range(48,60)], total_range)
@@ -46,9 +47,10 @@ def extract_nn10minutes_data(minute_data):
             computed_interval_data[end_index][1] = Helper.get_data_among_intervals(minute_data[end_index],[range(5,10),range(15,20),range(25,30),range(35,40),range(45,50),range(55,60)], total_range)
 
         cid = computed_interval_data
+
         #good data
         if sum(remaining_check) == 0 and len(minute_data[end_index + 1]) >= 1 and minute_data[end_index + 1][-1]["unix_time"] % 60 >= 40:
-            info =  cid[end_index - 9][6] + cid[end_index - 8][10] + cid[end_index - 7][6] + cid[end_index - 6][10] + cid[end_index - 5][6] + cid[end_index - 4][6] + cid[end_index - 3][6] + cid[end_index - 2][3] + cid[end_index - 1][3] + cid[end_index][1]
+            info = cid[end_index - 9][10] + cid[end_index - 8][10] + cid[end_index - 7][10] + cid[end_index - 6][10] + cid[end_index - 5][6] + cid[end_index - 4][6] + cid[end_index - 3][6] + cid[end_index - 2][3] + cid[end_index - 1][3] + cid[end_index][1]
             data.append(info)
             if minute_data[end_index][-1]["price"] > minute_data[end_index + 1][-1]["price"]:
                 result.append(-1)
@@ -105,7 +107,7 @@ testing_result = np_training_result[training_data_num:]
 print np.isnan(training_set).any()
 print "start_training"
 
-nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(50, 20, 10), random_state=1, max_iter=5000)
+nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(50, 20, 10), random_state=1, max_iter=500)
 nn.fit(training_set, training_set_result)
 
 print "start_testing"
