@@ -121,29 +121,6 @@ def step3_generate_minute_data():
 			db.db[currency].update({"date": day["date"]}, day, False)
 			print count
 
-def step4_add_minute_second():
-
-	db = Database()
-	available_currency_list = db.get_available_currency_list()
-
-	for currency in available_currency_list:
-		count = 0
-		print currency
-		for day in db.db[currency].find():
-			count = count + 1
-			date = str(day["date"])
-			minute_dict = day["minute_price"]
-			for minute_info in minute_dict:
-				minute_info["seconds_data"] = []
-			for tick in day["timeline"]:
-				current_minute = (tick["unix_time"] - day["unix_time"]) / 60
-				if current_minute >= 1440:
-					continue
-				minute_dict[current_minute]["seconds_data"].append({"price": tick["price"], "unix_time": tick["unix_time"]})
-			day["minute_price"] = minute_dict
-			db.db[currency].update({"date": day["date"]}, day, False)
-			print count
-
 if len(sys.argv) == 1:
 	if not os.path.exists(os.path.join(Helper.get_desktop_dir(), RAW_DATA_PATH)):
 		print "Error: raw data doesn't exist  run Pipeline_DownloadData"
@@ -155,5 +132,3 @@ elif sys.argv[1] == "2":
 	step2_load_data_into_database()
 elif sys.argv[1] == "3":
 	step3_generate_minute_data() 
-elif sys.argv[1] == "4":
-	step4_add_minute_second()
