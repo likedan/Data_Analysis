@@ -45,3 +45,14 @@ def run_every_month_until(func):
         current_month = 12
         current_year -= 1
 
+def get_cross_corelation(array):
+    corelation = []
+    for x in range(len(array)):
+        for y in range(x+1,len(array)):
+            if x > y:
+                corelation.append(1)
+            elif x < y:
+                corelation.append(-1)
+            else:
+                corelation.append(0)
+    return corelation

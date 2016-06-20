@@ -6,14 +6,14 @@ import threading
 import zipfile
 import time, os, sys, datetime
 import numpy as np
-from sknn.mlp import Classifier, Layer
+from sklearn.neural_network import MLPClassifier
 
 def extract_nn10minutes_data(first, high, low, last, occurance_count):
 
-    USE_SLICE_NUM = 11
+    USE_SLICE_NUM = 21
     data = []
     result = []
-    min_occurance_count = 4
+    min_occurance_count = 10
 
     remaining_check = USE_SLICE_NUM
     for end_index in range(len(first)):
@@ -33,7 +33,7 @@ training_result = []
 
 db = Database()
 # available_currency_list = db.get_available_currency_list()
-currency_data = db.get_range_currency_date("EURUSD", "20151130", "20160601")
+currency_data = db.get_range_currency_date("EURUSD", "20130601", "20160601")
 
 training_data = []
 
@@ -71,7 +71,10 @@ np_training_result = []
 
 for index in range(len(training_result)):
     index_range = max(training_data[index]) - min(training_data[index])
-    np_training_data[index] = (np_training_data[index] - min(training_data[index])) / index_range
+    if index_range == 0:
+        np_training_data[index] = (np_training_data[index] - min(training_data[index]))
+    else:
+        np_training_data[index] = (np_training_data[index] - training_data[index][-1]) / index_range
     if training_result[index] - training_data[index][-1] > 0:
         np_training_result.append(1)
     elif training_result[index] - training_data[index][-1] < 0:
@@ -81,7 +84,7 @@ for index in range(len(training_result)):
 
 np_training_result = np.array(np_training_result)
 
-TRAINING_PERCENTAGE = 0.05
+TRAINING_PERCENTAGE = 0.2
 training_data_num = int(TRAINING_PERCENTAGE * len(training_result))
 
 training_set = np_training_data[:training_data_num]
@@ -89,11 +92,37 @@ training_set_result = np_training_result[:training_data_num]
 testing_set = np_training_data[training_data_num:]
 testing_result = np_training_result[training_data_num:]
 
-nn = Classifier(layers=[Layer("Sigmoid", units=200), Layer("Rectifier", units=100), Layer("Sigmoid", units=50), Layer("Softmax")],learning_rate=0.01,n_iter=5)
-nn.fit(np_training_data, np_training_result)
+print np.isnan(training_set).any()
+print "start_training"
+
+nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(50, 20, 10), random_state=1, max_iter=5000)
+nn.fit(training_set, training_set_result)
 
 print "start_testing"
-result_proba = nn.predict_proba(testing_set)
+result_proba = nn.predict(testing_set)
+
+total = 0
+succ = 0
 for index in range(len(result_proba)):
-    print str(result_proba[index]) + "  " + str(testing_result[index])
+    if result_proba[index] == testing_result[index]:
+        succ += 1
+    if testing_result[index] != 0:
+        total += 1
+
+print float(succ)/(total)
+
+testing_set = training_set
+testing_result = training_set_result
+
+result_proba = nn.predict(testing_set)
+
+total = 0
+succ = 0
+for index in range(len(result_proba)):
+    if result_proba[index] == testing_result[index]:
+        succ += 1
+    if testing_result[index] != 0:
+        total += 1
+
+print float(succ)/(total)
 
