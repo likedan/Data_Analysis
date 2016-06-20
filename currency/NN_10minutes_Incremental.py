@@ -66,7 +66,7 @@ training_result = []
 
 db = Database()
 # available_currency_list = db.get_available_currency_list()
-currency_data = db.get_range_currency_date("EURUSD", "20030601", "20160601")
+currency_data = db.get_range_currency_date("EURUSD", "20060101", "20160601")
 
 training_data = []
 
