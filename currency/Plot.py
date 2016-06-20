@@ -10,7 +10,7 @@ from matplotlib.finance import candlestick_ohlc
 from matplotlib.dates import date2num, ticker, DateFormatter
 
 db = Database()
-data = db.get_range_stock_date("EURUSD", "20160608", "20160612")
+data = db.get_range_currency_date("EURUSD", "20160610", "20160610")
 
 dates = []
 last = []
@@ -25,10 +25,10 @@ for diction_index in range(len(data)):
 			pass
 		else:
 			# time.append(minute_Price[index]["minute_count"] + MINUTES_PER_DAY * diction_index)
-			last.append(minute_price[index]["last"] * 1000)
-			high.append(minute_price[index]["high"] * 1000)
-			low.append(minute_price[index]["low"] * 1000)
-			first.append(minute_price[index]["first"] * 1000)
+			last.append(minute_price[index]["last"])
+			high.append(minute_price[index]["high"])
+			low.append(minute_price[index]["low"])
+			first.append(minute_price[index]["first"])
 			dates.append(date2num(datetime.datetime.fromtimestamp(unix_time + minute_price[index]["minute_count"] * 60)))
 price = []
 for index in range(len(dates)):
@@ -39,7 +39,7 @@ fig.subplots_adjust(bottom=0.2)
 xfmt = DateFormatter('%Y-%m-%d %H:%M:%S')
 ax.xaxis.set_major_formatter(xfmt)
 
-candlestick_ohlc(ax, price, width=0.001)
+candlestick_ohlc(ax, price, width=0.0003)
 ax.xaxis.set_major_locator(ticker.MaxNLocator(10))
 
 fig.autofmt_xdate()
