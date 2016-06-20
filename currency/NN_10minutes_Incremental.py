@@ -7,6 +7,7 @@ import zipfile
 import time, os, sys, datetime
 import numpy as np
 from sklearn.neural_network import MLPClassifier
+from sklearn import preprocessing
 
 def extract_nn10minutes_data(minute_data):
 
@@ -15,28 +16,50 @@ def extract_nn10minutes_data(minute_data):
     INTERVAL_COUNT = [1, 3, 6, 10]
     remaining_check = [1, 3, 6, 10]
     total_range = 60
-    for end_index in range(len(minute_data)):
+    #key is index
+    computed_interval_data = {}
+    for end_index in range(len(minute_data) - 1):
 
         for index in range(len(remaining_check)):
             if remaining_check[index] > 0:
                 remaining_check[index] -= 1
-
-        if len(minute_data[end_index]) < 1 or minute_data[end_index][-1]["unix_time"] % 60 < 45:
+        
+        computed_interval_data[end_index] = {}
+        if len(minute_data[end_index]) < 1 or minute_data[end_index][-1]["unix_time"] % 60 < 40:
             remaining_check = INTERVAL_COUNT
-        elif len(minute_data[end_index]) < 2 or (not Helper.has_data_among_intervals(array,[range(20,30),range(50,60)], total_range)):
+        elif len(minute_data[end_index]) < 2 or (not Helper.has_data_among_intervals(minute_data[end_index],[range(18,30),range(48,60)], total_range)):
+            computed_interval_data[end_index][10] = Helper.get_data_among_intervals(minute_data[end_index],[range(40,60)], total_range)
             remaining_check[:-1] = INTERVAL_COUNT[:-1]
-        elif len(minute_data[end_index]) < 4 or (not Helper.has_data_among_intervals(array,[range(7,15),range(22,30),range(37,45),range(52,60)], total_range)):
+        elif len(minute_data[end_index]) < 4 or (not Helper.has_data_among_intervals(minute_data[end_index],[range(7,15),range(22,30),range(37,45),range(52,60)], total_range)):
+            computed_interval_data[end_index][10] = Helper.get_data_among_intervals(minute_data[end_index],[range(40,60)], total_range)
+            computed_interval_data[end_index][6] = Helper.get_data_among_intervals(minute_data[end_index],[range(18,30),range(48,60)], total_range)
             remaining_check[:-2] = INTERVAL_COUNT[:-2]
-        elif len(minute_data[end_index]) < 6 or (not Helper.has_data_among_intervals(array,[range(5,10),range(15,20),range(25,30),range(35,40),range(45,50),range(55,60)], total_range)):
+        elif len(minute_data[end_index]) < 6 or (not Helper.has_data_among_intervals(minute_data[end_index],[range(5,10),range(15,20),range(25,30),range(35,40),range(45,50),range(55,60)], total_range)):
+            computed_interval_data[end_index][10] = Helper.get_data_among_intervals(minute_data[end_index],[range(40,60)], total_range)
+            computed_interval_data[end_index][6] = Helper.get_data_among_intervals(minute_data[end_index],[range(18,30),range(48,60)], total_range)
+            computed_interval_data[end_index][3] = Helper.get_data_among_intervals(minute_data[end_index],[range(7,15),range(22,30),range(37,45),range(52,60)], total_range)):
             remaining_check[0] = INTERVAL_COUNT[0]
+        else:
+            computed_interval_data[end_index][10] = Helper.get_data_among_intervals(minute_data[end_index],[range(40,60)], total_range)
+            computed_interval_data[end_index][6] = Helper.get_data_among_intervals(minute_data[end_index],[range(18,30),range(48,60)], total_range)
+            computed_interval_data[end_index][3] = Helper.get_data_among_intervals(minute_data[end_index],[range(7,15),range(22,30),range(37,45),range(52,60)], total_range)):
+            computed_interval_data[end_index][1] = Helper.get_data_among_intervals(minute_data[end_index],[range(5,10),range(15,20),range(25,30),range(35,40),range(45,50),range(55,60)], total_range):
 
+        cid = computed_interval_data
         #good data
-        if sum(remaining_check) == 0:
-            info = first[end_index - USE_SLICE_NUM:end_index - 1] + high[end_index - USE_SLICE_NUM: end_index - 1] + low[end_index - USE_SLICE_NUM: end_index - 1] + last[end_index - USE_SLICE_NUM: end_index - 1]
+        if sum(remaining_check) == 0 and len(minute_data[end_index + 1]) >= 1 and minute_data[end_index + 1][-1]["unix_time"] % 60 >= 40:
+            info =  cid[end_index - 9][6] + cid[end_index - 8][10] + cid[end_index - 7][6] + cid[end_index - 6][10] + cid[end_index - 5][6] + cid[end_index - 4][6] + cid[end_index - 3][6] + cid[end_index - 2][3] + cid[end_index - 1][3] + cid[end_index][1]
             data.append(info)
-            result.append(last[end_index])
-            
+            if minute_data[end_index][-1]["price"] > minute_data[end_index + 1][-1]["price"]:
+                result.append(-1)
+            elif minute_data[end_index][-1]["price"] > minute_data[end_index + 1][-1]["price"]:
+                result.append(1)
+            else:
+                result.append(0)
+
     return (data, result)
+
+
 
 training_data = []
 training_result = []
@@ -64,22 +87,12 @@ for diction_index in range(len(currency_data)):
     # print len(minute_price)
 
 np_training_data = np.array(training_data)
+scaler = preprocessing.StandardScaler()
+np_training_data = scaler.fit_transform(np_training_data)
+
 np_training_result = []
 
-for index in range(len(training_result)):
-    index_range = max(training_data[index]) - min(training_data[index])
-    if index_range == 0:
-        np_training_data[index] = (np_training_data[index] - min(training_data[index]))
-    else:
-        np_training_data[index] = (np_training_data[index] - training_data[index][-1]) / index_range
-    if training_result[index] - training_data[index][-1] > 0:
-        np_training_result.append(1)
-    elif training_result[index] - training_data[index][-1] < 0:
-        np_training_result.append(2)
-    else:
-        np_training_result.append(0)
-
-np_training_result = np.array(np_training_result)
+np_training_result = np.array(training_result)
 
 TRAINING_PERCENTAGE = 0.2
 training_data_num = int(TRAINING_PERCENTAGE * len(training_result))
