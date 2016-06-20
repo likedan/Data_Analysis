@@ -103,7 +103,7 @@ def step3_generate_minute_data():
 			count = count + 1
 			#if not ("minute_price_high" in day):
 			date = str(day["date"])
-			minute_dict = [{"minute_count": index, "first": 0, "high": 0, "low": 9999, "last": 0, "tick_count": 0} for index in range(0, 1440)]
+			minute_dict = [{"minute_count": index, "first": 0, "high": 0, "low": 9999, "last": 0, "tick_count": 0, "seconds_data": []} for index in range(0, 1440)]
 			for tick in day["timeline"]:
 				current_minute = (tick["unix_time"] - day["unix_time"]) / 60
 				if current_minute >= 1440:
@@ -116,6 +116,7 @@ def step3_generate_minute_data():
 					minute_dict[current_minute]["first"] = tick["price"]
 				minute_dict[current_minute]["last"] = tick["price"]
 				minute_dict[current_minute]["tick_count"] = minute_dict[current_minute]["tick_count"] + 1
+				minute_dict[current_minute]["seconds_data"].append({"price": tick["price"], "unix_time": tick["unix_time"]})
 			day["minute_price"] = minute_dict
 			db.db[currency].update({"date": day["date"]}, day, False)
 			print count
@@ -154,5 +155,5 @@ elif sys.argv[1] == "2":
 	step2_load_data_into_database()
 elif sys.argv[1] == "3":
 	step3_generate_minute_data() 
-elif sys,argv[1] == "4":
+elif sys.argv[1] == "4":
 	step4_add_minute_second()
