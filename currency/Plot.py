@@ -24,7 +24,6 @@ for diction_index in range(len(data)):
 		if minute_price[index]["tick_count"] == 0:
 			pass
 		else:
-			# time.append(minute_Price[index]["minute_count"] + MINUTES_PER_DAY * diction_index)
 			last.append(minute_price[index]["last"])
 			high.append(minute_price[index]["high"])
 			low.append(minute_price[index]["low"])

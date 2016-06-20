@@ -2,6 +2,30 @@ from DefaultVariables import *
 import os, sys, os
 import datetime
 
+def get_data_among_intervals(array_data, intervals, total_range):
+    data = [[] for x in intervals]
+    for data_slice in array_data:
+        for index in range(len(intervals)):
+            if data_slice["unix_time"] % total_range in intervals[index]:
+                data[index].append(data_slice["price"])
+
+    results = []
+    for interval in data:
+        results.append(sum(interval)/len(interval))
+    return results
+
+def has_data_among_intervals(array_data, intervals, total_range):
+    for data_slice in array_data:
+        if len(intervals) == 0:
+            continue
+        for interval in intervals:
+            if data_slice["unix_time"] % total_range in interval:
+                intervals.remove(interval)
+                continue
+    if len(intervals) == 0:
+        return True
+    return False
+
 def is_valid_symbol(symbol):
     if not (isinstance(symbol, basestring) and len(symbol) == 6):
         raise Exception("invalid symbol")
