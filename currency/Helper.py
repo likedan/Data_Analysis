@@ -80,3 +80,10 @@ def get_cross_corelation(array):
             else:
                 corelation.append(0)
     return corelation
+
+class Line:
+    def __init__(self,x1,y1,x2,y2):
+        if x1 = x2:
+            raise Exception("two point of same x")
+        self.slope = (y2-y1) / (x2-x1)
+        self.intercept = y1 - slope * x1
