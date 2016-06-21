@@ -3,16 +3,12 @@ import os, sys, os
 import datetime
 
 def get_data_among_intervals(array_data, intervals, total_range):
-    data = [[] for x in intervals]
+    data = [0 for x in intervals]
     for data_slice in array_data:
         for index in range(len(intervals)):
             if data_slice["unix_time"] % total_range in intervals[index]:
-                data[index].append(data_slice["price"])
-
-    results = []
-    for interval in data:
-        results.append(sum(interval)/len(interval))
-    return results
+                data[index] = data_slice["price"]
+    return data
 
 def has_data_among_intervals(array_data, intervals, total_range):
     for data_slice in array_data:
@@ -82,8 +78,12 @@ def get_cross_corelation(array):
     return corelation
 
 class Line:
-    def __init__(self,x1,y1,x2,y2):
-        if x1 = x2:
+    def __init__(self, x1, y1, x2, y2):
+        if x1 == x2:
             raise Exception("two point of same x")
+        x1 = float(x1)
+        x2 = float(x2)
+        y1 = float(y1)
+        y2 = float(y2)
         self.slope = (y2-y1) / (x2-x1)
-        self.intercept = y1 - slope * x1
+        self.intercept = y1 - self.slope * x1

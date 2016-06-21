@@ -2,7 +2,7 @@ from Crawler import Crawler
 from DefaultVariables import *
 from Database import Database
 import Helper
-from Helper import Line
+from Line import Line
 import threading
 import zipfile
 import time, os, sys, datetime
@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import operator
 import Plot
 import numpy as np
+
 db = Database()
 currency_data = db.get_one_day_currency_data("EURUSD", 20160609)
 for price_index in range(len(currency_data["minute_price"])):
@@ -49,16 +50,16 @@ print tolerance_value
 max_intercept_size = frame_size * max_intercept_rate
 frame = currency_data["minute_price"][-frame_size:]
 
-Plot.plot_day_candle(frame, currency_data["unix_time"])
-
+# Plot.plot_day_candle(frame, currency_data["unix_time"])
 
 for e_index in reversed(range(frame_size)):
-	for s_index in reversed(range(frame_size - 1)):
+	for s_index in reversed(range(e_index - 1)):
 		higher_s = max(close[s_index],opening[s_index])
 		higher_e = max(close[e_index],opening[e_index])
 		lines = []
-		lines.append(Line(minute_count[s_index],higher_s[s_index],minute_count[e_index],higher_e[e_index]))
-		lines.append(Line(minute_count[s_index],higher_s[s_index],minute_count[e_index],high[e_index]))
-		lines.append(Line(minute_count[s_index],high[s_index],minute_count[e_index],higher_e[e_index]))
+		lines.append(Line(minute_count[s_index],higher_s,minute_count[e_index],higher_e))
+		lines.append(Line(minute_count[s_index],higher_s,minute_count[e_index],high[e_index]))
+		lines.append(Line(minute_count[s_index],high[s_index],minute_count[e_index],higher_e))
 		lines.append(Line(minute_count[s_index],high[s_index],minute_count[e_index],high[e_index]))
-
+		for test_index in reversed(range(s_index - 1)):
+			
