@@ -68,7 +68,7 @@ training_result = []
 
 db = Database()
 # available_currency_list = db.get_available_currency_list()
-currency_data = db.get_range_currency_date("EURUSD", "20060101", "20160601")
+currency_data = db.get_range_currency_date("EURUSD", "20110101", "20160601")
 training_data = []
 minute_data = []
 print "start preprocessiong data"
@@ -96,33 +96,40 @@ np_training_result = []
 
 np_training_result = np.array(training_result)
 
-TRAINING_PERCENTAGE = 0.2
-training_data_num = int(TRAINING_PERCENTAGE * len(training_result))
+TRAINING_DIVIDE_NUM = 10
+training_data_num = int(len(training_result) / TRAINING_DIVIDE_NUM)
 
 training_set = np_training_data[:training_data_num]
 training_set_result = np_training_result[:training_data_num]
-testing_set = np_training_data[training_data_num:]
-testing_result = np_training_result[training_data_num:]
 
+testing_sets = []
+testing_sets_result = []
+for x in range(TRAINING_DIVIDE_NUM):
+    if x + 1 < TRAINING_DIVIDE_NUM:
+        testing_sets.append(np_training_data[x * len(training_result) / TRAINING_DIVIDE_NUM:(x+1) * len(training_result) / TRAINING_DIVIDE_NUM])
+        testing_sets_result.append(np_training_result[x * len(training_result) / TRAINING_DIVIDE_NUM:(x+1) * len(training_result) / TRAINING_DIVIDE_NUM])
+    else:
+        testing_sets.append(np_training_data[x * len(training_result) / TRAINING_DIVIDE_NUM: len(training_result)])
+        testing_sets_result.append(np_training_result[x * len(training_result) / TRAINING_DIVIDE_NUM:len(training_result)])
 print np.isnan(training_set).any()
 print "start_training"
 
-nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(50, 20, 10), random_state=1, max_iter=200)
+nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(100, 50, 20, 10, 5), random_state=30, max_iter=100000)
 nn.fit(training_set, training_set_result)
 
 print "start_testing"
-result_proba = nn.predict(testing_set)
+for y in range(TRAINING_DIVIDE_NUM):
+    result_proba = nn.predict(testing_sets[y])
 
-total = 0
-succ = 0
-for index in range(len(result_proba)):
-    if result_proba[index] == testing_result[index]:
-        succ += 1
-    if testing_result[index] != 0:
-        total += 1
-    print (result_proba[index], testing_result[index])
+    total = 0
+    succ = 0
+    for index in range(len(result_proba)):
+        if result_proba[index] == testing_sets_result[y][index]:
+            succ += 1
+        if testing_sets_result[y][index] != 0:
+            total += 1
 
-print float(succ)/(total)
+    print float(succ)/(total)
 
 testing_set = training_set
 testing_result = training_set_result
