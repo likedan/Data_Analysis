@@ -44,9 +44,13 @@ def plot_day_candle(minute_price, unix_time, lines=[]):
 	fig.autofmt_xdate()
 	ax.autoscale_view()
 
-	for line in lines:
-		print line.get_y(line.left_end)
-		ax.plot([get_x_coord(line.left_end), get_x_coord(line.right_end)], [line.get_y(line.left_end), line.get_y(line.right_end)], color='k', linestyle='-', linewidth=1)
+	for color_index in range(len(lines)):
+		for line in lines[color_index]:
+			if color_index < len(COLOR_LIST):
+				ax.plot([get_x_coord(line.left_end), get_x_coord(line.right_end)], [line.get_y(line.left_end), line.get_y(line.right_end)], color=COLOR_LIST[color_index], linestyle='-', linewidth=1)
+			else:
+				raise Exception("out of color range")
+
 	plt.show()
 
 if __name__ == "__main__":

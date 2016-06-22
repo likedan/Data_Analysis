@@ -58,10 +58,14 @@ for e_index in reversed(range(frame_size)):
 		higher_s = max(close[s_index],opening[s_index])
 		higher_e = max(close[e_index],opening[e_index])
 
-		current_lines = [Line(s_index,higher_s, e_index,higher_e),
-		Line(s_index,higher_s, e_index,high[e_index]),
-		Line(s_index,high[s_index], e_index,higher_e),
-		Line(s_index,high[s_index], e_index,high[e_index])]
+		current_lines = [Line(s_index,high[s_index], e_index,high[e_index])]
+		if higher_s != high[s_index]:
+			current_lines.append(Line(s_index,higher_s, e_index,high[e_index]))
+		if higher_e != high[e_index]: 
+			current_lines.append(Line(s_index,high[s_index], e_index,higher_e))
+		if len(current_lines) == 3:
+			current_lines.append(Line(s_index,higher_s, e_index,higher_e))
+
 		for line in current_lines:
 			line.right_end = e_index
 			line.left_end = s_index
@@ -79,8 +83,17 @@ for key in lines.keys():
 
 sorted_lines = sorted(line_array, key=lambda k: k['intercept_num'])
 # print sorted_lines
-print sorted_lines[0]["line"].get_y(sorted_lines[0]["line"].left_end)
-Plot.plot_day_candle(frame, currency_data["unix_time"], lines=[sorted_lines[0]["line"],sorted_lines[-1]["line"]])
+good_lines = []
+bad_lines = []
+for l in sorted_lines:
+	bad_lines.append(l["line"])
+	if len(bad_lines) == 10: 
+		break
+for l in reversed(sorted_lines):
+	good_lines.append(l["line"])
+	if len(good_lines) == 10: 
+		break
+Plot.plot_day_candle(frame, currency_data["unix_time"], lines=[good_lines,bad_lines])
 		
 # l = Line(0.3,0.7,1.802,3.93)
 # printl.get_y(0.3)

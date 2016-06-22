@@ -2,6 +2,7 @@
 THREAD_NUMBER = 6
 
 DOWNLOAD_WAIT_SECOND = 3
+COLOR_LIST = ["b", "r", "g", "c", "m", "y", "k"]
 
 #time
 EARLIEST_YEAR = 1999
