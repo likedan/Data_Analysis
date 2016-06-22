@@ -10,7 +10,7 @@ from matplotlib.finance import candlestick_ohlc
 from matplotlib.dates import date2num, ticker, DateFormatter
 
 
-def plot_day_candle(minute_price, unix_time, lines=[]):
+def plot_day_candle(minute_price, unix_time, symbol, lines=[], save=False):
 	dates = []
 	last = []
 	high = []
@@ -39,20 +39,30 @@ def plot_day_candle(minute_price, unix_time, lines=[]):
 		xdata, ydata = ls[index].get_data()
 		return xdata[0]
 	ax.xaxis.set_major_locator(ticker.MaxNLocator(10))
+	date_str = datetime.datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d')
+	ax.set_title(symbol + ":" + date_str)
 
 	fig.autofmt_xdate()
 	ax.autoscale_view()
-
 	for color_index in range(len(lines)):
 		for line in lines[color_index]:
 			if color_index < len(COLOR_LIST):
-				
 				ax.plot([get_x_coord(0), get_x_coord(len(dates) - 1)], [line.get_y(0), line.get_y(len(dates) - 1)], color=COLOR_LIST[color_index], linestyle='-', linewidth=1)
 				# ax.plot([get_x_coord(line.left_end), get_x_coord(line.right_end)], [line.get_y(line.left_end), line.get_y(line.right_end)], color=COLOR_LIST[color_index], linestyle='-', linewidth=1)
 			else:
 				raise Exception("out of color range")
 
-	plt.show()
+	if save:
+		file_dir = os.path.join(Helper.get_desktop_dir(), PLOT_IMAGE_PATH)
+		if not os.path.exists(file_dir):
+			os.makedirs(file_dir)
+
+		fig.set_size_inches(27, 10)
+		image_name = symbol + "_" + date_str + ".png"
+		fig.savefig(os.path.join(file_dir, image_name), dpi=200)   # save the figure to file
+		plt.close(fig)
+	else:
+		plt.show()
 
 if __name__ == "__main__":
 	db = Database()

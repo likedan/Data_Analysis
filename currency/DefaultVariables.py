@@ -20,3 +20,4 @@ DATA_DOWNLOAD_URL = "/download-free-forex-historical-data/?/ninjatrader/tick-las
 # file system path
 RAW_DATA_PATH = "RawCurrencyData"
 DATA_PATH = "CurrencyData"
+PLOT_IMAGE_PATH = "CurrencyImage"
