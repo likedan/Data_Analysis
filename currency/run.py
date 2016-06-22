@@ -27,20 +27,18 @@ for price_index in range(len(currency_data["minute_price"])):
 			price["low"] = prev_last
 			price["high"] = next_first		
 
-minute_count = []
 close = []
 high = []
 low = []
 opening = []
 
 for slice_price in currency_data["minute_price"]:
-	minute_count.append(slice_price["minute_count"])
 	high.append(slice_price["high"])
 	low.append(slice_price["low"])
 	opening.append(slice_price["first"])
 	close.append(slice_price["last"])
 
-frame_size = 100
+frame_size = 30
 max_intercept_rate = 0.05
 associate_tolerance_rate = 0.1
 average_range = np.sum(np.absolute(np.array(close) - np.array(opening))) / float(frame_size)
@@ -49,17 +47,40 @@ print tolerance_value
 
 max_intercept_size = frame_size * max_intercept_rate
 frame = currency_data["minute_price"][-frame_size:]
-
-# Plot.plot_day_candle(frame, currency_data["unix_time"])
+close = close[-frame_size:]
+high = high[-frame_size:]
+low = low[-frame_size:]
+opening = opening[-frame_size:]
+lines = {}
 
 for e_index in reversed(range(frame_size)):
 	for s_index in reversed(range(e_index - 1)):
 		higher_s = max(close[s_index],opening[s_index])
 		higher_e = max(close[e_index],opening[e_index])
-		lines = []
-		lines.append(Line(minute_count[s_index],higher_s,minute_count[e_index],higher_e))
-		lines.append(Line(minute_count[s_index],higher_s,minute_count[e_index],high[e_index]))
-		lines.append(Line(minute_count[s_index],high[s_index],minute_count[e_index],higher_e))
-		lines.append(Line(minute_count[s_index],high[s_index],minute_count[e_index],high[e_index]))
+
+		current_lines = [Line(s_index,higher_s, e_index,higher_e),
+		Line(s_index,higher_s, e_index,high[e_index]),
+		Line(s_index,high[s_index], e_index,higher_e),
+		Line(s_index,high[s_index], e_index,high[e_index])]
+		for line in current_lines:
+			line.right_end = e_index
+			line.left_end = s_index
+			lines[line] = {"intercept_num": 0, "cross_num" : 0, "line": line}
+
 		for test_index in reversed(range(s_index - 1)):
-			
+			for line in current_lines:
+				if line.point_on_line(test_index, high[test_index],tolerance_value) or line.point_on_line(test_index, max(opening[test_index], close[test_index]),tolerance_value):
+					lines[line]["intercept_num"] += 1
+					line.left_end = test_index
+
+line_array = []
+for key in lines.keys():
+	line_array.append(lines[key])
+
+sorted_lines = sorted(line_array, key=lambda k: k['intercept_num'])
+# print sorted_lines
+print sorted_lines[0]["line"].get_y(sorted_lines[0]["line"].left_end)
+Plot.plot_day_candle(frame, currency_data["unix_time"], lines=[sorted_lines[0]["line"],sorted_lines[-1]["line"]])
+		
+# l = Line(0.3,0.7,1.802,3.93)
+# printl.get_y(0.3)

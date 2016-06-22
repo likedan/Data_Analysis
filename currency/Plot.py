@@ -10,7 +10,7 @@ from matplotlib.finance import candlestick_ohlc
 from matplotlib.dates import date2num, ticker, DateFormatter
 
 
-def plot_day_candle(minute_price, unix_time):
+def plot_day_candle(minute_price, unix_time, lines=[]):
 	dates = []
 	last = []
 	high = []
@@ -28,17 +28,25 @@ def plot_day_candle(minute_price, unix_time):
 	price = []
 	for index in range(len(dates)):
 		price.append((dates[index],first[index],high[index],low[index],last[index]))
+	print high
 	#and then following the official example. 
 	fig, ax = plt.subplots()
 	fig.subplots_adjust(bottom=0.2)
 	xfmt = DateFormatter('%Y-%m-%d %H:%M:%S')
 	ax.xaxis.set_major_formatter(xfmt)
 
-	candlestick_ohlc(ax, price, width=0.0003)
+	ls, bars = candlestick_ohlc(ax, price, width=0.0003)
+	def get_x_coord(index):
+		xdata, ydata = ls[index].get_data()
+		return xdata[0]
 	ax.xaxis.set_major_locator(ticker.MaxNLocator(10))
 
 	fig.autofmt_xdate()
 	ax.autoscale_view()
+
+	for line in lines:
+		print line.get_y(line.left_end)
+		ax.plot([get_x_coord(line.left_end), get_x_coord(line.right_end)], [line.get_y(line.left_end), line.get_y(line.right_end)], color='k', linestyle='-', linewidth=1)
 	plt.show()
 
 if __name__ == "__main__":

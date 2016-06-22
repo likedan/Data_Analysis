@@ -13,7 +13,15 @@ class Line:
         self.slope = (y2-y1) / (x2-x1)
         self.intercept = y1 - self.slope * x1
 
+    def get_y(self, x):
+        return float(x) * self.slope + self.intercept
+    
+    def get_x(self, y):
+        return (float(y) - self.intercept) / self.slope
+
     def point_on_line(self, x, y, tolerance):
-        if abs(y - (self.slope * x + self.intercept)) > tolerance:
+        x = float(x)
+        y = float(y)
+        if abs(y - self.get_y(x)) > tolerance:
             return False
         return True
