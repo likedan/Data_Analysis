@@ -38,7 +38,7 @@ for slice_price in currency_data["minute_price"]:
 	opening.append(slice_price["first"])
 	close.append(slice_price["last"])
 
-frame_size = 30
+frame_size = 100
 frame = currency_data["minute_price"][-frame_size:]
 close = close[-frame_size:]
 high = high[-frame_size:]
@@ -82,6 +82,15 @@ line_array = []
 for key in lines.keys():
 	line_array.append(lines[key])
 
+print len(line_array)
+#remove duplicate of lines
+for line_index in range(len(line_array)):
+	for l_index in reversed(range(line_index + 1,len(line_array))):
+		if line_array[line_index]["line"].left_end == line_array[l_index]["line"].left_end and line_array[line_index]["line"].right_end == line_array[l_index]["line"].right_end:
+			# print str(line_array[line_index]["line"]) + "   " + str(line_array[l_index]["line"]
+			del line_array[l_index]
+print len(line_array)
+
 sorted_lines = sorted(line_array, key=lambda k: k['intercept_num'])
 # print sorted_lines
 good_lines = []
@@ -93,10 +102,9 @@ for l in sorted_lines:
 		break
 for l in reversed(sorted_lines):
 	good_lines.append(l["line"])
-	print l
+	print l["line"]
 	if len(good_lines) == 5: 
 		break
-print good_lines
 Plot.plot_day_candle(frame, currency_data["unix_time"], lines=[good_lines,bad_lines])
 		
 # l = Line(0.3,0.7,1.802,3.93)
