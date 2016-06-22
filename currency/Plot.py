@@ -28,7 +28,6 @@ def plot_day_candle(minute_price, unix_time, lines=[]):
 	price = []
 	for index in range(len(dates)):
 		price.append((dates[index],first[index],high[index],low[index],last[index]))
-	print high
 	#and then following the official example. 
 	fig, ax = plt.subplots()
 	fig.subplots_adjust(bottom=0.2)

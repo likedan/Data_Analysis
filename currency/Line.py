@@ -25,3 +25,6 @@ class Line:
         if abs(y - self.get_y(x)) > tolerance:
             return False
         return True
+
+    def __str__(self):
+         return "k: " + str(self.slope) + " b: " + str(self.intercept) + " for y = kx + b"
