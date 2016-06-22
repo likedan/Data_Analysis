@@ -45,12 +45,12 @@ high = high[-frame_size:]
 low = low[-frame_size:]
 opening = opening[-frame_size:]
 
-max_intercept_rate = 0.05
+max_cross_rate = 0.05
 associate_tolerance_rate = 0.1
 average_range = np.sum(np.absolute(np.array(close) - np.array(opening))) / float(frame_size)
 tolerance_value = associate_tolerance_rate * average_range
 print tolerance_value
-max_intercept_size = frame_size * max_intercept_rate
+max_cross_size = frame_size * max_cross_rate
 
 lines = {}
 print tolerance_value
@@ -77,19 +77,25 @@ for e_index in reversed(range(frame_size)):
 				if line.point_on_line(test_index, high[test_index],tolerance_value) or line.point_on_line(test_index, max(opening[test_index], close[test_index]),tolerance_value):
 					lines[line]["intercept_num"] += 1
 					line.left_end = test_index
+				y_val = line.get_y(test_index)
+				if y_val >= min(opening[test_index], close[test_index]) + tolerance_value / 2 and y_val <= max(opening[test_index], close[test_index]) - tolerance_value / 2:
+					lines[line]["cross_num"] += 1
 
 line_array = []
 for key in lines.keys():
 	line_array.append(lines[key])
 
-print len(line_array)
+#remove overcross line
+for line in reversed(line_array):
+	if line["cross_num"] > max_cross_size:
+		line_array.remove(line)
+
 #remove duplicate of lines
 for line_index in range(len(line_array)):
 	for l_index in reversed(range(line_index + 1,len(line_array))):
 		if line_array[line_index]["line"].left_end == line_array[l_index]["line"].left_end and line_array[line_index]["line"].right_end == line_array[l_index]["line"].right_end:
 			# print str(line_array[line_index]["line"]) + "   " + str(line_array[l_index]["line"]
 			del line_array[l_index]
-print len(line_array)
 
 sorted_lines = sorted(line_array, key=lambda k: k['intercept_num'])
 # print sorted_lines
@@ -97,13 +103,12 @@ good_lines = []
 bad_lines = []
 for l in sorted_lines:
 	bad_lines.append(l["line"])
-	print l
 	if len(bad_lines) == 5: 
 		break
 for l in reversed(sorted_lines):
 	good_lines.append(l["line"])
-	print l["line"]
-	if len(good_lines) == 5: 
+	print l
+	if len(good_lines) == 10: 
 		break
 Plot.plot_day_candle(frame, currency_data["unix_time"], lines=[good_lines,bad_lines])
 		
