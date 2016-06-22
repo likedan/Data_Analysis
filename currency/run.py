@@ -55,7 +55,7 @@ tolerance_value = associate_tolerance_rate * average_range * math.sqrt(math.sqrt
 print tolerance_value
 max_cross_size = frame_size * max_cross_rate
 
-lines = {}
+lines_dict = {}
 print tolerance_value
 for e_index in reversed(range(frame_size)):
 	for s_index in reversed(range(e_index - 1)):
@@ -73,30 +73,33 @@ for e_index in reversed(range(frame_size)):
 		for line in current_lines:
 			line.right_end = e_index
 			line.left_end = s_index
-			lines[line] = {"intercept_num": 0, "cross_num" : 0, "over_num": 0, "line": line, "intercept_list": [e_index]}
+			lines_dict[line] = {"intercept_num": 0, "cross_num" : 0, "over_num": 0, "line": line, "intercept_list": [e_index]}
 
 		for test_index in reversed(range(e_index - 1)):
 			for line in current_lines:
 				if line.point_on_line(test_index, high[test_index],tolerance_value) or line.point_on_line(test_index, max(opening[test_index], close[test_index]),tolerance_value):
-					lines[line]["intercept_num"] += 1
-					lines[line]["intercept_list"].append(test_index)
+					lines_dict[line]["intercept_num"] += 1
+					lines_dict[line]["intercept_list"].append(test_index)
 					line.left_end = test_index
+				y_val = line.get_y(test_index)
+				if min(opening[test_index], close[test_index]) > y_val + tolerance_value:
+					lines_dict[line]["over_num"] += 1
 
 
 
 line_array = []
-for key in lines.keys():
-	line_array.append(lines[key])
+for key in lines_dict.keys():
+	line_array.append(lines_dict[key])
 
 #remove overcross line  and overhead
 for test_index in range(frame_size):
 	for line in reversed(line_array):
-		y_val = line["line"].get_y(test_index)
+		
 		if y_val >= min(opening[test_index], close[test_index]) + tolerance_value and y_val <= max(opening[test_index], close[test_index]) - tolerance_value:
 			line["cross_num"] += 1
 		if line["cross_num"] > max_cross_size:
 			line_array.remove(line)
-			break
+			continue
 		if frame_size - test_index < no_overhead_start_num and min(opening[test_index], close[test_index]) > y_val + tolerance_value:
 			print line
 			line_array.remove(line)
