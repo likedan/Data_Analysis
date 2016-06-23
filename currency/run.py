@@ -12,7 +12,7 @@ import Plot
 import numpy as np
 import math
 
-def draw_resistance(currency_data):
+def compute_trend_lines(currency_data, frame_size = 50):
 
 	prune_data = []
 	for price_index in range(len(currency_data["minute_price"]) - 1):
@@ -36,7 +36,8 @@ def draw_resistance(currency_data):
 				# del currency_data["minute_price"][price_index]
 				# print "failed at: " + str(price_index)
 				# break		
-
+	if len(prune_data) < frame_size:
+		raise Exception("date length < frame size")
 	close = []
 	high = []
 	low = []
@@ -48,7 +49,6 @@ def draw_resistance(currency_data):
 		opening.append(slice_price["first"])
 		close.append(slice_price["last"])
 
-	frame_size = 80
 	frame = prune_data[-frame_size:]
 	close = close[-frame_size:]
 	high = high[-frame_size:]
@@ -64,89 +64,132 @@ def draw_resistance(currency_data):
 	print tolerance_value
 	max_cross_size = frame_size * max_cross_rate
 
-	lines_dict = {}
+	resistance_dict = {}
+	support_dict = {}
 	print tolerance_value
 	for e_index in reversed(range(frame_size)):
 		for s_index in reversed(range(e_index - 1)):
 			higher_s = max(close[s_index],opening[s_index])
 			higher_e = max(close[e_index],opening[e_index])
 
-			current_lines = [Line(s_index,high[s_index], e_index,high[e_index])]
+			current_resistance_lines = [Line(s_index,high[s_index], e_index,high[e_index])]
 			if abs(higher_s - high[s_index]) > tolerance_value:
-				current_lines.append(Line(s_index,higher_s, e_index,high[e_index]))
+				current_resistance_lines.append(Line(s_index,higher_s, e_index,high[e_index]))
 			if abs(higher_e - high[e_index]) > tolerance_value: 
-				current_lines.append(Line(s_index,high[s_index], e_index,higher_e))
-			if len(current_lines) == 3:
-				current_lines.append(Line(s_index,higher_s, e_index,higher_e))
+				current_resistance_lines.append(Line(s_index,high[s_index], e_index,higher_e))
+			if len(current_resistance_lines) == 3:
+				current_resistance_lines.append(Line(s_index,higher_s, e_index,higher_e))
 
-			for line in current_lines:
+			for line in current_resistance_lines:
 				line.right_end = e_index
 				line.left_end = s_index
-				lines_dict[line] = {"intercept_num": 0, "cross_num" : 0, "over_num": 0, "line": line, "intercept_list": [e_index], "over_list":[]}
+				resistance_dict[line] = {"intercept_num": 0, "cross_num" : 0, "over_num": 0, "line": line, "intercept_list": [e_index], "over_list":[]}
+
+
+			lower_s = min(close[s_index],opening[s_index])
+			lower_e = min(close[e_index],opening[e_index])
+
+			current_support_lines = [Line(s_index,low[s_index], e_index,low[e_index])]
+			if abs(lower_s - low[s_index]) > tolerance_value:
+				current_support_lines.append(Line(s_index,lower_s, e_index,low[e_index]))
+			if abs(lower_e - low[e_index]) > tolerance_value: 
+				current_support_lines.append(Line(s_index,low[s_index], e_index,lower_e))
+			if len(current_support_lines) == 3:
+				current_support_lines.append(Line(s_index,lower_s, e_index,lower_e))
+
+			for line in current_support_lines:
+				line.right_end = e_index
+				line.left_end = s_index
+				support_dict[line] = {"intercept_num": 0, "cross_num" : 0, "over_num": 0, "line": line, "intercept_list": [e_index], "over_list":[]}
+
 
 			for test_index in reversed(range(e_index - 1)):
-				for line in current_lines:
+				for line in current_resistance_lines:
 					if line.point_on_line(test_index, high[test_index],tolerance_value) or line.point_on_line(test_index, max(opening[test_index], close[test_index]),tolerance_value):
-						lines_dict[line]["intercept_num"] += 1
-						lines_dict[line]["intercept_list"].append(test_index)
+						resistance_dict[line]["intercept_num"] += 1
+						resistance_dict[line]["intercept_list"].append(test_index)
 						line.left_end = test_index
 					y_val = line.get_y(test_index)
 					if min(opening[test_index], close[test_index]) > y_val + tolerance_value:
-						lines_dict[line]["over_num"] += 1
-						lines_dict[line]["over_list"].append(test_index)
+						resistance_dict[line]["over_num"] += 1
+						resistance_dict[line]["over_list"].append(test_index)
 
+				for line in current_support_lines:
+					if line.point_on_line(test_index, low[test_index],tolerance_value) or line.point_on_line(test_index, min(opening[test_index], close[test_index]),tolerance_value):
+						support_dict[line]["intercept_num"] += 1
+						support_dict[line]["intercept_list"].append(test_index)
+						line.left_end = test_index
+					y_val = line.get_y(test_index)
+					if max(opening[test_index], close[test_index]) < y_val - tolerance_value:
+						support_dict[line]["over_num"] += 1
+						support_dict[line]["over_list"].append(test_index)
 
-	line_array = []
-	for key in lines_dict.keys():
-		line_array.append(lines_dict[key])
+	def rank_trend_line(data_dict, is_resistance):
+		line_array = []
+		for key in data_dict.keys():
+			line_array.append(data_dict[key])
+		print len(line_array)
 
-	print len(line_array)
+		#remove overcross line  and overhead
+		for test_index in range(frame_size):
+			for line_dict in reversed(line_array):
+				y_val = line_dict["line"].get_y(test_index)
+				if y_val >= min(opening[test_index], close[test_index]) + tolerance_value and y_val <= max(opening[test_index], close[test_index]) - tolerance_value:
+					line_dict["cross_num"] += 1
+				if line_dict["cross_num"] > max_cross_size:
+					line_array.remove(line_dict)
+					continue
+				if is_resistance:
+					if frame_size - test_index < no_overhead_start_num and min(opening[test_index], close[test_index]) > y_val + tolerance_value:
+						line_array.remove(line_dict)
+				else:
+					if frame_size - test_index < no_overhead_start_num and max(opening[test_index], close[test_index]) < y_val - tolerance_value:
+						line_array.remove(line_dict)
 
-	#remove overcross line  and overhead
-	for test_index in range(frame_size):
-		for line_dict in reversed(line_array):
-			y_val = line_dict["line"].get_y(test_index)
-			if y_val >= min(opening[test_index], close[test_index]) + tolerance_value and y_val <= max(opening[test_index], close[test_index]) - tolerance_value:
-				line_dict["cross_num"] += 1
-			if line_dict["cross_num"] > max_cross_size:
-				line_array.remove(line_dict)
-				continue
-			if frame_size - test_index < no_overhead_start_num and min(opening[test_index], close[test_index]) > y_val + tolerance_value:
-				line_array.remove(line_dict)
+		line_array = sorted(line_array, key=lambda k: k['intercept_num'])
+		#remove duplicate of lines
+		for line_index in range(len(line_array)):
+			for l_index in reversed(range(line_index + 1,len(line_array))):
+				if line_array[line_index]["line"].left_end == line_array[l_index]["line"].left_end and line_array[line_index]["line"].right_end == line_array[l_index]["line"].right_end:
+					# print str(line_array[line_index]["line"]) + "   " + str(line_array[l_index]["line"]
+					del line_array[l_index]
 
-	line_array = sorted(line_array, key=lambda k: k['intercept_num'])
-	#remove duplicate of lines
-	for line_index in range(len(line_array)):
-		for l_index in reversed(range(line_index + 1,len(line_array))):
-			if line_array[line_index]["line"].left_end == line_array[l_index]["line"].left_end and line_array[line_index]["line"].right_end == line_array[l_index]["line"].right_end:
-				# print str(line_array[line_index]["line"]) + "   " + str(line_array[l_index]["line"]
-				del line_array[l_index]
+		#calculate interval value
+		for line in line_array:
+			product_sum = 1
+			for index in range(len(line["intercept_list"]) - 1):
+				product_sum = product_sum * math.sqrt(line["intercept_list"][index] - line["intercept_list"][index + 1])
+			#ranking modifier
+			line["product_sum"] = product_sum / math.pow((line["cross_num"] + 1), 2) / math.pow((line["over_num"] + 1), 2) * math.pow(line["line"].right_end - line["line"].left_end, 2)
+			if len(line["over_list"]) > 1:
+				for index in range(len(line["over_list"]) - 1):
+					product_sum = product_sum / math.pow((line["over_list"][index] - line["over_list"][index + 1] + 1), 2)
 
-	#calculate interval value
-	for line in line_array:
-		product_sum = 1
-		for index in range(len(line["intercept_list"]) - 1):
-			product_sum = product_sum * math.sqrt(line["intercept_list"][index] - line["intercept_list"][index + 1])
-		#ranking modifier
-		line["product_sum"] = product_sum / math.pow((line["cross_num"] + 1), 2) / math.pow((line["over_num"] + 1), 2) * math.pow(line["line"].right_end - line["line"].left_end, 2)
-		if len(line["over_list"]) > 1:
-			for index in range(len(line["over_list"]) - 1):
-				product_sum = product_sum / math.pow((line["over_list"][index] - line["over_list"][index + 1] + 1), 2)
+		sorted_lines = sorted(line_array, key=lambda k: k['product_sum'])
 
-	sorted_lines = sorted(line_array, key=lambda k: k['product_sum'])
+		return sorted_lines
 
-	return sorted_lines
+	ranked_resistance = rank_trend_line(resistance_dict, True)
+	ranked_support = rank_trend_line(support_dict, False)
+
+	return (frame, ranked_resistance, ranked_support)
 		
 db = Database()
 currency_data = db.get_range_currency_date("EURUSD", 20160416 ,20160606)
 for day_data in currency_data:
-	resistance_lines = draw_resistance(day_data)
+	frame, resistance_lines, support_lines = compute_trend_lines(day_data)
 
-	good_lines = []
-	for l in reversed(resistance_lines):
-		good_lines.append([l["line"]])
+	good_support = []
+	for l in reversed(support_lines[-7:]):
+		good_support.append(l["line"])
 		print l
-		if len(good_lines) == 7: 
-			break
-	Plot.plot_day_candle(frame, currency_data["unix_time"], "EURUSD", lines=resistance_lines, save=True)
+	good_resisitance = []
+	for l in reversed(resistance_lines[-7:]):
+		good_resisitance.append(l["line"])
+		print l
+	good_lines = []
+	for index in range(len(good_resisitance)):
+		good_lines.append([good_support[index],good_resisitance[index]])
+
+	Plot.plot_day_candle(frame, day_data["unix_time"], "EURUSD", lines=good_lines, save=True)
 
