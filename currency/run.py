@@ -13,33 +13,43 @@ import numpy as np
 import math
 
 def draw_resistance(currency_data):
-	for price_index in range(len(currency_data["minute_price"])):
+
+	prune_data = []
+	for price_index in range(len(currency_data["minute_price"]) - 1):
 		price = currency_data["minute_price"][price_index]
 		if price["tick_count"] == 0:
-			prev_last = currency_data["minute_price"][price_index - 1]["last"]
-			next_first = currency_data["minute_price"][price_index + 1]["first"] 
-			price["first"] = prev_last
-			price["last"] = next_first
-			if prev_last > next_first:
-				price["low"] = next_first
-				price["high"] = prev_last
-			else:
-				price["low"] = prev_last
-				price["high"] = next_first		
+			if currency_data["minute_price"][price_index + 1]["tick_count"] != 0 and currency_data["minute_price"][price_index - 1]["tick_count"] != 0:
+				prev_last = currency_data["minute_price"][price_index - 1]["last"]
+				next_first = currency_data["minute_price"][price_index + 1]["first"] 
+				price["first"] = prev_last
+				price["last"] = next_first
+				if prev_last > next_first:
+					price["low"] = next_first
+					price["high"] = prev_last
+				else:
+					price["low"] = prev_last
+					price["high"] = next_first
+				prune_data.append(price)
+		else:
+			prune_data.append(currency_data["minute_price"][price_index])
+			# else:
+				# del currency_data["minute_price"][price_index]
+				# print "failed at: " + str(price_index)
+				# break		
 
 	close = []
 	high = []
 	low = []
 	opening = []
 
-	for slice_price in currency_data["minute_price"]:
+	for slice_price in prune_data:
 		high.append(slice_price["high"])
 		low.append(slice_price["low"])
 		opening.append(slice_price["first"])
 		close.append(slice_price["last"])
 
-	frame_size = 50
-	frame = currency_data["minute_price"][-frame_size:]
+	frame_size = 80
+	frame = prune_data[-frame_size:]
 	close = close[-frame_size:]
 	high = high[-frame_size:]
 	low = low[-frame_size:]
@@ -72,7 +82,7 @@ def draw_resistance(currency_data):
 			for line in current_lines:
 				line.right_end = e_index
 				line.left_end = s_index
-				lines_dict[line] = {"intercept_num": 0, "cross_num" : 0, "over_num": 0, "line": line, "intercept_list": [e_index]}
+				lines_dict[line] = {"intercept_num": 0, "cross_num" : 0, "over_num": 0, "line": line, "intercept_list": [e_index], "over_list":[]}
 
 			for test_index in reversed(range(e_index - 1)):
 				for line in current_lines:
@@ -83,6 +93,7 @@ def draw_resistance(currency_data):
 					y_val = line.get_y(test_index)
 					if min(opening[test_index], close[test_index]) > y_val + tolerance_value:
 						lines_dict[line]["over_num"] += 1
+						lines_dict[line]["over_list"].append(test_index)
 
 
 	line_array = []
@@ -115,20 +126,27 @@ def draw_resistance(currency_data):
 	for line in line_array:
 		product_sum = 1
 		for index in range(len(line["intercept_list"]) - 1):
-			product_sum = product_sum * (line["intercept_list"][index] - line["intercept_list"][index + 1])
+			product_sum = product_sum * math.sqrt(line["intercept_list"][index] - line["intercept_list"][index + 1])
 		#ranking modifier
-		line["product_sum"] = product_sum * line["intercept_num"] / (line["cross_num"] + 1) / (line["cross_num"] + 1) / (line["over_num"] + 1)
+		line["product_sum"] = product_sum / math.pow((line["cross_num"] + 1), 2) / math.pow((line["over_num"] + 1), 2) * math.pow(line["line"].right_end - line["line"].left_end, 2)
+		if len(line["over_list"]) > 1:
+			for index in range(len(line["over_list"]) - 1):
+				product_sum = product_sum / math.pow((line["over_list"][index] - line["over_list"][index + 1] + 1), 2)
 
 	sorted_lines = sorted(line_array, key=lambda k: k['product_sum'])
-	# print sorted_lines
+
+	return sorted_lines
+		
+db = Database()
+currency_data = db.get_range_currency_date("EURUSD", 20160416 ,20160606)
+for day_data in currency_data:
+	resistance_lines = draw_resistance(day_data)
+
 	good_lines = []
-	for l in reversed(sorted_lines):
+	for l in reversed(resistance_lines):
 		good_lines.append([l["line"]])
 		print l
 		if len(good_lines) == 7: 
 			break
-	Plot.plot_day_candle(frame, currency_data["unix_time"], "EURUSD", lines=good_lines, save=True)
-		
-db = Database()
-currency_data = db.get_one_day_currency_data("EURUSD", 20160606)
-draw_resistance(currency_data)
+	Plot.plot_day_candle(frame, currency_data["unix_time"], "EURUSD", lines=resistance_lines, save=True)
+
