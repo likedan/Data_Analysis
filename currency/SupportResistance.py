@@ -12,10 +12,10 @@ import Plot
 import numpy as np
 import math
 
-def compute_support_resistance(currency_data, frame_size = 50):
+def compute_support_resistance(currency_data, frame_size = 50, no_overhead_start_rate = 0.1, max_cross_rate = 0.1, associate_tolerance_rate = 0.05):
 
 	prune_data = []
-	for price_index in range(len(currency_data["minute_price"]) - 1):
+	for price_index in reversed(range(len(currency_data["minute_price"]) - 1)):
 		price = currency_data["minute_price"][price_index]
 		if price["tick_count"] == 0:
 			if currency_data["minute_price"][price_index + 1]["tick_count"] != 0 and currency_data["minute_price"][price_index - 1]["tick_count"] != 0:
@@ -35,7 +35,9 @@ def compute_support_resistance(currency_data, frame_size = 50):
 			# else:
 				# del currency_data["minute_price"][price_index]
 				# print "failed at: " + str(price_index)
-				# break		
+				# break
+		if len(prune_data) == frame_size:
+			break		
 	if len(prune_data) < frame_size:
 		raise Exception("date length < frame size")
 	close = []
@@ -55,18 +57,14 @@ def compute_support_resistance(currency_data, frame_size = 50):
 	low = low[-frame_size:]
 	opening = opening[-frame_size:]
 
-	no_overhead_start_num = 5
+	no_overhead_start_num = no_overhead_start_rate * frame_size
 
-	max_cross_rate = 0.1
-	associate_tolerance_rate = 0.05
 	average_range = np.sum(np.absolute(np.array(close) - np.array(opening))) / float(frame_size)
 	tolerance_value = associate_tolerance_rate * average_range * math.sqrt(math.sqrt(frame_size))
-	print tolerance_value
 	max_cross_size = frame_size * max_cross_rate
 
 	resistance_dict = {}
 	support_dict = {}
-	print tolerance_value
 	for e_index in reversed(range(frame_size)):
 		for s_index in reversed(range(e_index - 1)):
 			higher_s = max(close[s_index],opening[s_index])

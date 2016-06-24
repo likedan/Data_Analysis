@@ -56,9 +56,9 @@ def plot_day_candle(minute_price, unix_time, symbol, lines=[], save=False):
 		file_dir = os.path.join(Helper.get_desktop_dir(), PLOT_IMAGE_PATH)
 		if not os.path.exists(file_dir):
 			os.makedirs(file_dir)
-
 		fig.set_size_inches(27, 10)
-		image_name = symbol + "_" + date_str + ".png"
+		cur_time = str(time.time())
+		image_name = symbol + "_" + date_str + "_" + cur_time + ".png"
 		fig.savefig(os.path.join(file_dir, image_name), dpi=200)   # save the figure to file
 		plt.close(fig)
 	else:
