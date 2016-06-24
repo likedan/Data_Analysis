@@ -12,7 +12,7 @@ import Plot
 import numpy as np
 import math
 
-def compute_support_resistance(currency_data, frame_size = 50, no_overhead_start_rate = 0.1, max_cross_rate = 0.1, associate_tolerance_rate = 0.05):
+def compute_support_resistance(currency_data, frame_size = 50, no_overhead_start_rate = 0.1, max_cross_rate = 0.1, associate_tolerance_rate = 0.4):
 
 	prune_data = []
 	for price_index in reversed(range(len(currency_data["minute_price"]) - 1)):

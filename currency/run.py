@@ -14,13 +14,13 @@ import math
 from SupportResistance import compute_support_resistance
 
 db = Database()
-currency_data = db.get_range_currency_date("EURUSD", 20160503 ,20160503)
+currency_data = db.get_range_currency_date("EURUSD", 20160203 ,20160503)
 for day_data in currency_data:
 
 	frame = []
 	support_slope_arr = []
 	resistance_slope_arr = []
-	for frame_size in range(20,50):
+	for frame_size in range(20,30):
 		frame, resistance_lines, support_lines = compute_support_resistance(day_data,frame_size = frame_size)
 
 		good_support = []
@@ -37,9 +37,14 @@ for day_data in currency_data:
 		support_slope_arr.append((np.std(np.array(support_slope)), good_support))
 		resistance_slope_arr.append((np.std(np.array(resistance_slope)), good_resisitance))
 
-	good_support = sorted(support_slope_arr, key=lambda x: x[0])[0][1]
-	good_resisitance = sorted(resistance_slope_arr, key=lambda x: x[0])[0][1]
-	good_lines = []
-	for index in range(7):
-		good_lines.append([good_support[index], good_resisitance[index]])
-	Plot.plot_day_candle(frame, day_data["unix_time"], "EURUSD", lines=good_lines, save=True)
+
+	good_support_arr = sorted(support_slope_arr, key=lambda x: x[0])
+	good_resisitance_arr = sorted(resistance_slope_arr, key=lambda x: x[0])
+	for index in range(5):
+		good_support = good_support_arr[index][1]
+		good_resisitance = good_resisitance_arr[index][1]
+
+		good_lines = []
+		for index in range(7):
+			good_lines.append([good_support[index], good_resisitance[index]])
+		Plot.plot_day_candle(frame, day_data["unix_time"], "EURUSD", lines=good_lines, save=True)
