@@ -17,6 +17,8 @@ DEFAULT_SITE_URL = "http://www.histdata.com"
 CURRENCYLIST_URL = "/download-free-forex-historical-data/?/ascii/tick-data-quotes/"
 DATA_DOWNLOAD_URL = "/download-free-forex-historical-data/?/ninjatrader/tick-last-quotes/"
 
+DEFAULT_IQOPTION_URL = "https://iqoption.com/en/forbidden"
+
 # file system path
 RAW_DATA_PATH = "RawCurrencyData"
 DATA_PATH = "CurrencyData"
