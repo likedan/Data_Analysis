@@ -18,7 +18,7 @@ class TradingView:
         firefox_profile = webdriver.FirefoxProfile()
         firefox_profile.set_preference("javascript.enabled", False)
         self.driver = webdriver.Firefox(firefox_profile=firefox_profile)
-        self.driver.set_window_size(1200, 800)
+        self.driver.set_window_size(BROWSER_WIDTH, BROWSER_HEIGHT)
 
         try:
             self.driver.get(DEFAULT_IQOPTION_URL)
@@ -40,11 +40,13 @@ class TradingView:
     def trade_down(self):
         element = self.driver.find_element_by_id("glcanvas")
         action = webdriver.common.action_chains.ActionChains(self.driver)
+        #position of down button
         action.move_to_element(element).move_by_offset(550, 240).click().perform()
 
     def trade_up(self):
         element = self.driver.find_element_by_id("glcanvas")
         action = webdriver.common.action_chains.ActionChains(self.driver)
+        #position of up button
         action.move_to_element(element).move_by_offset(550, 120).click().perform()
 
     def quit(self):

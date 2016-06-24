@@ -23,3 +23,8 @@ DEFAULT_IQOPTION_URL = "https://iqoption.com/en/forbidden"
 RAW_DATA_PATH = "RawCurrencyData"
 DATA_PATH = "CurrencyData"
 PLOT_IMAGE_PATH = "CurrencyImage"
+
+# browser 
+
+BROWSER_WIDTH = 1200
+BROWSER_HEIGHT = 800

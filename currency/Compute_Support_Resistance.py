@@ -11,7 +11,7 @@ import operator
 import Plot
 import numpy as np
 import math
-from SupportResistance import compute_support_resistance
+from SupportResistance import compute_support_resistance, parse_historical_data
 
 db = Database()
 currency_data = db.get_range_currency_date("EURUSD", 20160203 ,20160503)
@@ -21,7 +21,8 @@ for day_data in currency_data:
 	support_slope_arr = []
 	resistance_slope_arr = []
 	for frame_size in range(20,30):
-		frame, resistance_lines, support_lines = compute_support_resistance(day_data,frame_size = frame_size)
+		frame, opening, high, low, close = parse_historical_data(day_data, frame_size = frame_size)
+		resistance_lines, support_lines = compute_support_resistance(opening, high, low, close)
 
 		good_support = []
 		support_slope = []

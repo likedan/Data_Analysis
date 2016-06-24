@@ -12,51 +12,9 @@ import Plot
 import numpy as np
 import math
 
-def compute_support_resistance(currency_data, frame_size = 50, no_overhead_start_rate = 0.1, max_cross_rate = 0.1, associate_tolerance_rate = 0.4):
-
-	prune_data = []
-	for price_index in reversed(range(len(currency_data["minute_price"]) - 1)):
-		price = currency_data["minute_price"][price_index]
-		if price["tick_count"] == 0:
-			if currency_data["minute_price"][price_index + 1]["tick_count"] != 0 and currency_data["minute_price"][price_index - 1]["tick_count"] != 0:
-				prev_last = currency_data["minute_price"][price_index - 1]["last"]
-				next_first = currency_data["minute_price"][price_index + 1]["first"] 
-				price["first"] = prev_last
-				price["last"] = next_first
-				if prev_last > next_first:
-					price["low"] = next_first
-					price["high"] = prev_last
-				else:
-					price["low"] = prev_last
-					price["high"] = next_first
-				prune_data.append(price)
-		else:
-			prune_data.append(currency_data["minute_price"][price_index])
-			# else:
-				# del currency_data["minute_price"][price_index]
-				# print "failed at: " + str(price_index)
-				# break
-		if len(prune_data) == frame_size:
-			break		
-	if len(prune_data) < frame_size:
-		raise Exception("date length < frame size")
-	close = []
-	high = []
-	low = []
-	opening = []
-
-	for slice_price in prune_data:
-		high.append(slice_price["high"])
-		low.append(slice_price["low"])
-		opening.append(slice_price["first"])
-		close.append(slice_price["last"])
-
-	frame = prune_data[-frame_size:]
-	close = close[-frame_size:]
-	high = high[-frame_size:]
-	low = low[-frame_size:]
-	opening = opening[-frame_size:]
-
+def compute_support_resistance(opening, high, low, close, no_overhead_start_rate = 0.1, max_cross_rate = 0.1, associate_tolerance_rate = 0.2):
+	
+	frame_size = len(opening)
 	no_overhead_start_num = no_overhead_start_rate * frame_size
 
 	average_range = np.sum(np.absolute(np.array(close) - np.array(opening))) / float(frame_size)
@@ -170,5 +128,51 @@ def compute_support_resistance(currency_data, frame_size = 50, no_overhead_start
 	ranked_resistance = rank_trend_line(resistance_dict, True)
 	ranked_support = rank_trend_line(support_dict, False)
 
-	return (frame, ranked_resistance, ranked_support)
+	return (ranked_resistance, ranked_support)
+
+def parse_historical_data(currency_data, frame_size = 50):
+	prune_data = []
+	for price_index in reversed(range(len(currency_data["minute_price"]) - 1)):
+		price = currency_data["minute_price"][price_index]
+		if price["tick_count"] == 0:
+			if currency_data["minute_price"][price_index + 1]["tick_count"] != 0 and currency_data["minute_price"][price_index - 1]["tick_count"] != 0:
+				prev_last = currency_data["minute_price"][price_index - 1]["last"]
+				next_first = currency_data["minute_price"][price_index + 1]["first"] 
+				price["first"] = prev_last
+				price["last"] = next_first
+				if prev_last > next_first:
+					price["low"] = next_first
+					price["high"] = prev_last
+				else:
+					price["low"] = prev_last
+					price["high"] = next_first
+				prune_data.append(price)
+		else:
+			prune_data.append(currency_data["minute_price"][price_index])
+			# else:
+				# del currency_data["minute_price"][price_index]
+				# print "failed at: " + str(price_index)
+				# break
+		if len(prune_data) == frame_size:
+			break		
+	if len(prune_data) < frame_size:
+		raise Exception("date length < frame size")
+	close = []
+	high = []
+	low = []
+	opening = []
+
+	for slice_price in prune_data:
+		high.append(slice_price["high"])
+		low.append(slice_price["low"])
+		opening.append(slice_price["first"])
+		close.append(slice_price["last"])
+
+	frame = prune_data[-frame_size:]
+	close = close[-frame_size:]
+	high = high[-frame_size:]
+	low = low[-frame_size:]
+	opening = opening[-frame_size:]
+
+	return (frame, opening, high, low, close)
 
