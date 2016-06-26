@@ -26,12 +26,12 @@ while True:
         contents = urllib2.urlopen(request).read()
         price = float(contents.split(",")[1])
         current_time = time.time()
-        minute = int(current_time) / 60
+        minute = int(current_time) / 60 * 60
         symbol_cache = db.realtime_data.find_one({"symbol": symbol})
         if len(symbol_cache["data"]) > 0 and symbol_cache["data"][-1]["minute"] == minute:
-            symbol_cache["data"][-1]["minute_data"].append(price)
+            symbol_cache["data"][-1]["minute_data"].append([current_time, price])
         else:
-            symbol_cache["data"].append({"minute":minute, "minute_data":[price]})
+            symbol_cache["data"].append({"minute":minute, "minute_data":[[current_time, price]]})
         db.realtime_data.update({"symbol": symbol}, symbol_cache, False)
     time.sleep(1)
 
