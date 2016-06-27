@@ -84,8 +84,6 @@ def compute_support_resistance(opening, high, low, close, no_overhead_start_rate
 		line_array = []
 		for key in data_dict.keys():
 			line_array.append(data_dict[key])
-		print len(line_array)
-
 		#remove overcross line  and overhead
 		for test_index in range(frame_size):
 			for line_dict in reversed(line_array):

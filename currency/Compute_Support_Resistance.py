@@ -20,32 +20,46 @@ for day_data in currency_data:
 	frame = []
 	support_slope_arr = []
 	resistance_slope_arr = []
-	for frame_size in range(20,30):
-		frame, opening, high, low, close = parse_historical_data(day_data, frame_size = frame_size)
-		resistance_lines, support_lines = compute_support_resistance(opening, high, low, close)
+	# for frame_size in range(20,30):
+	frame_size = 25
+	frame, opening, high, low, close = parse_historical_data(day_data, frame_size = frame_size)
+	resistance_lines, support_lines = compute_support_resistance(opening, high, low, close)
 
-		good_support = []
-		support_slope = []
-		for l in reversed(support_lines[-7:]):
-			good_support.append(l["line"])
-			support_slope.append(l["line"].slope)
-		good_resisitance = []
-		resistance_slope = []
-		for l in reversed(resistance_lines[-7:]):
-			good_resisitance.append(l["line"])
-			resistance_slope.append(l["line"].slope)
+	support_end_points = []
+	good_support = []
+	support_slope = []
+	for l in reversed(support_lines[-7:]):
+		good_support.append(l["line"])
+		support_slope.append(l["line"].slope)
+		support_end_points.append(l["line"].get_y(0))
+		support_end_points.append(l["line"].get_y(frame_size))
+	good_resisitance = []
+	resistance_slope = []
 
-		support_slope_arr.append((np.std(np.array(support_slope)), good_support))
-		resistance_slope_arr.append((np.std(np.array(resistance_slope)), good_resisitance))
+	resistance_end_points = []
+	for l in reversed(resistance_lines[-7:]):
+		good_resisitance.append(l["line"])
+		resistance_slope.append(l["line"].slope)
+		resistance_end_points.append(l["line"].get_y(0))
+		resistance_end_points.append(l["line"].get_y(frame_size))
 
+	normalize_slope_val = max(resistance_end_points) - min(support_end_points) 
+	resistance_slope.remove(max(resistance_slope))
+	resistance_slope.remove(min(resistance_slope))
+	support_slope.remove(max(support_slope))
+	support_slope.remove(min(support_slope))
+
+	# support_slope_arr.append((np.std(np.array(support_slope)), good_support))
+	# resistance_slope_arr.append((np.std(np.array(resistance_slope)), good_resisitance))
+	print str(day_data["date"]) + "  " +  str(np.std(np.array(resistance_slope) / normalize_slope_val)) + "  " + str(np.std(np.array(support_slope) / normalize_slope_val))
 
 	good_support_arr = sorted(support_slope_arr, key=lambda x: x[0])
 	good_resisitance_arr = sorted(resistance_slope_arr, key=lambda x: x[0])
-	for index in range(5):
-		good_support = good_support_arr[index][1]
-		good_resisitance = good_resisitance_arr[index][1]
+	# for index in range(5):
+	# 	good_support = good_support_arr[index][1]
+	# 	good_resisitance = good_resisitance_arr[index][1]
 
-		good_lines = []
-		for index in range(7):
-			good_lines.append([good_support[index], good_resisitance[index]])
-		Plot.plot_day_candle(frame, day_data["unix_time"], "EURUSD", lines=good_lines, save=True)
+	good_lines = []
+	for index in range(7):
+		good_lines.append([good_support[index], good_resisitance[index]])
+	Plot.plot_day_candle(frame, day_data["unix_time"], "EURUSD", lines=good_lines, save=True)

@@ -18,7 +18,6 @@ if len(sys.argv) == 2:
     else:
         print "python RealtimeCurrency.py new for fresh start"
 
-
 while True:
     try:
         URL = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s="
