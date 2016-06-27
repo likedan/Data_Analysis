@@ -23,7 +23,7 @@ for day_data in currency_data:
 	# for frame_size in range(20,30):
 	frame_size = 25
 	frame, opening, high, low, close = parse_historical_data(day_data, frame_size = frame_size)
-	resistance_lines, support_lines = compute_support_resistance(opening, high, low, close)
+	resistance_lines, support_lines = compute_support_resistance(opening[:-1], high[:-1], low[:-1], close[:-1])
 
 	support_end_points = []
 	good_support = []
@@ -60,6 +60,10 @@ for day_data in currency_data:
 	# 	good_resisitance = good_resisitance_arr[index][1]
 
 	good_lines = []
-	for index in range(7):
+	for index in range(5):
 		good_lines.append([good_support[index], good_resisitance[index]])
+	# good_lines[2][0].slope = (good_lines[0][0].slope+good_lines[1][0].slope)/2
+	# good_lines[2][0].intercept = (good_lines[0][0].intercept+good_lines[1][0].intercept)/2
+	# good_lines[2][1].slope = (good_lines[0][1].slope+good_lines[1][1].slope)/2
+	# good_lines[2][1].intercept = (good_lines[0][1].intercept+good_lines[1][1].intercept)/2
 	Plot.plot_day_candle(frame, day_data["unix_time"], "EURUSD", lines=good_lines, save=True)

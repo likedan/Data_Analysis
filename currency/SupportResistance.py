@@ -39,7 +39,7 @@ def compute_support_resistance(opening, high, low, close, no_overhead_start_rate
 			for line in current_resistance_lines:
 				line.right_end = e_index
 				line.left_end = s_index
-				resistance_dict[line] = {"intercept_num": 0, "cross_num" : 0, "over_num": 0, "line": line, "intercept_list": [e_index], "over_list":[]}
+				resistance_dict[line] = {"intercept_num": 0, "cross_num" : 0, "over_num": 0, "cross_val" : 0, "over_val" : 0, "line": line, "intercept_list": [e_index], "over_list":[]}
 
 
 			lower_s = min(close[s_index],opening[s_index])
@@ -56,7 +56,7 @@ def compute_support_resistance(opening, high, low, close, no_overhead_start_rate
 			for line in current_support_lines:
 				line.right_end = e_index
 				line.left_end = s_index
-				support_dict[line] = {"intercept_num": 0, "cross_num" : 0, "over_num": 0, "line": line, "intercept_list": [e_index], "over_list":[]}
+				support_dict[line] = {"intercept_num": 0, "cross_num" : 0, "cross_val" : 0, "over_num": 0, "over_val" : 0, "line": line, "intercept_list": [e_index], "over_list":[]}
 
 
 			for test_index in reversed(range(e_index - 1)):
@@ -69,6 +69,7 @@ def compute_support_resistance(opening, high, low, close, no_overhead_start_rate
 					if min(opening[test_index], close[test_index]) > y_val + tolerance_value:
 						resistance_dict[line]["over_num"] += 1
 						resistance_dict[line]["over_list"].append(test_index)
+						resistance_dict[line]["over_val"] += math.log(test_index+1)
 
 				for line in current_support_lines:
 					if line.point_on_line(test_index, low[test_index],tolerance_value) or line.point_on_line(test_index, min(opening[test_index], close[test_index]),tolerance_value):
@@ -78,6 +79,7 @@ def compute_support_resistance(opening, high, low, close, no_overhead_start_rate
 					y_val = line.get_y(test_index)
 					if max(opening[test_index], close[test_index]) < y_val - tolerance_value:
 						support_dict[line]["over_num"] += 1
+						support_dict[line]["over_val"] += math.log(test_index+1)
 						support_dict[line]["over_list"].append(test_index)
 
 	def rank_trend_line(data_dict, is_resistance):
@@ -90,6 +92,7 @@ def compute_support_resistance(opening, high, low, close, no_overhead_start_rate
 				y_val = line_dict["line"].get_y(test_index)
 				if y_val >= min(opening[test_index], close[test_index]) + tolerance_value and y_val <= max(opening[test_index], close[test_index]) - tolerance_value:
 					line_dict["cross_num"] += 1
+					line_dict["cross_val"] += math.log(test_index+1)
 				if line_dict["cross_num"] > max_cross_size:
 					line_array.remove(line_dict)
 					continue
@@ -111,10 +114,10 @@ def compute_support_resistance(opening, high, low, close, no_overhead_start_rate
 		#calculate interval value
 		for line in line_array:
 			product_sum = 1
-			for index in range(len(line["intercept_list"]) - 1):
-				product_sum = product_sum * math.sqrt(line["intercept_list"][index] - line["intercept_list"][index + 1])
+			# for index in range(len(line["intercept_list"]) - 1):
+				# product_sum = product_sum * math.sqrt(line["intercept_list"][index] - line["intercept_list"][index + 1])
 			#ranking modifier
-			line["product_sum"] = product_sum / math.pow((line["cross_num"] + 1), 2) / math.pow((line["over_num"] + 1), 2) * math.pow(line["line"].right_end - line["line"].left_end, 2)
+			line["product_sum"] = product_sum / math.pow((line["cross_val"] + 1), 2) / math.pow((line["over_val"] + 1), 2) * math.pow(line["line"].right_end - line["line"].left_end, 2)
 			if len(line["over_list"]) > 1:
 				for index in range(len(line["over_list"]) - 1):
 					product_sum = product_sum / math.pow((line["over_list"][index] - line["over_list"][index + 1] + 1), 2)
