@@ -61,6 +61,7 @@ class TradingView:
             return True
         except Exception, e:
             raise e
+
     def trade_down(self):
 
         self.driver.save_screenshot(self.screenshot_file)
@@ -71,12 +72,12 @@ class TradingView:
         #click open new trade
         if (r,g,b) == NEWTRADE_BUTTON: 
             self.click_canvas_position(550, 100)
-            time.wait(1)
+            time.sleep(1)
             self.driver.save_screenshot(self.screenshot_file)
             im = Image.open(self.screenshot_file)
             rgb_im = im.convert('RGB')
             r, g, b = rgb_im.getpixel((1120, 400))
-
+        print (r,g,b)
         if (r,g,b) == UP_BUTTON_COLOR and self.is_ready:
             return self.click_canvas_position(550, 240)
         else:
@@ -92,12 +93,12 @@ class TradingView:
         #click open new trade
         if (r,g,b) == NEWTRADE_BUTTON: 
             self.click_canvas_position(550, 100)
-            time.wait(1)
+            time.sleep(1)
             self.driver.save_screenshot(self.screenshot_file)
             im = Image.open(self.screenshot_file)
             rgb_im = im.convert('RGB')
             r, g, b = rgb_im.getpixel((1120, 400))
-
+        print (r,g,b)
         if (r,g,b) == UP_BUTTON_COLOR and self.is_ready:
             return self.click_canvas_position(550, 100)
         else:
