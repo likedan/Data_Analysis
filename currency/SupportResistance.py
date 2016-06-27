@@ -131,14 +131,14 @@ def compute_support_resistance(opening, high, low, close, no_overhead_start_rate
 
 	return (ranked_resistance, ranked_support)
 
-def parse_historical_data(currency_data, frame_size = 50):
+def parse_historical_data(minute_price, frame_size = 50):
 	prune_data = []
-	for price_index in reversed(range(len(currency_data["minute_price"]) - 1)):
-		price = currency_data["minute_price"][price_index]
+	for price_index in reversed(range(len(minute_price) - 1)):
+		price = minute_price[price_index]
 		if price["tick_count"] == 0:
-			if currency_data["minute_price"][price_index + 1]["tick_count"] != 0 and currency_data["minute_price"][price_index - 1]["tick_count"] != 0:
-				prev_last = currency_data["minute_price"][price_index - 1]["last"]
-				next_first = currency_data["minute_price"][price_index + 1]["first"] 
+			if minute_price[price_index + 1]["tick_count"] != 0 and minute_price[price_index - 1]["tick_count"] != 0:
+				prev_last = minute_price[price_index - 1]["last"]
+				next_first = minute_price[price_index + 1]["first"] 
 				price["first"] = prev_last
 				price["last"] = next_first
 				if prev_last > next_first:
@@ -149,9 +149,9 @@ def parse_historical_data(currency_data, frame_size = 50):
 					price["high"] = next_first
 				prune_data.append(price)
 		else:
-			prune_data.append(currency_data["minute_price"][price_index])
+			prune_data.append(minute_price[price_index])
 			# else:
-				# del currency_data["minute_price"][price_index]
+				# del minute_price[price_index]
 				# print "failed at: " + str(price_index)
 				# break
 		if len(prune_data) == frame_size:

@@ -22,7 +22,7 @@ for day_data in currency_data:
 	resistance_slope_arr = []
 	# for frame_size in range(20,30):
 	frame_size = 25
-	frame, opening, high, low, close = parse_historical_data(day_data, frame_size = frame_size)
+	frame, opening, high, low, close = parse_historical_data(day_data["minute_price"], frame_size = frame_size)
 	resistance_lines, support_lines = compute_support_resistance(opening[:-1], high[:-1], low[:-1], close[:-1])
 
 	support_end_points = []
