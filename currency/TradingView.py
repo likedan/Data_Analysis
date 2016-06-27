@@ -52,42 +52,54 @@ class TradingView:
             os.makedirs(file_dir)
         self.screenshot_dir = file_dir
 
+    def click_canvas_position(self, x, y):
+        try:
+            element = self.driver.find_element_by_id("glcanvas")
+            action = webdriver.common.action_chains.ActionChains(self.driver)
+            #position of down button
+            action.move_to_element(element).move_by_offset(x, y).click().perform()
+            return True
+        except Exception, e:
+            raise e
     def trade_down(self):
 
         self.driver.save_screenshot(self.screenshot_file)
-        im = Image.open(image_dir)
+        im = Image.open(self.screenshot_file)
         rgb_im = im.convert('RGB')
-        r, g, b = rgb_im.getpixel((1, 1))
+        r, g, b = rgb_im.getpixel((1120, 400))
 
-        print r, g, b
-        if self.is_ready:
-            try:
-                element = self.driver.find_element_by_id("glcanvas")
-                action = webdriver.common.action_chains.ActionChains(self.driver)
-                #position of down button
-                action.move_to_element(element).move_by_offset(550, 240).click().perform()
-                return True
-            except Exception, e:
-                raise e
+        #click open new trade
+        if (r,g,b) == NEWTRADE_BUTTON: 
+            self.click_canvas_position(550, 100)
+            time.wait(1)
+            self.driver.save_screenshot(self.screenshot_file)
+            im = Image.open(self.screenshot_file)
+            rgb_im = im.convert('RGB')
+            r, g, b = rgb_im.getpixel((1120, 400))
+
+        if (r,g,b) == UP_BUTTON_COLOR and self.is_ready:
+            return self.click_canvas_position(550, 240)
         else:
             return False
 
+
     def trade_up(self):
         self.driver.save_screenshot(self.screenshot_file)
-        im = Image.open(image_dir)
+        im = Image.open(self.screenshot_file)
         rgb_im = im.convert('RGB')
-        r, g, b = rgb_im.getpixel((1, 1))
+        r, g, b = rgb_im.getpixel((1120, 400))
 
-        print r, g, b
-        if self.is_ready:
-            try:
-                element = self.driver.find_element_by_id("glcanvas")
-                action = webdriver.common.action_chains.ActionChains(self.driver)
-                #position of down button
-                action.move_to_element(element).move_by_offset(550, 100).click().perform()
-                return True
-            except Exception, e:
-                raise e
+        #click open new trade
+        if (r,g,b) == NEWTRADE_BUTTON: 
+            self.click_canvas_position(550, 100)
+            time.wait(1)
+            self.driver.save_screenshot(self.screenshot_file)
+            im = Image.open(self.screenshot_file)
+            rgb_im = im.convert('RGB')
+            r, g, b = rgb_im.getpixel((1120, 400))
+
+        if (r,g,b) == UP_BUTTON_COLOR and self.is_ready:
+            return self.click_canvas_position(550, 100)
         else:
             return False
 

@@ -16,10 +16,10 @@ from TradingView import TradingView
 from PIL import Image
 
 
-# trading = TradingView()
-# trading.login()
-# while True:
-# 	trading.trade_up()
-# 	time.sleep(1)
-# 	trading.trade_down()
-# 	time.sleep(1)
+trading = TradingView()
+trading.login()
+while True:
+	trading.trade_up()
+	time.sleep(5)
+	trading.trade_down()
+	time.sleep(5)
