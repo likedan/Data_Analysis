@@ -38,10 +38,18 @@ class TradingView:
         login_form.find_element_by_name("email").send_keys("likedan5@icloud.com")
         login_form.find_element_by_name("password").send_keys("Diyici140726")
         login_form.find_element_by_xpath("//button[@class='btn-submit input-form__btn input-form__btn_green']").click()
-        time.sleep(2)
+        time.sleep(3)
         self.driver.find_element_by_xpath("//div[@class='profile__trade js-btn-trade']").click()
-        time.sleep(20)
-        self.is_ready = True
+
+
+        while not self.is_ready:
+            self.driver.save_screenshot(self.screenshot_file)
+            im = Image.open(self.screenshot_file)
+            rgb_im = im.convert('RGB')
+            r, g, b = rgb_im.getpixel((1100, 50))
+            time.sleep(3)
+            if (r, g, b) == UP_BUTTON_COLOR:
+                self.is_ready = True
 
     def create_folder_if_not_exist(self):
         file_dir = os.path.join(Helper.get_desktop_dir(), PLOT_IMAGE_PATH)
