@@ -6,9 +6,13 @@ import Helper
 import os, sys, os
 import time
 
-streaming_currency_list = ["EURUSD","USDJPY"]
+
 
 db = Database()
+
+currency_list = db.get_currency_list()
+streaming_currency_list = [c["symbol"] for c in currency_list]
+print streaming_currency_list
 if len(sys.argv) == 2:
     if sys.argv[1] == "new":
         db.realtime_data.remove()
@@ -30,19 +34,20 @@ while True:
         info = {}
         for row in rows:
             split_row = row.split(",")
-            if len(split_row) == 4:
+            if len(split_row) == 4 and split_row[1] != "N/A":
                 info[split_row[0][1:-3]] = float(split_row[1])
 
         current_time = time.time()
         print current_time
         minute = int(current_time) / 60 * 60
         for symbol in streaming_currency_list:
-            symbol_cache = db.realtime_data.find_one({"symbol": symbol})
-            if len(symbol_cache["data"]) > 0 and symbol_cache["data"][-1]["minute"] == minute:
-                symbol_cache["data"][-1]["minute_data"].append([current_time, info[symbol]])
-            else:
-                symbol_cache["data"].append({"minute":minute, "minute_data":[[current_time, info[symbol]]]})
-            db.realtime_data.update({"symbol": symbol}, symbol_cache, False)
+            if symbol in info:
+                symbol_cache = db.realtime_data.find_one({"symbol": symbol})
+                if len(symbol_cache["data"]) > 0 and symbol_cache["data"][-1]["minute"] == minute:
+                    symbol_cache["data"][-1]["minute_data"].append([current_time, info[symbol]])
+                else:
+                    symbol_cache["data"].append({"minute":minute, "minute_data":[[current_time, info[symbol]]]})
+                db.realtime_data.update({"symbol": symbol}, symbol_cache, False)
         time.sleep(1)
     except Exception, e:
         print e
