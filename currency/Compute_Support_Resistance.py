@@ -16,12 +16,12 @@ from SupportResistance import compute_support_resistance, parse_historical_data
 db = Database()
 currency_data = db.get_range_currency_date("EURUSD", 20160203 ,20160503)
 for day_data in currency_data:
-
+	frame_size = 25
+	
 	frame = []
 	support_slope_arr = []
 	resistance_slope_arr = []
 	# for frame_size in range(20,30):
-	frame_size = 25
 	frame, opening, high, low, close = parse_historical_data(day_data["minute_price"], frame_size = frame_size)
 	resistance_lines, support_lines = compute_support_resistance(opening[:-1], high[:-1], low[:-1], close[:-1])
 

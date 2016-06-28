@@ -157,7 +157,7 @@ def parse_historical_data(minute_price, frame_size = 50):
 		if len(prune_data) == frame_size:
 			break		
 	if len(prune_data) < frame_size:
-		raise Exception("date length < frame size")
+		print "Error date length < frame size"
 	close = []
 	high = []
 	low = []
@@ -169,11 +169,5 @@ def parse_historical_data(minute_price, frame_size = 50):
 		opening.append(slice_price["first"])
 		close.append(slice_price["last"])
 
-	frame = prune_data[-frame_size:]
-	close = close[-frame_size:]
-	high = high[-frame_size:]
-	low = low[-frame_size:]
-	opening = opening[-frame_size:]
-
-	return (frame, opening, high, low, close)
+	return (prune_data, opening, high, low, close)
 
