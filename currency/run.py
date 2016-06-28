@@ -84,7 +84,7 @@ while True:
 	latest_price = last_data[-1]["minute_data"][-1][1]
 	latest_time = last_data[-1]["minute_data"][-1][0]
 	current_minute = int(latest_time) / 60
-	print current_minute
+	print latest_price
 	if current_minute != last_minute:
 		support, resistance = compute_resistance_support_line(frame_size=frame_size)
 		last_minute = current_minute
@@ -93,14 +93,15 @@ while True:
 
 	support_price = support.get_y(frame_size)
 	resistance_price = resistance.get_y(frame_size)
+	interval = resistance_price - support_price
 	print (support_price, resistance_price, support_price < resistance_price)
 
-	if support_price > latest_price and (not traded_up):
+	if support_price - 0.1 * interval > latest_price and (not traded_up):
 		if trading.trade_up():
 			traded_up = True
 			print "up"
 
-	if resistance_price < latest_price and (not traded_down):
+	if resistance_price + 0.1 * interval < latest_price and (not traded_down):
 		if trading.trade_down():
 			traded_down= True
 			print "down"
