@@ -16,12 +16,14 @@ from SupportResistance import compute_support_resistance
 from TradingView import TradingView
 from PIL import Image
 import urllib2
+
 db = Database()
 trading = TradingView()
 trading.login()
+trading_symbol = "USDCAD"
 
 def compute_resistance_support_line(frame_size=25):
-	price_data = db.get_realtime_Data("EURUSD", frame_size)
+	price_data = db.get_realtime_Data(trading_symbol, frame_size)
 	print "compute_resistance_support_line"
 	close = []
 	high = []
@@ -73,20 +75,24 @@ def compute_resistance_support_line(frame_size=25):
 	final_resistance.intercept = (good_lines[0][1].intercept+good_lines[1][1].intercept)/2
 	return (final_support, final_resistance)
 
+long_support = None
+long_resistance = None
 resistance = None
 support = None
 last_minute = 0
 frame_size = 25
 traded_up = False
 traded_down = False
+
 while True:
-	last_data = db.get_realtime_Data("EURUSD", 1)
+	last_data = db.get_realtime_Data(trading_symbol, 1)
 	latest_price = last_data[-1]["minute_data"][-1][1]
 	latest_time = last_data[-1]["minute_data"][-1][0]
 	current_minute = int(latest_time) / 60
 	print latest_price
 	if current_minute != last_minute:
 		support, resistance = compute_resistance_support_line(frame_size=frame_size)
+		long_support, long_resistance = compute_resistance_support_line(frame_size=100)
 		last_minute = current_minute
 		traded_up = False
 		traded_down = False
@@ -96,12 +102,12 @@ while True:
 	interval = resistance_price - support_price
 	print (support_price, resistance_price, support_price < resistance_price)
 
-	if support_price - 0.1 * interval > latest_price and (not traded_up):
+	if support_price - 0.05 * interval > latest_price and (not traded_up) and (not (long_support.slope < 0 and long_resistance.slope < 0)):
 		if trading.trade_up():
 			traded_up = True
 			print "up"
 
-	if resistance_price + 0.1 * interval < latest_price and (not traded_down):
+	if resistance_price + 0.05 * interval < latest_price and (not traded_down) and (not (long_support.slope > 0 and long_resistance.slope > 0)):
 		if trading.trade_down():
 			traded_down= True
 			print "down"
