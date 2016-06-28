@@ -17,6 +17,12 @@ class Database:
         self.currency_list = self.db['currency_list']
         self.realtime_data = self.db["realtime_data"]
 
+    def get_realtime_Data(self, symbol, length):
+        data = self.realtime_data.find_one({"symbol": symbol})["data"]
+        if len(data) > length:
+            return data[-length:]
+        return None
+
     def get_currency_list(self):
         c_list = [currency for currency in self.currency_list.find()]
         return c_list
