@@ -22,6 +22,11 @@ def has_data_among_intervals(array_data, intervals, total_range):
         return True
     return False
 
+def similar_color(color1, color2):
+    if abs(color1[0] - color2[0]) < 5 and abs(color1[1] - color2[1]) < 5 and abs(color1[2] - color2[2]) < 5:
+        return True
+    return False
+
 def is_valid_symbol(symbol):
     if not (isinstance(symbol, basestring) and len(symbol) == 6):
         raise Exception("invalid symbol")

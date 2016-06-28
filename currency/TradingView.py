@@ -78,7 +78,7 @@ class TradingView:
         r, g, b = rgb_im.getpixel((1120, 400))
 
         #click open new trade
-        if (r,g,b) == NEWTRADE_BUTTON: 
+        if Helper.similar_color((r,g,b), NEWTRADE_BUTTON): 
             self.click_canvas_position(550, 100)
             time.sleep(1)
             self.driver.save_screenshot(self.screenshot_file)
@@ -86,7 +86,7 @@ class TradingView:
             rgb_im = im.convert('RGB')
             r, g, b = rgb_im.getpixel((1120, 400))
         print (r,g,b)
-        if (r,g,b) == UP_BUTTON_COLOR and self.is_ready:
+        if Helper.similar_color((r,g,b), UP_BUTTON_COLOR) and self.is_ready:
             return self.click_canvas_position(550, 240)
         else:
             return False
@@ -99,7 +99,7 @@ class TradingView:
         r, g, b = rgb_im.getpixel((1120, 400))
 
         #click open new trade
-        if (r,g,b) == NEWTRADE_BUTTON: 
+        if Helper.similar_color((r,g,b), NEWTRADE_BUTTON): 
             self.click_canvas_position(550, 100)
             time.sleep(1)
             self.driver.save_screenshot(self.screenshot_file)
@@ -107,7 +107,7 @@ class TradingView:
             rgb_im = im.convert('RGB')
             r, g, b = rgb_im.getpixel((1120, 400))
         print (r,g,b)
-        if (r,g,b) == UP_BUTTON_COLOR and self.is_ready:
+        if Helper.similar_color((r,g,b), UP_BUTTON_COLOR) and self.is_ready:
             return self.click_canvas_position(550, 100)
         else:
             return False
