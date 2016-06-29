@@ -29,17 +29,15 @@ class Database:
         result = []
         date = datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y%m%d')
         data = self.realtime_data.find_one({"symbol": symbol, "date":str(date)})["data"]
-        for index in range(length):
-            if date != datetime.datetime.fromtimestamp(int(time.time() - index * 60)).strftime('%Y%m%d'):
-                date = datetime.datetime.fromtimestamp(int(time.time() - index * 60)).strftime('%Y%m%d')
-                data = self.realtime_data.find_one({"symbol": symbol, "date":str(date)})["data"]
+        index = 0
+        while len(result) < length:
             minute_in_unix = int(time.time()) / 60 * 60 - index * 60
+            if date != datetime.datetime.fromtimestamp(minute_in_unix).strftime('%Y%m%d'):
+                date = datetime.datetime.fromtimestamp(minute_in_unix).strftime('%Y%m%d')
+                data = self.realtime_data.find_one({"symbol": symbol, "date":str(date)})["data"]
             if str(minute_in_unix) in data:
                 result.insert(0, data[str(minute_in_unix)])
-            else:
-                continue
-        return result
-
+            index += 1
 
         if len(result) == length:
             return result
