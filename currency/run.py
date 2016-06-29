@@ -19,8 +19,8 @@ from PIL import Image
 import urllib2
 
 db = Database()
-# trading = TradingView()
-# trading.login()
+trading = TradingView()
+trading.login()
 trading_symbol = "USDCAD"
 
 if len(sys.argv) == 2 and db.get_realtime_Data(sys.argv[1], 1) != None:
@@ -127,16 +127,16 @@ while True:
 
 	if support_price < resistance_price:
 		if support_price - 0.05 * interval > latest_price and (not traded_up):# and (not (long_support.slope < 0 and long_resistance.slope < 0)):
-			#if trading.trade_up():
-			traded_up = True
-			db.add_open_trades(trading_symbol, latest_price, latest_time, True, current_minute + 60)
-			print "up"
-			plot_rupport_resistance([[support],[resistance]])
+			if trading.trade_up():
+				traded_up = True
+				db.add_open_trades(trading_symbol, latest_price, latest_time, True, current_minute + 60)
+				print "up"
+				plot_rupport_resistance([[support],[resistance]])
 
 		if resistance_price + 0.05 * interval < latest_price and (not traded_down): #and (not (long_support.slope > 0 and long_resistance.slope > 0)):
-			#if trading.trade_down():
-			traded_down= True
-			db.add_open_trades(trading_symbol, latest_price, latest_time, False, current_minute + 60)
-			print "down"
-			plot_rupport_resistance([[support],[resistance]])
+			if trading.trade_down():
+				traded_down= True
+				db.add_open_trades(trading_symbol, latest_price, latest_time, False, current_minute + 60)
+				print "down"
+				plot_rupport_resistance([[support],[resistance]])
 	time.sleep(0.5)
