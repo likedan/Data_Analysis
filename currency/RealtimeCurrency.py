@@ -6,8 +6,7 @@ import Helper
 import os, sys, os
 import time
 
-
-
+TIMEOUT = 2
 db = Database()
 
 currency_list = db.get_currency_list()
@@ -17,10 +16,12 @@ if len(sys.argv) == 2:
     if sys.argv[1] == "new":
         db.realtime_data.remove()
         db.realtime_data = db.db["realtime_data"]
-        for symbol in streaming_currency_list:
-            db.realtime_data.insert({"symbol": symbol, "data":[]})
     else:
         print "python RealtimeCurrency.py new for fresh start"
+
+for symbol in streaming_currency_list:
+    if db.realtime_data.find_one({"symbol": symbol}) == None:
+        db.realtime_data.insert({"symbol": symbol, "data":[]})
 
 while True:
     try:
@@ -29,7 +30,11 @@ while True:
             URL = URL + symbol + "=X,"
         URL = URL[:-1]
         request = urllib2.Request(URL, headers={"Accept" : "text/html", 'User-Agent': 'Mozilla/5.0'})
-        contents = urllib2.urlopen(request).read()
+        print "send"
+        stream = urllib2.urlopen(request, timeout=TIMEOUT)
+        print "load"
+        contents = stream.read()
+        print "read"
         rows = contents.split("\n")
         info = {}
         for row in rows:
@@ -39,6 +44,7 @@ while True:
 
         current_time = time.time()
         print current_time
+        print info
         minute = int(current_time) / 60 * 60
         for symbol in streaming_currency_list:
             if symbol in info:
@@ -51,6 +57,6 @@ while True:
         time.sleep(1)
     except Exception, e:
         print e
-        time.sleep(2)
+        time.sleep(1)
 
 
