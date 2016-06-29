@@ -1,4 +1,5 @@
 from Crawler import Crawler
+from Crawler import Crawler
 from DefaultVariables import *
 from Database import Database
 import Helper
@@ -28,19 +29,17 @@ if len(sys.argv) == 2 and db.get_realtime_Data(sys.argv[1], 1) != None:
 def end_open_trade():
 	for open_trade in db.open_trades.find():
 		mongo_id = open_trade["_id"]
-		current_time = time.time()
-        print current_time
-        minute_in_unix = int(current_time) / 60 * 60
-        if open_trade["close_time"] == minute_in_unix:
-        	db.open_trades.remove({"_id":mongo_id})
-        	last_data = db.get_realtime_Data(open_trade["symbol"], 1)
-        	latest_price = last_data[-1]["minute_data"][-1][1]
-        	result = 0
-        	if (latest_price > open_trade["trade_price"] and open_trade["is_up"]) or (latest_price < open_trade["trade_price"] and not open_trade["is_up"]):
-        		result = 1
-        	elif (latest_price < open_trade["trade_price"] and open_trade["is_up"]) or (latest_price > open_trade["trade_price"] and not open_trade["is_up"]):
-        		result = -1
-        	db.add_historical_trades(open_trade["symbol"], open_trade["trade_price"], open_trade["trade_time"], open_trade["is_up"], open_trade["close_time"], latest_price, result)
+		minute_in_unix = int(time.time()) / 60 * 60
+		if open_trade["close_time"] == minute_in_unix:
+			db.open_trades.remove({"_id":mongo_id})
+			last_data = db.get_realtime_Data(open_trade["symbol"], 1)
+			latest_price = last_data[-1]["minute_data"][-1][1]
+			result = 0
+			if (latest_price > open_trade["trade_price"] and open_trade["is_up"]) or (latest_price < open_trade["trade_price"] and not open_trade["is_up"]):
+				result = 1
+			elif (latest_price < open_trade["trade_price"] and open_trade["is_up"]) or (latest_price > open_trade["trade_price"] and not open_trade["is_up"]):
+				result = -1
+			db.add_historical_trades(open_trade["symbol"], open_trade["trade_price"], open_trade["trade_time"], open_trade["is_up"], open_trade["close_time"], latest_price, result)
 
 def compute_resistance_support_line(frame_size=25):
 	price_data = db.get_realtime_Data(trading_symbol, frame_size)

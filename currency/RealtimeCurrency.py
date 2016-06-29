@@ -4,7 +4,7 @@ from Database import Database
 from DefaultVariables import *
 import Helper
 import os, sys, os
-import time
+import time, datetime
 
 TIMEOUT = 2
 db = Database()
@@ -19,22 +19,24 @@ if len(sys.argv) == 2:
     else:
         print "python RealtimeCurrency.py new for fresh start"
 
-for symbol in streaming_currency_list:
-    if db.realtime_data.find_one({"symbol": symbol}) == None:
-        db.realtime_data.insert({"symbol": symbol, "data":[]})
+current_date = "20010101"
 
 while True:
+    date = datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y%m%d')
+    print date
+    if date != current_date:
+        for symbol in streaming_currency_list:
+            if db.realtime_data.find_one({"symbol": symbol, "date": date}) == None:
+                db.realtime_data.insert({"symbol": symbol, "data":{}, "date": date})
+        current_date = date
     try:
         URL = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s="
         for symbol in streaming_currency_list:
             URL = URL + symbol + "=X,"
         URL = URL[:-1]
         request = urllib2.Request(URL, headers={"Accept" : "text/html", 'User-Agent': 'Mozilla/5.0'})
-        print "send"
         stream = urllib2.urlopen(request, timeout=TIMEOUT)
-        print "load"
         contents = stream.read()
-        print "read"
         rows = contents.split("\n")
         info = {}
         for row in rows:
@@ -45,15 +47,15 @@ while True:
         current_time = time.time()
         print current_time
         print info
-        minute = int(current_time) / 60 * 60
+        minute = str(int(current_time) / 60 * 60)
         for symbol in streaming_currency_list:
             if symbol in info:
-                symbol_cache = db.realtime_data.find_one({"symbol": symbol})
-                if len(symbol_cache["data"]) > 0 and symbol_cache["data"][-1]["minute"] == minute:
-                    symbol_cache["data"][-1]["minute_data"].append([current_time, info[symbol]])
+                symbol_cache = db.realtime_data.find_one({"symbol": symbol, "date": current_date})
+                if minute in symbol_cache["data"]:
+                    symbol_cache["data"][minute].append([current_time, info[symbol]])
                 else:
-                    symbol_cache["data"].append({"minute":minute, "minute_data":[[current_time, info[symbol]]]})
-                db.realtime_data.update({"symbol": symbol}, symbol_cache, False)
+                    symbol_cache["data"][minute] = [[current_time, info[symbol]]]
+                db.realtime_data.update({"symbol": symbol, "date": current_date}, symbol_cache, False)
         time.sleep(1)
     except Exception, e:
         print e

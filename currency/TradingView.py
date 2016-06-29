@@ -48,7 +48,7 @@ class TradingView:
             rgb_im = im.convert('RGB')
             r, g, b = rgb_im.getpixel((1100, 50))
             time.sleep(3)
-            if (r, g, b) == UP_BUTTON_COLOR:
+            if Helper.similar_color((r,g,b), UP_BUTTON_COLOR):
                 self.is_ready = True
 
     def create_folder_if_not_exist(self):
