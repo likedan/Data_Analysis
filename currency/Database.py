@@ -26,9 +26,23 @@ class Database:
         self.open_trades.insert({"symbol":symbol, "trade_price": float(trade_price), "trade_time": int(trade_time), "is_up": is_up, "close_time": int(close_time)})
 
     def get_realtime_Data(self, symbol, length):
-        data = self.realtime_data.find_one({"symbol": symbol})["data"]
-        if len(data) > length:
-            return data[-length:]
+        result = []
+        date = datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y%m%d')
+        data = self.realtime_data.find_one({"symbol": symbol, "date":str(date)})["data"]
+        for index in range(length):
+            if date != datetime.datetime.fromtimestamp(int(time.time() - index * 60)).strftime('%Y%m%d'):
+                date = datetime.datetime.fromtimestamp(int(time.time() - index * 60)).strftime('%Y%m%d')
+                data = self.realtime_data.find_one({"symbol": symbol, "date":str(date)})["data"]
+            minute_in_unix = int(time.time()) / 60 * 60 - index * 60
+            if str(minute_in_unix) in data:
+                result.insert(0, data[str(minute_in_unix)])
+            else:
+                continue
+        return result
+
+
+        if len(result) == length:
+            return result
         return None
 
     def get_currency_list(self):
