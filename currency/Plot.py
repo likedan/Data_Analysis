@@ -29,8 +29,7 @@ def plot_day_candle(unit_dates, first, high, low, last, symbol, lines=[], save=F
 		xdata, ydata = ls[index].get_data()
 		return xdata[0]
 	ax.xaxis.set_major_locator(ticker.MaxNLocator(10))
-	date_str = datetime.datetime.fromtimestamp(dates[0]).strftime('%Y-%m-%d')
-	ax.set_title(symbol + ":" + date_str)
+	ax.set_title(symbol)
 
 	fig.autofmt_xdate()
 	ax.autoscale_view()
@@ -48,7 +47,7 @@ def plot_day_candle(unit_dates, first, high, low, last, symbol, lines=[], save=F
 			os.makedirs(file_dir)
 		fig.set_size_inches(27, 10)
 		cur_time = str(time.time())
-		image_name = symbol + "_" + date_str + "_" + cur_time + ".png"
+		image_name = symbol + "_" + cur_time + ".png"
 		fig.savefig(os.path.join(file_dir, image_name), dpi=200)   # save the figure to file
 		plt.close(fig)
 	else:

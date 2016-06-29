@@ -6,7 +6,7 @@ import Helper
 import os, sys, os
 import time, datetime
 
-TIMEOUT = 2
+TIMEOUT = 1
 db = Database()
 
 currency_list = db.get_currency_list()
@@ -59,6 +59,5 @@ while True:
         time.sleep(1)
     except Exception, e:
         print e
-        time.sleep(1)
 
 

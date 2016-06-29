@@ -1,7 +1,7 @@
 from DefaultVariables import *
 import os, sys, os
 import datetime
-
+import numpy as np
 def get_opening_high_low_close(price_data):
     close = []
     high = []
@@ -9,7 +9,7 @@ def get_opening_high_low_close(price_data):
     opening = []
     time_stamp = []
     for minute in price_data:
-        time_stamp.append(minute[0][0] / 60 * 60)
+        time_stamp.append(int(minute[0][0]) / 60 * 60)
         transpose_arr = np.array(minute).T
         opening.append(minute[0][1])
         close.append(minute[-1][1])

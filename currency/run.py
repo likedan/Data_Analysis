@@ -19,8 +19,12 @@ from PIL import Image
 import urllib2
 
 db = Database()
-price_data = db.get_realtime_Data("USDCAD", 20)
-opening, high, low, close, time_stamp = get_opening_high_low_close(price_data)
+price_data = db.get_realtime_Data("EURUSD", 200)
+opening, high, low, close, time_stamp = Helper.get_opening_high_low_close(price_data)
+time_s = []
+for t in time_stamp:
+	time_s.append(datetime.datetime.fromtimestamp(t))
+Plot.plot_day_candle(time_s, opening, high, low, close, "EURUSD")
 # trading = TradingView()
 # trading.login()
 # trading_symbol = "USDCAD"
