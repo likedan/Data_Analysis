@@ -22,6 +22,9 @@ trading = TradingView()
 trading.login()
 trading_symbol = "USDCAD"
 
+if len(sys.argv) == 2 and db.get_realtime_Data(sys.argv[1], 1) != None:
+	trading_symbol = sys.argv[1]
+
 def compute_resistance_support_line(frame_size=25):
 	price_data = db.get_realtime_Data(trading_symbol, frame_size)
 	print "compute_resistance_support_line"
@@ -88,11 +91,12 @@ while True:
 	last_data = db.get_realtime_Data(trading_symbol, 1)
 	latest_price = last_data[-1]["minute_data"][-1][1]
 	latest_time = last_data[-1]["minute_data"][-1][0]
-	current_minute = int(latest_time) / 60
+	current_minute = int(latest_time) / 60 
+	current_minute = current_minute * 60
 	print latest_price
 	if current_minute != last_minute:
 		support, resistance = compute_resistance_support_line(frame_size=frame_size)
-		long_support, long_resistance = compute_resistance_support_line(frame_size=100)
+		# long_support, long_resistance = compute_resistance_support_line(frame_size=80)
 		last_minute = current_minute
 		traded_up = False
 		traded_down = False
@@ -102,13 +106,16 @@ while True:
 	interval = resistance_price - support_price
 	print (support_price, resistance_price, support_price < resistance_price)
 
-	if support_price - 0.05 * interval > latest_price and (not traded_up) and (not (long_support.slope < 0 and long_resistance.slope < 0)):
-		if trading.trade_up():
-			traded_up = True
-			print "up"
+	if support_price < resistance_price:
+		if support_price - 0.05 * interval > latest_price and (not traded_up):# and (not (long_support.slope < 0 and long_resistance.slope < 0)):
+			if trading.trade_up():
+				traded_up = True
+				db.add_open_trades(trading_symbol, latest_price, latest_time, True, current_minute + 2 * 60)
+				print "up"
 
-	if resistance_price + 0.05 * interval < latest_price and (not traded_down) and (not (long_support.slope > 0 and long_resistance.slope > 0)):
-		if trading.trade_down():
-			traded_down= True
-			print "down"
+		if resistance_price + 0.05 * interval < latest_price and (not traded_down): #and (not (long_support.slope > 0 and long_resistance.slope > 0)):
+			if trading.trade_down():
+				traded_down= True
+				db.add_open_trades(trading_symbol, latest_price, latest_time, False, current_minute + 2 * 60)
+				print "down"
 	time.sleep(0.5)

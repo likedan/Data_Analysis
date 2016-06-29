@@ -16,6 +16,14 @@ class Database:
         self.db = self.client[DATABASE_NAME]
         self.currency_list = self.db['currency_list']
         self.realtime_data = self.db["realtime_data"]
+        self.trading_history = self.db["trading_history"]
+        self.open_trades = self.db["open_trades"]
+
+    def add_historical_trades(self, symbol, trade_price, trade_time, is_up, close_time, close_price, success):
+        self.open_trades.insert({"symbol":symbol, "price": float(price), "time": int(time)})
+
+    def add_open_trades(self, symbol, price, time, is_up, close_time):
+        self.open_trades.insert({"symbol":symbol, "price": float(price), "time": int(time), "is_up": is_up, "close_time": int(close_time)})
 
     def get_realtime_Data(self, symbol, length):
         data = self.realtime_data.find_one({"symbol": symbol})["data"]
