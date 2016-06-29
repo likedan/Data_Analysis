@@ -19,7 +19,8 @@ from PIL import Image
 import urllib2
 
 db = Database()
-print db.get_realtime_Data("USDCAD", 10)
+price_data = db.get_realtime_Data("USDCAD", 20)
+opening, high, low, close, time_stamp = get_opening_high_low_close(price_data)
 # trading = TradingView()
 # trading.login()
 # trading_symbol = "USDCAD"
@@ -46,17 +47,7 @@ print db.get_realtime_Data("USDCAD", 10)
 # def compute_resistance_support_line(frame_size=25):
 # 	price_data = db.get_realtime_Data(trading_symbol, frame_size)
 # 	print "compute_resistance_support_line"
-# 	close = []
-# 	high = []
-# 	low = []
-# 	opening = []
-
-# 	for minute in price_data:
-# 		transpose_arr = np.array(minute["minute_data"]).T
-# 		opening.append(minute["minute_data"][0][1])
-# 		close.append(minute["minute_data"][-1][1])
-# 		high.append(transpose_arr[1].max())
-# 		low.append(transpose_arr[1].min())
+	# opening, high, low, close, time_stamp = get_opening_high_low_close(price_data)
 
 # 	resistance_lines, support_lines = compute_support_resistance(opening[:-1], high[:-1], low[:-1], close[:-1])
 # 	support_end_points = []

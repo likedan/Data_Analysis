@@ -2,6 +2,21 @@ from DefaultVariables import *
 import os, sys, os
 import datetime
 
+def get_opening_high_low_close(price_data):
+    close = []
+    high = []
+    low = []
+    opening = []
+    time_stamp = []
+    for minute in price_data:
+        time_stamp.append(minute[0][0] / 60 * 60)
+        transpose_arr = np.array(minute).T
+        opening.append(minute[0][1])
+        close.append(minute[-1][1])
+        high.append(transpose_arr[1].max())
+        low.append(transpose_arr[1].min())
+    return (opening, high, low, close, time_stamp)
+
 def get_data_among_intervals(array_data, intervals, total_range):
     data = [0 for x in intervals]
     for data_slice in array_data:

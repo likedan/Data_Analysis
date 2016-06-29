@@ -12,6 +12,7 @@ import Plot
 import numpy as np
 import math
 from SupportResistance import compute_support_resistance, parse_historical_data
+from matplotlib.dates import date2num
 
 db = Database()
 currency_data = db.get_range_currency_date("EURUSD", 20160203 ,20160503)
@@ -66,4 +67,19 @@ for day_data in currency_data:
 	# good_lines[2][0].intercept = (good_lines[0][0].intercept+good_lines[1][0].intercept)/2
 	# good_lines[2][1].slope = (good_lines[0][1].slope+good_lines[1][1].slope)/2
 	# good_lines[2][1].intercept = (good_lines[0][1].intercept+good_lines[1][1].intercept)/2
-	Plot.plot_day_candle(frame, day_data["unix_time"], "EURUSD", lines=good_lines, save=True)
+	dates = []
+	last = []
+	high = []
+	low = []
+	first = []
+	for index in range(len(frame)):
+		if frame[index]["tick_count"] == 0:
+			pass
+		else:
+			last.append(frame[index]["last"])
+			high.append(frame[index]["high"])
+			low.append(frame[index]["low"])
+			first.append(frame[index]["first"])
+			dates.append(datetime.datetime.fromtimestamp(day_data["unix_time"] + frame[index]["minute_count"] * 60))
+
+	Plot.plot_day_candle(dates, first, high, low, last, "EURUSD", lines=good_lines, save=True)

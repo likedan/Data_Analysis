@@ -10,21 +10,11 @@ from matplotlib.finance import candlestick_ohlc
 from matplotlib.dates import date2num, ticker, DateFormatter
 
 
-def plot_day_candle(minute_price, unix_time, symbol, lines=[], save=False):
+def plot_day_candle(unit_dates, first, high, low, last, symbol, lines=[], save=False):
+
 	dates = []
-	last = []
-	high = []
-	low = []
-	first = []
-	for index in range(len(minute_price)):
-		if minute_price[index]["tick_count"] == 0:
-			pass
-		else:
-			last.append(minute_price[index]["last"])
-			high.append(minute_price[index]["high"])
-			low.append(minute_price[index]["low"])
-			first.append(minute_price[index]["first"])
-			dates.append(date2num(datetime.datetime.fromtimestamp(unix_time + minute_price[index]["minute_count"] * 60)))
+	for time_stamp in unit_dates:
+		dates.append(date2num(time_stamp))
 	price = []
 	for index in range(len(dates)):
 		price.append((dates[index],first[index],high[index],low[index],last[index]))
@@ -39,7 +29,7 @@ def plot_day_candle(minute_price, unix_time, symbol, lines=[], save=False):
 		xdata, ydata = ls[index].get_data()
 		return xdata[0]
 	ax.xaxis.set_major_locator(ticker.MaxNLocator(10))
-	date_str = datetime.datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d')
+	date_str = datetime.datetime.fromtimestamp(dates[0]).strftime('%Y-%m-%d')
 	ax.set_title(symbol + ":" + date_str)
 
 	fig.autofmt_xdate()
