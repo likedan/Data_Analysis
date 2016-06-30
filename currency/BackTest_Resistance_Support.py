@@ -11,8 +11,73 @@ import operator
 import Plot
 import numpy as np
 import math
-from SupportResistance import compute_support_resistance, parse_historical_data
+from SupportResistance import compute_support_resistance
 from matplotlib.dates import date2num
+
+def parse_historical_data(serialized_chunk):
+	close = []
+	high = []
+	low = []
+	opening = []
+	good_result = []
+	good_result_threshold = 3
+
+	chunk_results = []
+	for chunk in serialized_chunk:
+		for index in range(len(chunk)):
+
+			if chunk[index]["tick_count"] == 0:
+				if chunk[index + 1]["tick_count"] > 0 and chunk[index - 1]["tick_count"] > 0:
+					prev_last = chunk[index - 1]["last"]
+					next_first = chunk[index + 1]["first"]
+					opening.append(prev_last)
+					close.append(next_first)
+					high.append(max(prev_last,next_first))
+					low.append(min(prev_last,next_first))
+					n_c_minute = int(chunk[index + 1]["seconds_data"][0]["unix_time"]) / 60 * 60
+					if int(chunk[index + 1]["seconds_data"][0]["unix_time"]) - n_c_minute <= good_result_threshold:
+						good_result.append(chunk[index + 1]["seconds_data"][0]["price"])
+					else:
+						good_result.append(0.0)
+				elif chunk[index + 1]["tick_count"] == 0:
+					prev_last = chunk[index - 1]["last"]
+					opening.append(prev_last)
+					close.append(prev_last)
+					high.append(prev_last)
+					low.append(prev_last)
+					good_result.append(0.0)
+
+				elif chunk[index - 1]["tick_count"] == 0:
+					next_first = chunk[index + 1]["first"]
+					opening.append(next_first)
+					close.append(next_first)
+					high.append(next_first)
+					low.append(next_first)
+					n_c_minute = int(chunk[index + 1]["seconds_data"][0]["unix_time"]) / 60 * 60
+					if int(chunk[index + 1]["seconds_data"][0]["unix_time"]) - n_c_minute <= good_result_threshold:
+						good_result.append(chunk[index + 1]["seconds_data"][0]["price"])
+					else:
+						good_result.append(0.0)
+				else:
+					print "consecutive missing minutes"
+					# raise Exception("consecutive missing minutes")
+
+			else:
+				c_minute = int(chunk[index]["seconds_data"][0]["unix_time"]) / 60 * 60
+				if (c_minute + 60) - int(chunk[index]["seconds_data"][-1]["unix_time"]) <= good_result_threshold:
+					good_result.append(chunk[index]["seconds_data"][-1]["price"])
+				elif index + 1 < len(chunk) and chunk[index + 1]["tick_count"] > 0 and int(chunk[index + 1]["seconds_data"][0]["unix_time"]) - (c_minute + 60) <= good_result_threshold:
+					good_result.append(chunk[index + 1]["seconds_data"][0]["price"])
+				else:
+					good_result.append(0.0)
+
+				high.append(chunk[index]["high"])
+				low.append(chunk[index]["low"])
+				opening.append(chunk[index]["first"])
+				close.append(chunk[index]["last"])
+		chunk_results.append([opening, high, low, close, good_result])
+
+	return chunk_results
 
 start_time = 20160203
 end_time = 20160503
@@ -32,8 +97,6 @@ for day_data in currency_data:
 	serialized_chunk[-1] = serialized_chunk[-1] + day_data["minute_price"]
 	suppose_unix_time += SECONDS_PER_DAY
 
-print serialized_chunk[-1]
-
 for chunk_index in range(len(serialized_chunk)):
 	start_index = 0
 	for minute_data in serialized_chunk[chunk_index]:
@@ -50,8 +113,15 @@ for chunk_index in range(len(serialized_chunk)):
 	serialized_chunk[chunk_index] = serialized_chunk[chunk_index][start_index: end_index]
 	print start_index
 	print end_index
-print "!!??"
-print serialized_chunk[-1]
+
+result = parse_historical_data(serialized_chunk)
+
+for chunk in result:
+	for x in range(4):
+		print len(chunk[4]) == len(chunk[x])
+# 		print index
+# 		break
+# 	break
 
 	# frame_size = 25
 	
