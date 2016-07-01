@@ -15,36 +15,31 @@ from SupportResistance import compute_support_resistance
 from matplotlib.dates import date2num
 
 def parse_historical_data(serialized_chunk):
-	close = []
-	high = []
-	low = []
-	opening = []
-	good_result = []
+
 	good_result_threshold = 3
 
 	chunk_results = []
 	for chunk in serialized_chunk:
+		close = []
+		high = []
+		low = []
+		opening = []
+		unix_time = []
+		good_result = []
 		for index in range(len(chunk)):
 			if chunk[index]["tick_count"] == 0:
-				if chunk[index + 1]["tick_count"] > 0 and chunk[index - 1]["tick_count"] > 0:
-					prev_last = chunk[index - 1]["last"]
-					next_first = chunk[index + 1]["first"]
-					opening.append(prev_last)
-					close.append(next_first)
-					high.append(max(prev_last,next_first))
-					low.append(min(prev_last,next_first))
-					n_c_minute = int(chunk[index + 1]["seconds_data"][0]["unix_time"]) / 60 * 60
-					if int(chunk[index + 1]["seconds_data"][0]["unix_time"]) - n_c_minute <= good_result_threshold:
-						good_result.append(chunk[index + 1]["seconds_data"][0]["price"])
-					else:
-						good_result.append(0.0)
+				if chunk[index + 1]["tick_count"] == 0 and chunk[index - 1]["tick_count"] == 0:
+					print "consecutive missing minutes"
+					# raise Exception("consecutive missing minutes")
 				elif chunk[index + 1]["tick_count"] == 0:
+					p_c_minute = int(chunk[index - 1]["seconds_data"][0]["unix_time"]) / 60 * 60
 					prev_last = chunk[index - 1]["last"]
 					opening.append(prev_last)
 					close.append(prev_last)
 					high.append(prev_last)
 					low.append(prev_last)
 					good_result.append(0.0)
+					unix_time.append(p_c_minute + 60)
 
 				elif chunk[index - 1]["tick_count"] == 0:
 					next_first = chunk[index + 1]["first"]
@@ -57,9 +52,20 @@ def parse_historical_data(serialized_chunk):
 						good_result.append(chunk[index + 1]["seconds_data"][0]["price"])
 					else:
 						good_result.append(0.0)
-				else:
-					print "consecutive missing minutes"
-					# raise Exception("consecutive missing minutes")
+					unix_time.append(n_c_minute - 60)
+				else:					
+					prev_last = chunk[index - 1]["last"]
+					next_first = chunk[index + 1]["first"]
+					opening.append(prev_last)
+					close.append(next_first)
+					high.append(max(prev_last,next_first))
+					low.append(min(prev_last,next_first))
+					n_c_minute = int(chunk[index + 1]["seconds_data"][0]["unix_time"]) / 60 * 60
+					if int(chunk[index + 1]["seconds_data"][0]["unix_time"]) - n_c_minute <= good_result_threshold:
+						good_result.append(chunk[index + 1]["seconds_data"][0]["price"])
+					else:
+						good_result.append(0.0)
+					unix_time.append(n_c_minute - 60)
 
 			else:
 				c_minute = int(chunk[index]["seconds_data"][0]["unix_time"]) / 60 * 60
@@ -74,7 +80,8 @@ def parse_historical_data(serialized_chunk):
 				low.append(chunk[index]["low"])
 				opening.append(chunk[index]["first"])
 				close.append(chunk[index]["last"])
-		chunk_results.append([opening, high, low, close, good_result])
+				unix_time.append(c_minute)
+		chunk_results.append([unix_time, opening, high, low, close, good_result])
 
 	return chunk_results
 
@@ -115,15 +122,25 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20160203,
 	result = parse_historical_data(serialized_chunk)
 
 	for chunk in result:
-		for x in range(4):
-			if len(chunk[4]) != len(chunk[x]):
+		for x in range(5):
+			if len(chunk[5]) != len(chunk[x]):
 				raise Exception("data length inconsistent")
 
 	return result
 
 
-training_data = get_ML_data_for_resistance_support()
-print len(training_data)
+raw_training_data = get_ML_data_for_resistance_support()
+training_data = []
+training_result = []
+for chunk in raw_training_data:
+	unixtime, opening, high, low, close, good_result = chunk
+	print(len(opening))
+	for index in range(101,len(opening)):
+		if good_result[index] != 0.0:
+			resistance_lines, support_lines = compute_support_resistance(opening[index - 26:index - 1], high[index - 26:index - 1], low[index - 26:index - 1], close[index - 26:index - 1])
+		print index
+
+# print len(training_data)
 # 		print index
 # 		break
 # 	break
@@ -135,7 +152,6 @@ print len(training_data)
 	# resistance_slope_arr = []
 	# # for frame_size in range(20,30):
 	# frame, opening, high, low, close = parse_historical_data(day_data["minute_price"], frame_size = frame_size)
-	# resistance_lines, support_lines = compute_support_resistance(opening[:-1], high[:-1], low[:-1], close[:-1])
 
 	# support_end_points = []
 	# good_support = []
