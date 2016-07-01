@@ -48,7 +48,7 @@ class TradingView:
             rgb_im = im.convert('RGB')
             r, g, b = rgb_im.getpixel((1100, 50))
             time.sleep(3)
-            if Helper.similar_color((r,g,b), UP_BUTTON_COLOR):
+            if Helper.similar_color((r,g,b), UP_BUTTON_COLOR) or Helper.similar_color((r,g,b), UP_BUTTON_COLOR2):
                 self.is_ready = True
 
     def create_folder_if_not_exist(self):
@@ -86,7 +86,7 @@ class TradingView:
             rgb_im = im.convert('RGB')
             r, g, b = rgb_im.getpixel((1120, 400))
         print (r,g,b)
-        if Helper.similar_color((r,g,b), UP_BUTTON_COLOR) and self.is_ready:
+        if (Helper.similar_color((r,g,b), UP_BUTTON_COLOR) or Helper.similar_color((r,g,b), UP_BUTTON_COLOR2)) and self.is_ready:
             return self.click_canvas_position(550, 240)
         else:
             return False
@@ -107,7 +107,7 @@ class TradingView:
             rgb_im = im.convert('RGB')
             r, g, b = rgb_im.getpixel((1120, 400))
         print (r,g,b)
-        if Helper.similar_color((r,g,b), UP_BUTTON_COLOR) and self.is_ready:
+        if (Helper.similar_color((r,g,b), UP_BUTTON_COLOR) or  Helper.similar_color((r,g,b), UP_BUTTON_COLOR2)) and self.is_ready:
             return self.click_canvas_position(550, 100)
         else:
             return False
