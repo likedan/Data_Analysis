@@ -129,7 +129,7 @@ def compute_support_resistance(opening, high, low, close, no_overhead_start_rate
 	ranked_resistance = rank_trend_line(resistance_dict, True)
 	ranked_support = rank_trend_line(support_dict, False)
 
-	return (ranked_resistance, ranked_support)
+	return (ranked_support, ranked_resistance)
 
 def parse_historical_data(minute_price, frame_size = 50):
 	prune_data = []
