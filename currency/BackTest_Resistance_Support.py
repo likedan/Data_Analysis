@@ -210,7 +210,14 @@ for chunk in raw_training_data:
 				training_result.append(get_simple_features(good_result[index]))
 				features_arr.append(get_complex_features(high[index - 1]))
 				features_arr.append(get_complex_features(low[index - 1]))
-
+				features_arr.append(get_complex_features(high[index - 2]))
+				features_arr.append(get_complex_features(low[index - 2]))
+				features_arr.append(get_simple_features(high[index - 3]))
+				features_arr.append(get_simple_features(low[index - 3]))
+				features_arr.append(get_simple_features(high[index - 4]))
+				features_arr.append(get_simple_features(low[index - 4]))
+				features_arr.append(get_simple_features(high[index - 5]))
+				features_arr.append(get_simple_features(low[index - 5]))
 				def get_slope(array):
 					x = np.array(range(0,len(array)))
 					y = np.array(array)
