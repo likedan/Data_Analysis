@@ -14,6 +14,7 @@ import math
 from SupportResistance import compute_support_resistance
 from matplotlib.dates import date2num
 from scipy import stats
+from sklearn.ensemble import RandomForestClassifier
 
 def parse_historical_data(serialized_chunk):
 
@@ -167,7 +168,7 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20160203,
 	return result
 
 
-raw_training_data = get_ML_data_for_resistance_support()
+raw_training_data = get_ML_data_for_resistance_support(start_time = 20160223, end_time = 20160229)
 training_data = []
 training_result = []
 for chunk in raw_training_data:
@@ -181,10 +182,10 @@ for chunk in raw_training_data:
 			resistance_line_val = resistance_line.get_y(25)
 			support_line_val = support_line.get_y(25)
 			print (support_line_val, resistance_line_val, support_line_val < resistance_line_val)
-			time_s = []
-			for t in unixtime[index - 101:index]:
-				time_s.append(datetime.datetime.fromtimestamp(t))
-			Plot.plot_day_candle(time_s, opening[index - 101:index], high[index - 101:index], low[index - 101:index], close[index - 101:index], "EURUSD", lines=[[support_line],[resistance_line]], save=True)
+			# time_s = []
+			# for t in unixtime[index - 101:index]:
+			# 	time_s.append(datetime.datetime.fromtimestamp(t))
+			# Plot.plot_day_candle(time_s, opening[index - 101:index], high[index - 101:index], low[index - 101:index], close[index - 101:index], 26, "EURUSD", lines=[[support_line],[resistance_line]], save=True)
 			if resistance_line_val > support_line_val:
 				features_arr = []
 				if resistance_line.slope > 0:
@@ -228,6 +229,32 @@ for chunk in raw_training_data:
 			# average_price_movement
 			# features_arr
 			print index
+
+threshold = len(training_data)/4
+training_set = training_data[:threshold]
+training_set_result = training_result[:threshold]
+testing_set = training_data[threshold:]
+testing_set_result = training_result[threshold:]
+
+forest = RandomForestClassifier(n_estimators = 100)
+forest = forest.fit(np.array(training_set), np.array(training_set_result))
+output = forest.predict(np.array(testing_set))
+
+total_count = 0
+true_count = 0
+for index in range(len(output)):
+	print (output[index], testing_set_result[index])
+	if output[index] == 1:
+		total_count += 1 
+		if testing_set_result[index] == 1:
+			true_count += 1
+	if output[index] == -1:
+		total_count += 1 
+		if testing_set_result[index] == -1:
+			true_count += 1
+
+print true_count
+print total_count
 
 # print len(training_data)
 # 		print index
