@@ -25,7 +25,6 @@ def parse_historical_data(serialized_chunk):
 	chunk_results = []
 	for chunk in serialized_chunk:
 		for index in range(len(chunk)):
-
 			if chunk[index]["tick_count"] == 0:
 				if chunk[index + 1]["tick_count"] > 0 and chunk[index - 1]["tick_count"] > 0:
 					prev_last = chunk[index - 1]["last"]
@@ -79,46 +78,52 @@ def parse_historical_data(serialized_chunk):
 
 	return chunk_results
 
-start_time = 20160203
-end_time = 20160503
 
-db = Database()
-currency_data = db.get_range_currency_date("EURUSD", start_time ,end_time)
-suppose_unix_time = int(time.mktime(datetime.datetime.strptime(str(start_time), "%Y%m%d").timetuple()))
-serialized_chunk = [[]]
+def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20160203, end_time = 20160503):
+	db = Database()
+	currency_data = db.get_range_currency_date(symbol, start_time ,end_time)
+	suppose_unix_time = int(time.mktime(datetime.datetime.strptime(str(start_time), "%Y%m%d").timetuple()))
+	serialized_chunk = [[]]
 
-for day_data in currency_data:
-	print day_data["unix_time"]
-	if day_data["unix_time"] != suppose_unix_time:
-		serialized_chunk.append([])
-		suppose_unix_time = day_data["unix_time"]
-		print "  "
+	for day_data in currency_data:
+		print day_data["unix_time"]
+		if day_data["unix_time"] != suppose_unix_time:
+			serialized_chunk.append([])
+			suppose_unix_time = day_data["unix_time"]
+			print "  "
 
-	serialized_chunk[-1] = serialized_chunk[-1] + day_data["minute_price"]
-	suppose_unix_time += SECONDS_PER_DAY
+		serialized_chunk[-1] = serialized_chunk[-1] + day_data["minute_price"]
+		suppose_unix_time += SECONDS_PER_DAY
 
-for chunk_index in range(len(serialized_chunk)):
-	start_index = 0
-	for minute_data in serialized_chunk[chunk_index]:
-		if minute_data["tick_count"] == 0:
-			start_index += 1
-		else:
-			break
-	end_index = len(serialized_chunk[chunk_index])
-	for minute_data in reversed(serialized_chunk[chunk_index]):
-		if minute_data["tick_count"] == 0:
-			end_index -= 1
-		else:
-			break
-	serialized_chunk[chunk_index] = serialized_chunk[chunk_index][start_index: end_index]
-	print start_index
-	print end_index
+	for chunk_index in range(len(serialized_chunk)):
+		start_index = 0
+		for minute_data in serialized_chunk[chunk_index]:
+			if minute_data["tick_count"] == 0:
+				start_index += 1
+			else:
+				break
+		end_index = len(serialized_chunk[chunk_index])
+		for minute_data in reversed(serialized_chunk[chunk_index]):
+			if minute_data["tick_count"] == 0:
+				end_index -= 1
+			else:
+				break
+		serialized_chunk[chunk_index] = serialized_chunk[chunk_index][start_index: end_index]
+		# print start_index
+		# print end_index
 
-result = parse_historical_data(serialized_chunk)
+	result = parse_historical_data(serialized_chunk)
 
-for chunk in result:
-	for x in range(4):
-		print len(chunk[4]) == len(chunk[x])
+	for chunk in result:
+		for x in range(4):
+			if len(chunk[4]) != len(chunk[x]):
+				raise Exception("data length inconsistent")
+
+	return result
+
+
+training_data = get_ML_data_for_resistance_support()
+print len(training_data)
 # 		print index
 # 		break
 # 	break
