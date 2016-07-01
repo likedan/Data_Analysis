@@ -15,6 +15,7 @@ from SupportResistance import compute_support_resistance
 from matplotlib.dates import date2num
 from scipy import stats
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.externals import joblib
 
 def parse_historical_data(serialized_chunk):
 
@@ -245,6 +246,9 @@ testing_set_result = training_result[threshold:]
 
 forest = RandomForestClassifier(n_estimators = 100)
 forest = forest.fit(np.array(training_set), np.array(training_set_result))
+joblib.dump(forest, 'RandomForrest.pkl') 
+forest = joblib.load('RandomForrest.pkl')
+
 output = forest.predict(np.array(testing_set))
 
 total_count = 0
@@ -262,74 +266,3 @@ for index in range(len(output)):
 
 print true_count
 print total_count
-
-# print len(training_data)
-# 		print index
-# 		break
-# 	break
-
-	# frame_size = 25
-	
-	# frame = []
-	# support_slope_arr = []
-	# resistance_slope_arr = []
-	# # for frame_size in range(20,30):
-	# frame, opening, high, low, close = parse_historical_data(day_data["minute_price"], frame_size = frame_size)
-
-	# support_end_points = []
-	# good_support = []
-	# support_slope = []
-	# for l in reversed(support_lines[-7:]):
-	# 	good_support.append(l["line"])
-	# 	support_slope.append(l["line"].slope)
-	# 	support_end_points.append(l["line"].get_y(0))
-	# 	support_end_points.append(l["line"].get_y(frame_size))
-	# good_resisitance = []
-	# resistance_slope = []
-
-	# resistance_end_points = []
-	# for l in reversed(resistance_lines[-7:]):
-	# 	good_resisitance.append(l["line"])
-	# 	resistance_slope.append(l["line"].slope)
-	# 	resistance_end_points.append(l["line"].get_y(0))
-	# 	resistance_end_points.append(l["line"].get_y(frame_size))
-
-	# normalize_slope_val = max(resistance_end_points) - min(support_end_points) 
-	# resistance_slope.remove(max(resistance_slope))
-	# resistance_slope.remove(min(resistance_slope))
-	# support_slope.remove(max(support_slope))
-	# support_slope.remove(min(support_slope))
-
-	# # support_slope_arr.append((np.std(np.array(support_slope)), good_support))
-	# # resistance_slope_arr.append((np.std(np.array(resistance_slope)), good_resisitance))
-	# print str(day_data["date"]) + "  " +  str(np.std(np.array(resistance_slope) / normalize_slope_val)) + "  " + str(np.std(np.array(support_slope) / normalize_slope_val))
-
-	# good_support_arr = sorted(support_slope_arr, key=lambda x: x[0])
-	# good_resisitance_arr = sorted(resistance_slope_arr, key=lambda x: x[0])
-	# # for index in range(5):
-	# # 	good_support = good_support_arr[index][1]
-	# # 	good_resisitance = good_resisitance_arr[index][1]
-
-	# good_lines = []
-	# for index in range(5):
-	# 	good_lines.append([good_support[index], good_resisitance[index]])
-	# # good_lines[2][0].slope = (good_lines[0][0].slope+good_lines[1][0].slope)/2
-	# # good_lines[2][0].intercept = (good_lines[0][0].intercept+good_lines[1][0].intercept)/2
-	# # good_lines[2][1].slope = (good_lines[0][1].slope+good_lines[1][1].slope)/2
-	# # good_lines[2][1].intercept = (good_lines[0][1].intercept+good_lines[1][1].intercept)/2
-	# dates = []
-	# last = []
-	# high = []
-	# low = []
-	# first = []
-	# for index in range(len(frame)):
-	# 	if frame[index]["tick_count"] == 0:
-	# 		pass
-	# 	else:
-	# 		last.append(frame[index]["last"])
-	# 		high.append(frame[index]["high"])
-	# 		low.append(frame[index]["low"])
-	# 		first.append(frame[index]["first"])
-	# 		dates.append(datetime.datetime.fromtimestamp(day_data["unix_time"] + frame[index]["minute_count"] * 60))
-
-	# Plot.plot_day_candle(dates, first, high, low, last, "EURUSD", lines=good_lines, save=True)
