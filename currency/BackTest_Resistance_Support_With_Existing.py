@@ -17,6 +17,8 @@ from scipy import stats
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.externals import joblib
 
+existing_file = 'RandomForrest/RandomForrest.pkl'
+
 def parse_historical_data(serialized_chunk):
 
 	good_result_threshold = 3
@@ -126,7 +128,7 @@ def choose_best_line(resistance_lines, support_lines, frame_size):
 	final_resistance.intercept = (good_lines[0][1].intercept+good_lines[1][1].intercept)/2
 	return (final_support, final_resistance)
 
-def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20160203, end_time = 20160213):
+def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20160203, end_time = 20160303):
 	db = Database()
 	currency_data = db.get_range_currency_date(symbol, start_time ,end_time)
 	suppose_unix_time = int(time.mktime(datetime.datetime.strptime(str(start_time), "%Y%m%d").timetuple()))
@@ -169,7 +171,7 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20160203,
 	return result
 
 
-raw_training_data = get_ML_data_for_resistance_support(start_time = 20160223, end_time = 20160529)
+raw_training_data = get_ML_data_for_resistance_support(symbol = "USDCAD", start_time = 20160523, end_time = 20160523)
 training_data = []
 training_result = []
 for chunk in raw_training_data:
@@ -197,12 +199,6 @@ for chunk in raw_training_data:
 					features_arr.append(0)
 				else:
 					features_arr.append(1)
-
-			#smoothing value of the line
-			if (resistance_line.get_y(200) > support_line.get_y(200)) == (resistance_line.get_y(-200) > support_line.get_y(-200)):
-				features_arr.append(0)
-			else:
-				features_arr.append(1)
 
 				def get_simple_features(compare_val):
 					if compare_val >= resistance_line_val:
@@ -244,16 +240,10 @@ for chunk in raw_training_data:
 			# features_arr
 			print index
 
-threshold = len(training_data)/4
-training_set = training_data[:threshold]
-training_set_result = training_result[:threshold]
-testing_set = training_data[threshold:]
-testing_set_result = training_result[threshold:]
+testing_set = training_data
+testing_set_result = training_result
 
-forest = RandomForestClassifier(n_estimators = 100)
-forest = forest.fit(np.array(training_set), np.array(training_set_result))
-joblib.dump(forest, 'RandomForrest.pkl') 
-forest = joblib.load('RandomForrest.pkl')
+forest = joblib.load(existing_file)
 
 output = forest.predict(np.array(testing_set))
 
@@ -272,6 +262,7 @@ for index in range(len(output)):
 		total_count += 1 
 		if testing_set_result[index] == -1:
 			true_count += 1
+
 
 print (true_count, total_count) 
 print float(true_count) / float(total_count)
