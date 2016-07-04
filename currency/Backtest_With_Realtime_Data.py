@@ -88,16 +88,16 @@ def compute_resistance_support_line(opening, high, low, close):
 	final_resistance.intercept = (good_lines[0][1].intercept+good_lines[1][1].intercept)/2
 	return (final_support, final_resistance)
 
+minute_high = 0
+minute_low = 9999
 resistance_line_val = 0
 support_line_val = 0
-resistance = None
-support = None
+
 frame_size = 25
 traded_up = False
 traded_down = False
 last_minute = 0
-minute_high = 0
-minute_low = 9999
+
 def plot_rupport_resistance(lines):
 	price_data = db.get_realtime_Data(trading_symbol, frame_size)
 	opening, high, low, close, time_stamp = Helper.get_opening_high_low_close(price_data)
