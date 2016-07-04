@@ -43,6 +43,20 @@ class Database:
             return result
         return None
 
+    def get_realtime_date_Data(self, symbol, length, date):
+        result = []
+        unix_date = int(time.mktime(datetime.datetime.strptime(str(start), "%Y%m%d").timetuple()))
+        data = self.realtime_data.find_one({"symbol": symbol, "date":str(date)})["data"]
+        
+        for index in range(MINUTES_PER_DAY):
+            minute_in_unix = int(time.time()) / 60 * 60 - index * 60
+            if str(minute_in_unix) in data:
+                result.append(data[str(minute_in_unix)])
+            else:
+                print "missing minute"
+
+        return result
+
     def get_currency_list(self):
         c_list = [currency for currency in self.currency_list.find()]
         return c_list

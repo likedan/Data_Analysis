@@ -169,7 +169,7 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20160203,
 	return result
 
 
-raw_training_data = get_ML_data_for_resistance_support(start_time = 20160223, end_time = 20160529)
+raw_training_data = get_ML_data_for_resistance_support(start_time = 20160223, end_time = 20160423)
 training_data = []
 training_result = []
 for chunk in raw_training_data:
@@ -198,11 +198,11 @@ for chunk in raw_training_data:
 				else:
 					features_arr.append(1)
 
-			#smoothing value of the line
-			if (resistance_line.get_y(200) > support_line.get_y(200)) == (resistance_line.get_y(-200) > support_line.get_y(-200)):
-				features_arr.append(0)
-			else:
-				features_arr.append(1)
+				#smoothing value of the line
+				if (resistance_line.get_y(100) > support_line.get_y(100)) == (resistance_line.get_y(-100) > support_line.get_y(-100)):
+					features_arr.append(0)
+				else:
+					features_arr.append(1)
 
 				def get_simple_features(compare_val):
 					if compare_val >= resistance_line_val:

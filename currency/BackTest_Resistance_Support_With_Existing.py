@@ -45,7 +45,6 @@ def parse_historical_data(serialized_chunk):
 					low.append(prev_last)
 					good_result.append(0.0)
 					unix_time.append(p_c_minute + 60)
-
 				elif chunk[index - 1]["tick_count"] == 0:
 					next_first = chunk[index + 1]["first"]
 					opening.append(next_first)
@@ -171,7 +170,7 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20160203,
 	return result
 
 
-raw_training_data = get_ML_data_for_resistance_support(symbol = "USDCAD", start_time = 20160523, end_time = 20160523)
+raw_training_data = get_ML_data_for_resistance_support(symbol = "USDCAD", start_time = 20160520, end_time = 20160520)
 training_data = []
 training_result = []
 for chunk in raw_training_data:
@@ -226,10 +225,10 @@ for chunk in raw_training_data:
 					y = np.array(array)
 					slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
 					return slope
-				fifty_high_slope = get_slope(high[index - 51:index - 2])
-				fifty_low_slope = get_slope(low[index - 51:index - 2])
-				hundred_high_slope = get_slope(high[index - 101:index - 2])
-				hundred_low_slope = get_slope(low[index - 101:index - 2])
+				fifty_high_slope = get_slope(high[index - 51: index - 2])
+				fifty_low_slope = get_slope(low[index - 51: index - 2])
+				hundred_high_slope = get_slope(high[index - 101: index - 2])
+				hundred_low_slope = get_slope(low[index - 101: index - 2])
 				features_arr.append(int(fifty_high_slope > 0))
 				features_arr.append(int(fifty_low_slope > 0))
 				features_arr.append(int(hundred_high_slope > 0))
@@ -246,12 +245,13 @@ testing_set_result = training_result
 forest = joblib.load(existing_file)
 
 output = forest.predict(np.array(testing_set))
+prediction = forest.predict_proba(np.array(testing_set))
 
 total_count = 0
 true_count = 0
 correct_count = 0
 for index in range(len(output)):
-	print (output[index], testing_set_result[index])
+	print (output[index], testing_set_result[index], prediction[index])
 	if output[index] == testing_set_result[index]:
 		correct_count += 1
 	if output[index] == 1:
