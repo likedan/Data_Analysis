@@ -108,10 +108,10 @@ support_line_val = 0
 last_minute = 0
 last_price = 0
 frame_size = 25
-traded_up = False
-traded_down = False
-trade_num = 0
-last_trade_time = 0
+traded_up_num = 0
+traded_down_num = 0
+last_down_trade_time = 0
+last_up_trade_time = 0
 close = []
 high = []
 low = []
@@ -126,7 +126,7 @@ while True:
 	current_minute = int(latest_time) / 60 * 60
 
 	tradable = False
-	if last_price != latest_price and trade_num < MINUTE_MAX_TRADE and latest_time - last_trade_time > MAX_TRADE__SECOND_INTERVAL:
+	if last_price != latest_price:
 		tradable = True
 		last_price = latest_price
 
@@ -137,7 +137,8 @@ while True:
 		resistance_line_val = resistance_line.get_y(25)
 		support_line_val = support_line.get_y(25)
 		print (support_line_val, resistance_line_val, support_line_val < resistance_line_val)
-		trade_num = 0
+		traded_up_num = 0
+		traded_down_num = 0
 		minute_high = 0
 		minute_low = 9999
 		end_open_trade()
@@ -202,30 +203,30 @@ while True:
 		output = forest.predict(np.array([features_arr]))[0]
 		print output
 		if output == 0:
-			if latest_price > resistance_line_val:
+			if latest_price > resistance_line_val and traded_down_num < MINUTE_MAX_TRADE and latest_time - last_down_trade_time > MAX_TRADE__SECOND_INTERVAL:
 				print "trade_down"
 				if trading.trade_down():
 					db.add_open_trades(trading_symbol, latest_price, latest_time, False, current_minute + 60)
-					trade_num += 1
-					last_trade_time = latest_time
-			elif latest_price < support_line_val:
+					traded_down_num += 1
+					last_down_trade_time = latest_time
+			elif latest_price < support_line_val and traded_up_num < MINUTE_MAX_TRADE and latest_time - last_up_trade_time > MAX_TRADE__SECOND_INTERVAL:
 				print "trade_up"
 				if trading.trade_up():
-					last_trade_time = latest_time
+					last_up_trade_time = latest_time
 					db.add_open_trades(trading_symbol, latest_price, latest_time, True, current_minute + 60)
-					trade_num += 1
+					traded_up_num += 1
 		elif output == 1:
-			if latest_price > support_line_val:
+			if latest_price > support_line_val and traded_down_num < MINUTE_MAX_TRADE and latest_time - last_down_trade_time > MAX_TRADE__SECOND_INTERVAL:
 				print "trade_down"
 				if trading.trade_down():
-					last_trade_time = latest_time
+					last_down_trade_time = latest_time
 					db.add_open_trades(trading_symbol, latest_price, latest_time, False, current_minute + 60)
-					trade_num += 1
+					traded_down_num += 1
 		elif output == -1:
-			if latest_price < resistance_line_val:
+			if latest_price < resistance_line_val and traded_up_num < MINUTE_MAX_TRADE and latest_time - last_up_trade_time > MAX_TRADE__SECOND_INTERVAL:
 				print "trade_up"
 				if trading.trade_up():
-					last_trade_time = latest_time
+					last_up_trade_time = latest_time
 					db.add_open_trades(trading_symbol, latest_price, latest_time, True, current_minute + 60)
-					trade_num += 1
+					traded_up_num += 1
 	time.sleep(0.5)
