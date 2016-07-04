@@ -170,7 +170,7 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20160203,
 	return result
 
 
-raw_training_data = get_ML_data_for_resistance_support(symbol = "USDCAD", start_time = 20160520, end_time = 20160520)
+raw_training_data = get_ML_data_for_resistance_support(symbol = "USDCAD", start_time = 20160520, end_time = 20160520 )
 training_data = []
 training_result = []
 for chunk in raw_training_data:

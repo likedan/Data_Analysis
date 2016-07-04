@@ -169,7 +169,7 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20160203,
 	return result
 
 
-raw_training_data = get_ML_data_for_resistance_support(start_time = 20160223, end_time = 20160423)
+raw_training_data = get_ML_data_for_resistance_support(start_time = 20160223, end_time = 20160223)
 training_data = []
 training_result = []
 for chunk in raw_training_data:
@@ -198,48 +198,48 @@ for chunk in raw_training_data:
 				else:
 					features_arr.append(1)
 
-				#smoothing value of the line
-				if (resistance_line.get_y(100) > support_line.get_y(100)) == (resistance_line.get_y(-100) > support_line.get_y(-100)):
+			#smoothing value of the line
+				if (resistance_line.get_y(200) > support_line.get_y(100)) == (resistance_line.get_y(-100) > support_line.get_y(-100)):
 					features_arr.append(0)
 				else:
 					features_arr.append(1)
 
-				def get_simple_features(compare_val):
-					if compare_val >= resistance_line_val:
-						return -1
-					elif compare_val <= support_line_val:
-						return 1
-					else:
-						return 0
-				def get_complex_features(compare_val):
-					interval = resistance_line_val - support_line_val
-					return (compare_val - (support_line_val + interval / 2)) / interval
-				training_result.append(get_simple_features(good_result[index]))
-				features_arr.append(get_complex_features(high[index - 1]))
-				features_arr.append(get_complex_features(low[index - 1]))
-				features_arr.append(get_complex_features(high[index - 2]))
-				features_arr.append(get_complex_features(low[index - 2]))
-				features_arr.append(get_simple_features(high[index - 3]))
-				features_arr.append(get_simple_features(low[index - 3]))
-				features_arr.append(get_simple_features(high[index - 4]))
-				features_arr.append(get_simple_features(low[index - 4]))
-				features_arr.append(get_simple_features(high[index - 5]))
-				features_arr.append(get_simple_features(low[index - 5]))
-				def get_slope(array):
-					x = np.array(range(0,len(array)))
-					y = np.array(array)
-					slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
-					return slope
-				fifty_high_slope = get_slope(high[index - 51:index - 2])
-				fifty_low_slope = get_slope(low[index - 51:index - 2])
-				hundred_high_slope = get_slope(high[index - 101:index - 2])
-				hundred_low_slope = get_slope(low[index - 101:index - 2])
-				features_arr.append(int(fifty_high_slope > 0))
-				features_arr.append(int(fifty_low_slope > 0))
-				features_arr.append(int(hundred_high_slope > 0))
-				features_arr.append(int(hundred_low_slope > 0))
-				print features_arr
-				training_data.append(features_arr)
+					def get_simple_features(compare_val):
+						if compare_val >= resistance_line_val:
+							return -1
+						elif compare_val <= support_line_val:
+							return 1
+						else:
+							return 0
+					def get_complex_features(compare_val):
+						interval = resistance_line_val - support_line_val
+						return (compare_val - (support_line_val + interval / 2)) / interval
+					training_result.append(get_simple_features(good_result[index]))
+					features_arr.append(get_complex_features(high[index - 1]))
+					features_arr.append(get_complex_features(low[index - 1]))
+					features_arr.append(get_complex_features(high[index - 2]))
+					features_arr.append(get_complex_features(low[index - 2]))
+					features_arr.append(get_simple_features(high[index - 3]))
+					features_arr.append(get_simple_features(low[index - 3]))
+					features_arr.append(get_simple_features(high[index - 4]))
+					features_arr.append(get_simple_features(low[index - 4]))
+					features_arr.append(get_simple_features(high[index - 5]))
+					features_arr.append(get_simple_features(low[index - 5]))
+					def get_slope(array):
+						x = np.array(range(0,len(array)))
+						y = np.array(array)
+						slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
+						return slope
+					fifty_high_slope = get_slope(high[index - 51:index - 2])
+					fifty_low_slope = get_slope(low[index - 51:index - 2])
+					hundred_high_slope = get_slope(high[index - 101:index - 2])
+					hundred_low_slope = get_slope(low[index - 101:index - 2])
+					features_arr.append(int(fifty_high_slope > 0))
+					features_arr.append(int(fifty_low_slope > 0))
+					features_arr.append(int(hundred_high_slope > 0))
+					features_arr.append(int(hundred_low_slope > 0))
+					print features_arr
+					training_data.append(features_arr)
 			# average_price_movement
 			# features_arr
 			print index

@@ -18,12 +18,19 @@ class Database:
         self.realtime_data = self.db["realtime_data"]
         self.trading_history = self.db["trading_history"]
         self.open_trades = self.db["open_trades"]
-
+        self.mock_trading_history = self.db["mock_trading_history"]
+        self.mock_open_trades = self.db["mock_open_trades"]
     def add_historical_trades(self, symbol, trade_price, trade_time, is_up, close_time, close_price, result):
         self.trading_history.insert({"symbol":symbol, "trade_price": float(trade_price), "trade_time": int(trade_time), "is_up": is_up, "close_time": int(close_time), "close_price": close_price, "result":result})
 
     def add_open_trades(self, symbol, trade_price, trade_time, is_up, close_time):
         self.open_trades.insert({"symbol":symbol, "trade_price": float(trade_price), "trade_time": int(trade_time), "is_up": is_up, "close_time": int(close_time)})
+
+    def add_mock_historical_trades(self, symbol, trade_price, trade_time, is_up, close_time, close_price, result):
+        self.mock_trading_history.insert({"symbol":symbol, "trade_price": float(trade_price), "trade_time": int(trade_time), "is_up": is_up, "close_time": int(close_time), "close_price": close_price, "result":result})
+
+    def add_mock_open_trades(self, symbol, trade_price, trade_time, is_up, close_time):
+        self.mock_open_trades.insert({"symbol":symbol, "trade_price": float(trade_price), "trade_time": int(trade_time), "is_up": is_up, "close_time": int(close_time)})
 
     def get_realtime_Data(self, symbol, length):
         result = []
@@ -43,13 +50,13 @@ class Database:
             return result
         return None
 
-    def get_realtime_date_Data(self, symbol, length, date):
+    def get_realtime_date_Data(self, symbol, date):
         result = []
-        unix_date = int(time.mktime(datetime.datetime.strptime(str(start), "%Y%m%d").timetuple()))
+        date_in_unix = int(time.mktime(datetime.datetime.strptime(str(date), "%Y%m%d").timetuple()))
         data = self.realtime_data.find_one({"symbol": symbol, "date":str(date)})["data"]
         
         for index in range(MINUTES_PER_DAY):
-            minute_in_unix = int(time.time()) / 60 * 60 - index * 60
+            minute_in_unix = date_in_unix + index * 60
             if str(minute_in_unix) in data:
                 result.append(data[str(minute_in_unix)])
             else:
