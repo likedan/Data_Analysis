@@ -141,7 +141,7 @@ while True:
 		time_s = []
 		for t in time_stamp:
 			time_s.append(datetime.datetime.fromtimestamp(t))
-		Plot.plot_day_candle(time_s, opening, high, low, close, 25, "USDCAD", lines=[[support_line],[resistance_line]], save=True)
+		Plot.plot_day_candle(time_s, opening, high, low, close, 25, trading_symbol, lines=[[support_line],[resistance_line]], save=True)
 
 	last_minute = current_minute
 
