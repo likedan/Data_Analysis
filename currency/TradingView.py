@@ -70,21 +70,31 @@ class TradingView:
         except Exception, e:
             raise e
 
+    def clean_new_trade(self):
+        self.driver.save_screenshot(self.screenshot_file)
+        im = Image.open(self.screenshot_file)
+        rgb_im = im.convert('RGB')
+        r, g, b = rgb_im.getpixel((1120, 400))
+        #click open new trade
+        if Helper.similar_color((r,g,b), NEWTRADE_BUTTON): 
+            self.click_canvas_position(550, 100)
+            time.sleep(0.2)
+
     def trade_down(self):
 
         self.driver.save_screenshot(self.screenshot_file)
         im = Image.open(self.screenshot_file)
         rgb_im = im.convert('RGB')
         r, g, b = rgb_im.getpixel((1120, 400))
-
         #click open new trade
         if Helper.similar_color((r,g,b), NEWTRADE_BUTTON): 
             self.click_canvas_position(550, 100)
-            time.sleep(1)
+            time.sleep(0.5)
             self.driver.save_screenshot(self.screenshot_file)
             im = Image.open(self.screenshot_file)
             rgb_im = im.convert('RGB')
             r, g, b = rgb_im.getpixel((1120, 400))
+        
         print (r,g,b)
         if (Helper.similar_color((r,g,b), UP_BUTTON_COLOR) or Helper.similar_color((r,g,b), UP_BUTTON_COLOR2)) and self.is_ready:
             return self.click_canvas_position(550, 240)
@@ -101,7 +111,7 @@ class TradingView:
         #click open new trade
         if Helper.similar_color((r,g,b), NEWTRADE_BUTTON): 
             self.click_canvas_position(550, 100)
-            time.sleep(1)
+            time.sleep(0.5)
             self.driver.save_screenshot(self.screenshot_file)
             im = Image.open(self.screenshot_file)
             rgb_im = im.convert('RGB')

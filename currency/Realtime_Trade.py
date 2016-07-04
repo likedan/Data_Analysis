@@ -141,6 +141,7 @@ while True:
 		minute_high = 0
 		minute_low = 9999
 		end_open_trade()
+		trading.clean_new_trade()
 		time_s = []
 		for t in time_stamp:
 			time_s.append(datetime.datetime.fromtimestamp(t))
