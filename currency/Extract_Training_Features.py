@@ -89,19 +89,6 @@ def parse_historical_data(serialized_chunk):
 
 	return chunk_results
 
-def choose_top_five_lines(resistance_lines, support_lines, frame_size):
-	good_support = []
-	for l in reversed(support_lines[-5:]):
-		good_support.append(l["line"])
-
-	good_resisitance = []
-
-	resistance_end_points = []
-	for l in reversed(resistance_lines[-5:]):
-		good_resisitance.append(l["line"])
-
-	return (good_support, good_resisitance)
-
 def choose_best_line(resistance_lines, support_lines, frame_size):
 	support_end_points = []
 	good_support = []
@@ -140,7 +127,7 @@ def choose_best_line(resistance_lines, support_lines, frame_size):
 	final_resistance.intercept = (good_lines[0][1].intercept+good_lines[1][1].intercept)/2
 	return (final_support, final_resistance)
 
-def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20151003, end_time = 20160213):
+def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20141003, end_time = 20151002):
 	db = Database()
 	currency_data = db.get_range_currency_date(symbol, start_time ,end_time)
 	suppose_unix_time = int(time.mktime(datetime.datetime.strptime(str(start_time), "%Y%m%d").timetuple()))
@@ -182,13 +169,19 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20151003,
 
 	return result
 
+symbol = "EURUSD"
+raw_training_data = get_ML_data_for_resistance_support(symbol=symbol, start_time = 20140223, end_time = 20160522)
 
-raw_training_data = get_ML_data_for_resistance_support(start_time = 20160223, end_time = 20160223)
-training_data = []
-training_result = []
+training_data_path = os.path.join(os.getcwd(),"Training")
+if not os.path.exists(training_data_path):
+    os.makedirs(training_data_path)
 for chunk in raw_training_data:
 	unixtime, opening, high, low, close, good_result = chunk
-	print(len(opening))
+	date = datetime.datetime.fromtimestamp(int(unixtime[0])).strftime('%Y%m%d')
+	print(date)
+	f = open('Training/'+date+symbol+'.txt','w+')
+	training_data = []
+	training_result = []
 	for index in range(101,len(opening)):
 		if good_result[index] != 0.0:
 			print "good_result"
@@ -211,26 +204,6 @@ for chunk in raw_training_data:
 					features_arr.append(0)
 				else:
 					features_arr.append(1)
-
-				def get_simple_features(compare_val):
-					if compare_val >= resistance_line_val:
-						return -1
-					elif compare_val <= support_line_val:
-						return 1
-					else:
-						return 0
-				def get_complex_features(compare_val):
-					interval = resistance_line_val - support_line_val
-					return (compare_val - (support_line_val + interval / 2)) / interval
-				training_result.append(get_simple_features(good_result[index]))
-				features_arr.append(get_complex_features(high[index - 1]))
-				features_arr.append(get_complex_features(low[index - 1]))
-				features_arr.append(get_complex_features(close[index - 2]))
-				features_arr.append(get_simple_features(close[index - 3]))
-				features_arr.append(get_simple_features(close[index - 4]))
-				features_arr.append(get_simple_features(close[index - 5]))
-				features_arr.append(get_simple_features(close[index - 6]))
-
 				def get_slope(array):
 					x = np.array(range(0,len(array)))
 					y = np.array(array)
@@ -244,50 +217,29 @@ for chunk in raw_training_data:
 				features_arr.append(int(fifty_low_slope > 0))
 				features_arr.append(int(hundred_high_slope > 0))
 				features_arr.append(int(hundred_low_slope > 0))
+				def get_simple_features(compare_val):
+					if compare_val >= resistance_line_val:
+						return -1
+					elif compare_val <= support_line_val:
+						return 1
+					else:
+						return 0
+				def get_complex_features(compare_val):
+					interval = resistance_line_val - support_line_val
+					return (compare_val - (support_line_val + interval / 2)) / interval
+				features_arr.append(get_complex_features(high[index - 1]))
+				features_arr.append(get_complex_features(low[index - 1]))
+				features_arr.append(get_complex_features(close[index - 2]))
+				features_arr.append(get_simple_features(close[index - 3]))
+				features_arr.append(get_simple_features(close[index - 4]))
+				features_arr.append(get_simple_features(close[index - 5]))
+				features_arr.append(get_simple_features(close[index - 6]))
+				features_arr.append(get_simple_features(close[index - 7]))
+				features_arr.append(get_simple_features(close[index - 8]))
+				features_arr.append(get_simple_features(close[index - 9]))
 				print features_arr
-				training_data.append(features_arr)
-			# average_price_movement
-			# features_arr
-			print index
 
-threshold = len(training_data)/3
-training_set = training_data[:threshold]
-training_set_result = training_result[:threshold]
-testing_set = training_data[threshold:]
-testing_set_result = training_result[threshold:]
+				f.write(str(features_arr) + "|"+ str(get_simple_features(good_result[index])) + '\n') # python will convert \n to os.linesep
+	f.close()
 
-nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(30, 10, 5), random_state=10, max_iter=10000)
-nn = nn.fit(np.array(training_set), np.array(training_set_result))
-forest = RandomForestClassifier(n_estimators = 50)
-forest = forest.fit(np.array(training_set), np.array(training_set_result))
-# joblib.dump(forest, 'RandomForrest.pkl') 
-# forest = joblib.load('RandomForrest.pkl')
 
-def evaluate_output(output):
-	total_count = 0
-	true_count = 0
-	correct_count = 0
-	for index in range(len(output)):
-		# print (output[index], testing_set_result[index])
-		if output[index] == testing_set_result[index]:
-			correct_count += 1
-		if output[index] == 1:
-			total_count += 1 
-			if testing_set_result[index] == 1:
-				true_count += 1
-		if output[index] == -1:
-			total_count += 1 
-			if testing_set_result[index] == -1:
-				true_count += 1
-
-	print (true_count, total_count) 
-	print float(true_count) / float(total_count)
-	print (correct_count, len(output))
-	print float(correct_count) / float(len(output))
-	print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-
-output = forest.predict(np.array(testing_set))
-evaluate_output(output)
-
-output = nn.predict(np.array(testing_set))
-evaluate_output(output)
