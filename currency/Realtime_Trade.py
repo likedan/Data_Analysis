@@ -212,22 +212,24 @@ while True:
 		features_arr.append(int(hundred_low_slope > 0))
 
 		def should_up_trade():
-			return latest_price < support_line_val and traded_up_num < MINUTE_MAX_SIDE_TRADE and latest_time - last_up_trade_time > MAX_TRADE_SECOND_INTERVAL and last_up_trade_price - latest_price > (resistance_line_val - support_line_val) * SECOND_TRADE_ADVANTAGE_RATE
+			return traded_up_num < MINUTE_MAX_SIDE_TRADE and latest_time - last_up_trade_time > MAX_TRADE_SECOND_INTERVAL and last_up_trade_price - latest_price > (resistance_line_val - support_line_val) * SECOND_TRADE_ADVANTAGE_RATE
 
 		def should_down_trade():
-			return latest_price > resistance_line_val and traded_down_num < MINUTE_MAX_SIDE_TRADE and latest_time - last_down_trade_time > MAX_TRADE_SECOND_INTERVAL and latest_price - last_down_trade_price > (resistance_line_val - support_line_val) * SECOND_TRADE_ADVANTAGE_RATE
+			return traded_down_num < MINUTE_MAX_SIDE_TRADE and latest_time - last_down_trade_time > MAX_TRADE_SECOND_INTERVAL and latest_price - last_down_trade_price > (resistance_line_val - support_line_val) * SECOND_TRADE_ADVANTAGE_RATE
 
 		output = forest.predict(np.array([features_arr]))[0]
+		print output
+		print max(list(forest.predict_proba(np.array([features_arr]))[0]))
 		if max(list(forest.predict_proba(np.array([features_arr]))[0])) > MIN_CONFIDENCE:
 			if output == 0:
-				if should_down_trade():
+				if latest_price > resistance_line_val and should_down_trade() :
 					print "trade_down"
 					if trading.trade_down():
 						last_down_trade_time = latest_time
 						db.add_open_trades(trading_symbol, latest_price, latest_time, False, current_minute + 60)
 						traded_down_num += 1
 						last_down_trade_price = latest_price
-				elif should_up_trade():
+				elif latest_price < support_line_val and should_up_trade():
 					print "trade_up"
 					if trading.trade_up():
 						last_up_trade_time = latest_time
@@ -235,7 +237,7 @@ while True:
 						traded_up_num += 1
 						last_up_trade_price = latest_price
 			elif output == 1:
-				if should_down_trade():
+				if latest_price > support_line_val and should_down_trade():
 					print "trade_down"
 					if trading.trade_down():
 						last_down_trade_time = latest_time
@@ -243,7 +245,7 @@ while True:
 						traded_down_num += 1
 						last_down_trade_price = latest_price
 			elif output == -1:
-				if should_up_trade():
+				if latest_price < resistance_line_val and should_up_trade():
 					print "trade_up"
 					if trading.trade_up():
 						last_up_trade_time = latest_time
