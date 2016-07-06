@@ -169,8 +169,8 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20141003,
 
 	return result
 
-symbol = "EURUSD"
-raw_training_data = get_ML_data_for_resistance_support(symbol=symbol, start_time = 20140223, end_time = 20160522)
+symbol = "USDCAD"
+raw_training_data = get_ML_data_for_resistance_support(symbol=symbol, start_time = 20150927, end_time = 20160522)
 
 training_data_path = os.path.join(os.getcwd(),"Training")
 if not os.path.exists(training_data_path):
