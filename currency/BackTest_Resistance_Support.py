@@ -183,7 +183,7 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20151003,
 	return result
 
 
-raw_training_data = get_ML_data_for_resistance_support(start_time = 20160223, end_time = 20160223)
+raw_training_data = get_ML_data_for_resistance_support(start_time = 20160213, end_time = 20160223)
 training_data = []
 training_result = []
 for chunk in raw_training_data:
@@ -212,6 +212,29 @@ for chunk in raw_training_data:
 				else:
 					features_arr.append(1)
 
+				def get_simple_features2(compare_val):
+					if compare_val >= resistance_line_val:
+						return 3
+					elif compare_val <= support_line_val:
+						return 0
+					elif compare_val > (resistance_line_val+support_line_val/2):
+						return 2
+					else:
+						return 1
+
+				def get_simple_features3(compare_val):
+					interval = resistance_line_val - support_line_val
+					if compare_val <= support_line_val:
+						return 0
+					elif compare_val < (interval/3 + support_line_val):
+						return 1
+					elif compare_val < (interval/3*2 + support_line_val):
+						return 2
+					elif compare_val < (resistance_line_val):
+						return 3 
+					else:
+						return 4
+
 				def get_simple_features(compare_val):
 					if compare_val >= resistance_line_val:
 						return -1
@@ -222,7 +245,7 @@ for chunk in raw_training_data:
 				def get_complex_features(compare_val):
 					interval = resistance_line_val - support_line_val
 					return (compare_val - (support_line_val + interval / 2)) / interval
-				training_result.append(get_simple_features(good_result[index]))
+				training_result.append(get_simple_features3(good_result[index]))
 				features_arr.append(get_complex_features(high[index - 1]))
 				features_arr.append(get_complex_features(low[index - 1]))
 				features_arr.append(get_complex_features(close[index - 2]))
@@ -256,8 +279,8 @@ training_set_result = training_result[:threshold]
 testing_set = training_data[threshold:]
 testing_set_result = training_result[threshold:]
 
-nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(30, 10, 5), random_state=10, max_iter=10000)
-nn = nn.fit(np.array(training_set), np.array(training_set_result))
+# nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(30, 10, 5), random_state=10, max_iter=10000)
+# nn = nn.fit(np.array(training_set), np.array(training_set_result))
 forest = RandomForestClassifier(n_estimators = 50)
 forest = forest.fit(np.array(training_set), np.array(training_set_result))
 # joblib.dump(forest, 'RandomForrest.pkl') 
@@ -289,5 +312,5 @@ def evaluate_output(output):
 output = forest.predict(np.array(testing_set))
 evaluate_output(output)
 
-output = nn.predict(np.array(testing_set))
-evaluate_output(output)
+# output = nn.predict(np.array(testing_set))
+# evaluate_output(output)

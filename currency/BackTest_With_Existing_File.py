@@ -245,21 +245,21 @@ def evaluate_proba_output(output, output_proba, threshold):
 	print float(true_count) / float(total_count)
 	print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-forest = RandomForestClassifier(n_estimators = 100)
-forest = forest.fit(np.array(training_set), np.array(training_set_result))
+# forest = RandomForestClassifier(n_estimators = 100)
+# forest = forest.fit(np.array(training_set), np.array(training_set_result))
 # joblib.dump(forest, 'RandomForrest.pkl') 
 # forest = joblib.load('RandomForrest.pkl')
-output = forest.predict(np.array(testing_set))
-output_proba = forest.predict_proba(np.array(testing_set))
+
+nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(100, 20, 10), random_state=100, max_iter=10000)
+nn = nn.fit(np.array(training_set), np.array(training_set_result))
+
+output = nn.predict(np.array(testing_set))
+evaluate_output(output)
+
+output_proba = nn.predict_proba(np.array(testing_set))
 
 evaluate_proba_output(output, output_proba, 0)
 evaluate_proba_output(output, output_proba, 0.6)
 evaluate_proba_output(output, output_proba, 0.7)
 evaluate_proba_output(output, output_proba, 0.8)
 evaluate_proba_output(output, output_proba, 0.9)
-
-# nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(100, 20, 10), random_state=100, max_iter=10000)
-# nn = nn.fit(np.array(training_set), np.array(training_set_result))
-
-# output = nn.predict(np.array(testing_set))
-# evaluate_output(output)
