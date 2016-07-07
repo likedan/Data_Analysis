@@ -273,7 +273,7 @@ while True:
 					db.add_open_trades(trading_symbol, latest_price, latest_time, True, current_minute + 60)
 					traded_up_num += 1
 					last_up_trade_price = latest_price
-		elif output == 2:
+		elif current_category == 2:
 			if should_down_trade() and probabilities[0] + probabilities[1] > 0.7:
 				print "trade_down"
 				if trading.trade_down():
@@ -288,7 +288,7 @@ while True:
 					db.add_open_trades(trading_symbol, latest_price, latest_time, True, current_minute + 60)
 					traded_up_num += 1
 					last_up_trade_price = latest_price
-		elif output == 3:
+		elif current_category == 3:
 			if should_down_trade() and probabilities[0] + probabilities[1] + probabilities[2] > 0.75:
 				print "trade_down"
 				if trading.trade_down():
