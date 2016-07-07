@@ -179,7 +179,7 @@ for chunk in raw_training_data:
 	unixtime, opening, high, low, close, good_result = chunk
 	date = datetime.datetime.fromtimestamp(int(unixtime[0])).strftime('%Y%m%d')
 	print(date)
-	f = open('Training2/'+date+symbol+'.txt','w+')
+	f = open('Training3/'+date+symbol+'.txt','w+')
 	training_data = []
 	training_result = []
 	for index in range(101,len(opening)):
@@ -196,14 +196,8 @@ for chunk in raw_training_data:
 			# Plot.plot_day_candle(time_s, opening[index - 101:index], high[index - 101:index], low[index - 101:index], close[index - 101:index], 26, "EURUSD", lines=[[support_line],[resistance_line]], save=True)
 			if resistance_line_val > support_line_val:
 				features_arr = []
-				if resistance_line.slope > 0:
-					features_arr.append(0)
-				else:
-					features_arr.append(1)
-				if support_line.slope > 0:
-					features_arr.append(0)
-				else:
-					features_arr.append(1)
+				features_arr.append(resistance_line.slope/interval)
+				features_arr.append(support_line.slope/interval)
 				def get_slope(array):
 					x = np.array(range(0,len(array)))
 					y = np.array(array)
@@ -252,22 +246,22 @@ for chunk in raw_training_data:
 				features_arr.append(get_complex_features(low[index - 7]))
 				features_arr.append(get_complex_features(high[index - 8]))
 				features_arr.append(get_complex_features(low[index - 8]))
-				features_arr.append(get_simple_features(close[index - 9]))
-				features_arr.append(get_simple_features(close[index - 10]))
-				features_arr.append(get_simple_features(close[index - 11]))
-				features_arr.append(get_simple_features(close[index - 12]))
-				features_arr.append(get_simple_features(close[index - 13]))
-				features_arr.append(get_simple_features(close[index - 14]))
-				features_arr.append(get_simple_features(close[index - 15]))
-				features_arr.append(get_simple_features(close[index - 16]))
-				features_arr.append(get_simple_features(close[index - 17]))
-				features_arr.append(get_simple_features(close[index - 18]))
-				features_arr.append(get_simple_features(close[index - 19]))
-				features_arr.append(get_simple_features(close[index - 20]))
+				features_arr.append(get_complex_features(close[index - 9]))
+				features_arr.append(get_complex_features(close[index - 10]))
+				features_arr.append(get_complex_features(close[index - 11]))
+				features_arr.append(get_complex_features(close[index - 12]))
+				features_arr.append(get_complex_features(close[index - 13]))
+				features_arr.append(get_complex_features(close[index - 14]))
+				features_arr.append(get_complex_features(close[index - 15]))
+				features_arr.append(get_complex_features(close[index - 16]))
+				features_arr.append(get_complex_features(close[index - 17]))
+				features_arr.append(get_complex_features(close[index - 18]))
+				features_arr.append(get_complex_features(close[index - 19]))
+				features_arr.append(get_complex_features(close[index - 20]))
 
 				# print features_arr
 
-				f.write(str(features_arr) + "|"+ str(get_simple_features2(good_result[index])) + '\n') # python will convert \n to os.linesep
+				f.write(str(features_arr) + "|"+ str(get_complex_features(good_result[index])) + '\n') # python will convert \n to os.linesep
 	f.close()
 
 
