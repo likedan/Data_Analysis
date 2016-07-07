@@ -183,110 +183,7 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20151003,
 	return result
 
 
-raw_training_data = get_ML_data_for_resistance_support(start_time = 20160213, end_time = 20160223)
-training_data = []
-training_result = []
-for chunk in raw_training_data:
-	unixtime, opening, high, low, close, good_result = chunk
-	print(len(opening))
-	for index in range(101,len(opening)):
-		if good_result[index] != 0.0:
-			print "good_result"
-			support_lines, resistance_lines = compute_support_resistance(opening[index - 26:index - 2], high[index - 26:index - 2], low[index - 26:index - 2], close[index - 26:index - 2])
-			support_line, resistance_line = choose_best_line(resistance_lines, support_lines, 25)
-			resistance_line_val = resistance_line.get_y(25)
-			support_line_val = support_line.get_y(25)
-			print (support_line_val, resistance_line_val, support_line_val < resistance_line_val)
-			# time_s = []
-			# for t in unixtime[index - 101:index]:
-			# 	time_s.append(datetime.datetime.fromtimestamp(t))
-			# Plot.plot_day_candle(time_s, opening[index - 101:index], high[index - 101:index], low[index - 101:index], close[index - 101:index], 26, "EURUSD", lines=[[support_line],[resistance_line]], save=True)
-			if resistance_line_val > support_line_val:
-				features_arr = []
-				if resistance_line.slope > 0:
-					features_arr.append(0)
-				else:
-					features_arr.append(1)
-				if support_line.slope > 0:
-					features_arr.append(0)
-				else:
-					features_arr.append(1)
-
-				def get_simple_features2(compare_val):
-					if compare_val >= resistance_line_val:
-						return 3
-					elif compare_val <= support_line_val:
-						return 0
-					elif compare_val > (resistance_line_val+support_line_val/2):
-						return 2
-					else:
-						return 1
-
-				def get_simple_features3(compare_val):
-					interval = resistance_line_val - support_line_val
-					if compare_val <= support_line_val:
-						return 0
-					elif compare_val < (interval/3 + support_line_val):
-						return 1
-					elif compare_val < (interval/3*2 + support_line_val):
-						return 2
-					elif compare_val < (resistance_line_val):
-						return 3 
-					else:
-						return 4
-
-				def get_simple_features(compare_val):
-					if compare_val >= resistance_line_val:
-						return -1
-					elif compare_val <= support_line_val:
-						return 1
-					else:
-						return 0
-				def get_complex_features(compare_val):
-					interval = resistance_line_val - support_line_val
-					return (compare_val - (support_line_val + interval / 2)) / interval
-				training_result.append(get_simple_features2(good_result[index]))
-				features_arr.append(get_complex_features(high[index - 1]))
-				features_arr.append(get_complex_features(low[index - 1]))
-				features_arr.append(get_complex_features(close[index - 2]))
-				features_arr.append(get_simple_features(close[index - 3]))
-				features_arr.append(get_simple_features(close[index - 4]))
-				features_arr.append(get_simple_features(close[index - 5]))
-				features_arr.append(get_simple_features(close[index - 6]))
-
-				def get_slope(array):
-					x = np.array(range(0,len(array)))
-					y = np.array(array)
-					slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
-					return slope
-				fifty_high_slope = get_slope(high[index - 51:index - 2])
-				fifty_low_slope = get_slope(low[index - 51:index - 2])
-				hundred_high_slope = get_slope(high[index - 101:index - 2])
-				hundred_low_slope = get_slope(low[index - 101:index - 2])
-				features_arr.append(int(fifty_high_slope > 0))
-				features_arr.append(int(fifty_low_slope > 0))
-				features_arr.append(int(hundred_high_slope > 0))
-				features_arr.append(int(hundred_low_slope > 0))
-				print features_arr
-				training_data.append(features_arr)
-			# average_price_movement
-			# features_arr
-			print index
-
-threshold = len(training_data)/3
-training_set = training_data[:threshold]
-training_set_result = training_result[:threshold]
-testing_set = training_data[threshold:]
-testing_set_result = training_result[threshold:]
-
-# nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(30, 10, 5), random_state=10, max_iter=10000)
-# nn = nn.fit(np.array(training_set), np.array(training_set_result))
-forest = RandomForestClassifier(n_estimators = 50)
-forest = forest.fit(np.array(training_set), np.array(training_set_result))
-# joblib.dump(forest, 'RandomForrest.pkl') 
-# forest = joblib.load('RandomForrest.pkl')
-
-def evaluate_output(output):
+def evaluate_output(output, testing_set_result):
 	total_count = 0
 	true_count = 0
 	correct_count = 0
@@ -309,8 +206,65 @@ def evaluate_output(output):
 	print float(correct_count) / float(len(output))
 	print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-output = forest.predict(np.array(testing_set))
-evaluate_output(output)
+training_data = []
+training_result = []
 
-# output = nn.predict(np.array(testing_set))
-# evaluate_output(output)
+training_data_path = os.path.join(os.getcwd(),"Training")
+for file in os.listdir(training_data_path):
+	print file
+	if file[-3:] == "txt":
+		with open(os.path.join(training_data_path, file), "r") as open_file:
+		    for line in open_file:
+		    	training_result.append(int(line.split("|")[1][:-1]))
+		    	features_arr = []
+		    	raw_features = line.split("|")[0][1:-1].split(",")
+		    	for index in range(len(raw_features)):
+		    		if index == 6 or index == 7 or index == 8:
+		    			features_arr.append(float(raw_features[index]))
+		    		else:
+		    			features_arr.append(int(raw_features[index]))
+		    	training_data.append(features_arr)
+
+
+threshold = len(training_data)/3
+training_set = training_data[:threshold]
+training_set_result = training_result[:threshold]
+testing_set = training_data[threshold:]
+testing_set_result_all = training_result[threshold:]
+
+def evaluate_proba_output(output, output_proba, testing_set_result, threshold):
+	total_count = 0
+	true_count = 0
+	for index in range(len(output)):
+		if output_proba[index][output[index] + 1] > threshold:
+			total_count += 1 
+			if testing_set_result[index] == output[index]:
+				true_count += 1
+
+	print (true_count, total_count) 
+	print float(true_count) / float(total_count)
+	print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+forest = RandomForestClassifier(n_estimators = 100)
+forest = forest.fit(np.array(training_set), np.array(training_set_result))
+# joblib.dump(forest, 'RandomForrest.pkl') 
+# forest = joblib.load('RandomForrest.pkl')
+
+# nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(100, 20, 10), random_state=100, max_iter=10000)
+# nn = nn.fit(np.array(training_set), np.array(training_set_result))
+
+small_chunk_num = 20
+chunk_length = len(testing_set)/ small_chunk_num
+for chunk_index in range(small_chunk_num - 1):
+
+	output = forest.predict(np.array(testing_set[chunk_index * chunk_length: (chunk_index + 1) * chunk_length]))
+	evaluate_output(output, testing_set_result_all[chunk_index * chunk_length: (chunk_index + 1) * chunk_length])
+
+	output_proba = forest.predict_proba(np.array(testing_set[chunk_index * chunk_length: (chunk_index + 1) * chunk_length]))
+
+	evaluate_proba_output(output, output_proba, testing_set_result_all[chunk_index * chunk_length: (chunk_index + 1) * chunk_length], 0)
+	evaluate_proba_output(output, output_proba, testing_set_result_all[chunk_index * chunk_length: (chunk_index + 1) * chunk_length], 0.6)
+	evaluate_proba_output(output, output_proba, testing_set_result_all[chunk_index * chunk_length: (chunk_index + 1) * chunk_length], 0.7)
+	evaluate_proba_output(output, output_proba, testing_set_result_all[chunk_index * chunk_length: (chunk_index + 1) * chunk_length], 0.8)
+	evaluate_proba_output(output, output_proba, testing_set_result_all[chunk_index * chunk_length: (chunk_index + 1) * chunk_length], 0.9)
+	print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
