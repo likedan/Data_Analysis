@@ -217,8 +217,7 @@ while True:
 		features_arr.append(get_complex_features(low[-6]))
 		features_arr.append(get_complex_features(high[-7]))
 		features_arr.append(get_complex_features(low[-7]))
-		features_arr.append(get_complex_features(high[-8]))
-		features_arr.append(get_complex_features(low[-8]))
+		features_arr.append(get_simple_features(close[-8]))
 		features_arr.append(get_simple_features(close[-9]))
 		features_arr.append(get_simple_features(close[-10]))
 		features_arr.append(get_simple_features(close[-11]))
@@ -230,7 +229,6 @@ while True:
 		features_arr.append(get_simple_features(close[-17]))
 		features_arr.append(get_simple_features(close[-18]))
 		features_arr.append(get_simple_features(close[-19]))
-		features_arr.append(get_simple_features(close[-20]))
 
 		def should_up_trade():
 			return traded_up_num < MINUTE_MAX_SIDE_TRADE and latest_time - last_up_trade_time > MAX_TRADE_SECOND_INTERVAL and last_up_trade_price - latest_price > (resistance_line_val - support_line_val) * SECOND_TRADE_ADVANTAGE_RATE
