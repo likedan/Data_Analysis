@@ -265,7 +265,6 @@ for chunk in raw_training_data:
 				features_arr.append(get_simple_features(close[index - 19]))
 				features_arr.append(get_simple_features(close[index - 20]))
 
-
 				# print features_arr
 
 				f.write(str(features_arr) + "|"+ str(get_simple_features2(good_result[index])) + '\n') # python will convert \n to os.linesep
