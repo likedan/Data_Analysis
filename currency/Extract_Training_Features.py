@@ -170,7 +170,7 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20141003,
 	return result
 
 symbol = "USDCAD"
-raw_training_data = get_ML_data_for_resistance_support(symbol=symbol, start_time = 20160104, end_time = 20160529)
+raw_training_data = get_ML_data_for_resistance_support(symbol=symbol, start_time = 20150604, end_time = 20160101)
 
 training_data_path = os.path.join(os.getcwd(),"Training2")
 if not os.path.exists(training_data_path):
@@ -184,12 +184,12 @@ for chunk in raw_training_data:
 	training_result = []
 	for index in range(101,len(opening)):
 		if good_result[index] != 0.0:
-			print "good_result"
+			# print "good_result"
 			support_lines, resistance_lines = compute_support_resistance(opening[index - 26:index - 2], high[index - 26:index - 2], low[index - 26:index - 2], close[index - 26:index - 2])
 			support_line, resistance_line = choose_best_line(resistance_lines, support_lines, 25)
 			resistance_line_val = resistance_line.get_y(25)
 			support_line_val = support_line.get_y(25)
-			print (support_line_val, resistance_line_val, support_line_val < resistance_line_val)
+			# print (support_line_val, resistance_line_val, support_line_val < resistance_line_val)
 			# time_s = []
 			# for t in unixtime[index - 101:index]:
 			# 	time_s.append(datetime.datetime.fromtimestamp(t))
@@ -266,7 +266,7 @@ for chunk in raw_training_data:
 				features_arr.append(get_simple_features(close[index - 20]))
 
 
-				print features_arr
+				# print features_arr
 
 				f.write(str(features_arr) + "|"+ str(get_simple_features2(good_result[index])) + '\n') # python will convert \n to os.linesep
 	f.close()
