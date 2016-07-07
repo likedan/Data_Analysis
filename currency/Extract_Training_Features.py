@@ -217,6 +217,15 @@ for chunk in raw_training_data:
 				features_arr.append(int(fifty_low_slope > 0))
 				features_arr.append(int(hundred_high_slope > 0))
 				features_arr.append(int(hundred_low_slope > 0))
+				def get_simple_features2(compare_val):
+					if compare_val >= resistance_line_val:
+						return 3
+					elif compare_val <= support_line_val:
+						return 0
+					elif compare_val > (resistance_line_val+support_line_val/2):
+						return 2
+					else:
+						return 1
 				def get_simple_features(compare_val):
 					if compare_val >= resistance_line_val:
 						return -1
