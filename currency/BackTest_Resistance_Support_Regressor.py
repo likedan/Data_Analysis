@@ -270,7 +270,7 @@ training_set_result = training_result[:threshold]
 testing_set = training_data[threshold:]
 testing_set_result = training_result[threshold:]
 
-svr = SVR(C=1.0, epsilon=0.2)
+svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
 svr = svr.fit(np.array(training_set), np.array(training_set_result))
 # joblib.dump(forest, 'RandomForrest.pkl') 
 # forest = joblib.load('RandomForrest.pkl')
