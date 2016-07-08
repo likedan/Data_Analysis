@@ -169,10 +169,10 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20141003,
 
 	return result
 
-symbol = "USDCAD"
-raw_training_data = get_ML_data_for_resistance_support(symbol=symbol, start_time = 20150604, end_time = 20160101)
+symbol = "EURUSD"
+raw_training_data = get_ML_data_for_resistance_support(symbol=symbol, start_time = 20150604, end_time = 20160604)
 
-training_data_path = os.path.join(os.getcwd(),"Training2")
+training_data_path = os.path.join(os.getcwd(),"Training3")
 if not os.path.exists(training_data_path):
     os.makedirs(training_data_path)
 for chunk in raw_training_data:
@@ -196,6 +196,7 @@ for chunk in raw_training_data:
 			# Plot.plot_day_candle(time_s, opening[index - 101:index], high[index - 101:index], low[index - 101:index], close[index - 101:index], 26, "EURUSD", lines=[[support_line],[resistance_line]], save=True)
 			if resistance_line_val > support_line_val:
 				features_arr = []
+				interval = resistance_line_val - support_line_val
 				features_arr.append(resistance_line.slope/interval)
 				features_arr.append(support_line.slope/interval)
 				def get_slope(array):
