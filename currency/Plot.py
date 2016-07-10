@@ -10,7 +10,7 @@ from matplotlib.finance import candlestick_ohlc
 from matplotlib.dates import date2num, ticker, DateFormatter
 
 
-def plot_day_candle(unit_dates, first, high, low, last, symbol, end_index = 0, lines=[], save=False):
+def plot_day_candle(unit_dates, first, high, low, last, symbol, start_index=[], lines=[], save=False):
 
 	dates = []
 	for time_stamp in unit_dates:
@@ -33,13 +33,16 @@ def plot_day_candle(unit_dates, first, high, low, last, symbol, end_index = 0, l
 
 	fig.autofmt_xdate()
 	ax.autoscale_view()
-	for color_index in range(len(lines)):
-		for line in lines[color_index]:
-			if color_index < len(COLOR_LIST):
-				ax.plot([get_x_coord(0), get_x_coord(len(dates) - 1)], [line.get_y(end_index - len(dates)), line.get_y(end_index)], color=COLOR_LIST[color_index], linestyle='-', linewidth=1)
-				# ax.plot([get_x_coord(line.left_end), get_x_coord(line.right_end)], [line.get_y(line.left_end), line.get_y(line.right_end)], color=COLOR_LIST[color_index], linestyle='-', linewidth=1)
-			else:
-				raise Exception("out of color range")
+
+	if len(start_index) != len(lines):
+		raise Exception("inconsistent lines vs start_index")
+	for index in range(len(start_index)):
+		xs = []
+		ys = []
+		for x in range(len(lines[index])):
+			xs.append(get_x_coord(x + start_index[index]))
+			ys.append(lines[index][x])
+		ax.plot(xs, ys, color=COLOR_LIST[index], linestyle='-', linewidth=1)
 
 	if save:
 		file_dir = os.path.join(Helper.get_desktop_dir(), PLOT_IMAGE_PATH)
