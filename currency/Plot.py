@@ -10,7 +10,7 @@ from matplotlib.finance import candlestick_ohlc
 from matplotlib.dates import date2num, ticker, DateFormatter
 
 
-def plot_day_candle(unit_dates, first, high, low, last, end_index, symbol, lines=[], save=False):
+def plot_day_candle(unit_dates, first, high, low, last, symbol, end_index = 0, lines=[], save=False):
 
 	dates = []
 	for time_stamp in unit_dates:

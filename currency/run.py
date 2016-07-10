@@ -12,7 +12,6 @@ import operator
 import Plot
 import numpy as np
 import math
-import time
 from SupportResistance import compute_support_resistance
 from TradingView import TradingView
 from PIL import Image
@@ -21,30 +20,18 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.externals import joblib
 from scipy import stats
 
-
+symbol = "EURUSD"
+start_time = 20160223
+end_time = 20160223
 db = Database()
-trading = TradingView()
-trading.login()
-trading_symbol = "USDCAD"
-existing_file = 'RandomForrest/RandomForrest.pkl'
-forest = joblib.load(existing_file)
+currency_data = db.get_range_currency_date(symbol, start_time ,end_time)
+raw_training_data = Helper.get_ML_data_for_resistance_support(currency_data, symbol = symbol, start_time = start_time, end_time = end_time)
+for chunk in raw_training_data:
+	unixtime, opening, high, low, close, good_result = chunk
+	mean_average3 = Helper.compute_moving_average(high, 3)
+	Plot.plot_day_candle(Helper.unix_to_date_object(unixtime), opening, high, low, close, symbol)
+	# print mean_average3
+	# print close
+	break
 
-if len(sys.argv) == 2 and db.get_realtime_Data(sys.argv[1], 1) != None:
-	trading_symbol = sys.argv[1]
 
-def end_open_trade():
-	print "end_open_trade"
-	for open_trade in db.open_trades.find():
-		mongo_id = open_trade["_id"]
-		symbol_data = db.realtime_data.find_one({"symbol": open_trade["symbol"]})["data"]
-		if str(open_trade["close_time"]) in symbol_data:
-			
-			last_data = db.get_realtime_Data(trading_symbol, 1)
-			latest_price = symbol_data[str(open_trade["close_time"])][0][1]
-			result = 0
-			if (latest_price > open_trade["trade_price"] and open_trade["is_up"]) or (latest_price < open_trade["trade_price"] and not open_trade["is_up"]):
-				result = 1
-			elif (latest_price < open_trade["trade_price"] and open_trade["is_up"]) or (latest_price > open_trade["trade_price"] and not open_trade["is_up"]):
-				result = -1
-			db.add_historical_trades(open_trade["symbol"], open_trade["trade_price"], open_trade["trade_time"], open_trade["is_up"], open_trade["close_time"], latest_price, result)
-			db.open_trades.remove({"_id":mongo_id})
