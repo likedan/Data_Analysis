@@ -67,7 +67,7 @@ def evaluate_output(output):
 	diff_smaller5 = 0
 
 	for index in range(len(output)):
-		print (output[index], testing_set_result[index])
+		# print (output[index], testing_set_result[index])
 		if output[index] - testing_set_result[index] > 0.1:
 			diff_bigger1 += 1
 		if output[index] - testing_set_result[index] > 0.2:
@@ -117,11 +117,11 @@ def evaluate_output(output):
 	# print float(true_count) / float(total_count)
 	# print (correct_count, len(output))
 	# print float(correct_count) / float(len(output))
-	# print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-print "predict"
-output = svr.predict(np.array(training_data[-4000:-2000]))
-print "finish predict"
-evaluate_output(output)
+	print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+for index in range(1000):
+	output = svr.predict(np.array(training_data[index*1000:(index + 1) * 1000]))
+	evaluate_output(output)
 
 # output = nn.predict(np.array(testing_set))
 # evaluate_output(output)

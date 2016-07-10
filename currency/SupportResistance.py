@@ -19,7 +19,7 @@ def compute_support_resistance(opening, high, low, close, no_overhead_start_rate
 
 	average_range = np.sum(np.absolute(np.array(close) - np.array(opening))) / float(frame_size)
 	tolerance_value = associate_tolerance_rate * average_range * math.sqrt(math.sqrt(frame_size))
-	max_cross_size = frame_size * max_cross_rate
+	max_cross_size = 0#frame_size * max_cross_rate
 
 	resistance_dict = {}
 	support_dict = {}
