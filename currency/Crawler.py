@@ -44,7 +44,6 @@ class Crawler:
 
     def download_historical_data(self, symbol, start_time, folder):
         
-
         directory = os.path.join(folder, symbol)
         if not os.path.exists(directory):
             os.makedirs(directory)

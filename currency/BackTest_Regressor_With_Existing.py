@@ -42,16 +42,16 @@ def get_training_data():
 			    	training_data.append(features_arr)
 
 get_training_data()
-threshold = len(training_data)/3
+threshold = int(float(len(training_data))/1.25)
 training_set = training_data[:threshold]
 training_set_result = training_result[:threshold]
 testing_set = training_data[threshold:]
 testing_set_result = training_result[threshold:]
 
-svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
-svr = svr.fit(np.array(training_set), np.array(training_set_result))
-# joblib.dump(forest, 'RandomForrest.pkl') 
-# forest = joblib.load('RandomForrest.pkl')
+# svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
+# svr = svr.fit(np.array(training_set), np.array(training_set_result))
+# joblib.dump(svr, 'SVR.pkl') 
+svr = joblib.load('SVR/SVR.pkl')
 
 def evaluate_output(output):
 	total_diff = 0.0
@@ -60,18 +60,35 @@ def evaluate_output(output):
 	diff_bigger3 = 0
 	diff_bigger4 = 0
 	diff_bigger5 = 0
+	diff_smaller1 = 0
+	diff_smaller2 = 0
+	diff_smaller3 = 0
+	diff_smaller4 = 0
+	diff_smaller5 = 0
 
 	for index in range(len(output)):
-		if abs(output[index] - testing_set_result[index]) > 0.1:
+		print (output[index], testing_set_result[index])
+		if output[index] - testing_set_result[index] > 0.1:
 			diff_bigger1 += 1
-		if abs(output[index] - testing_set_result[index]) > 0.2:
+		if output[index] - testing_set_result[index] > 0.2:
 			diff_bigger2 += 1
-		if abs(output[index] - testing_set_result[index]) > 0.3:
+		if output[index] - testing_set_result[index] > 0.3:
 			diff_bigger3 += 1
-		if abs(output[index] - testing_set_result[index]) > 0.4:
+		if output[index] - testing_set_result[index] > 0.4:
 			diff_bigger4 += 1
-		if abs(output[index] - testing_set_result[index]) > 0.5:
+		if output[index] - testing_set_result[index] > 0.5:
 			diff_bigger5 += 1
+
+		if output[index] - testing_set_result[index] < -0.1:
+			diff_smaller1 += 1
+		if output[index] - testing_set_result[index] < -0.2:
+			diff_smaller2 += 1
+		if output[index] - testing_set_result[index] < -0.3:
+			diff_smaller3 += 1
+		if output[index] - testing_set_result[index] < -0.4:
+			diff_smaller4 += 1
+		if output[index] - testing_set_result[index] < -0.5:
+			diff_smaller5 += 1
 
 		total_diff += abs(output[index] - testing_set_result[index])
 
@@ -88,17 +105,22 @@ def evaluate_output(output):
 
 	print total_diff/float(len(output))
 	print float(diff_bigger1)/float(len(output))
+	print float(diff_smaller1)/float(len(output))
 	print float(diff_bigger2)/float(len(output))
+	print float(diff_smaller2)/float(len(output))
 	print float(diff_bigger3)/float(len(output))
+	print float(diff_smaller3)/float(len(output))
 	print float(diff_bigger4)/float(len(output))
+	print float(diff_smaller4)/float(len(output))
 	print float(diff_bigger5)/float(len(output))
-
+	print float(diff_smaller5)/float(len(output))
 	# print float(true_count) / float(total_count)
 	# print (correct_count, len(output))
 	# print float(correct_count) / float(len(output))
 	# print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-
-output = svr.predict(np.array(testing_set))
+print "predict"
+output = svr.predict(np.array(training_data[-4000:-2000]))
+print "finish predict"
 evaluate_output(output)
 
 # output = nn.predict(np.array(testing_set))
