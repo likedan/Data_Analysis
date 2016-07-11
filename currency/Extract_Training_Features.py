@@ -170,16 +170,16 @@ def get_ML_data_for_resistance_support(symbol = "EURUSD", start_time = 20141003,
 	return result
 
 symbol = "EURUSD"
-raw_training_data = get_ML_data_for_resistance_support(symbol=symbol, start_time = 20150604, end_time = 20160604)
+raw_training_data = get_ML_data_for_resistance_support(symbol=symbol, start_time = 20150603, end_time = 20151231)
 
-training_data_path = os.path.join(os.getcwd(),"Training3")
+training_data_path = os.path.join(os.getcwd(),"Training4")
 if not os.path.exists(training_data_path):
     os.makedirs(training_data_path)
 for chunk in raw_training_data:
 	unixtime, opening, high, low, close, good_result = chunk
 	date = datetime.datetime.fromtimestamp(int(unixtime[0])).strftime('%Y%m%d')
 	print(date)
-	f = open('Training3/'+date+symbol+'.txt','w+')
+	f = open('Training4/'+date+symbol+'.txt','w+')
 	training_data = []
 	training_result = []
 	for index in range(101,len(opening)):
@@ -197,6 +197,10 @@ for chunk in raw_training_data:
 			if resistance_line_val > support_line_val:
 				features_arr = []
 				interval = resistance_line_val - support_line_val
+				def get_complex_features(compare_val):
+					interval = resistance_line_val - support_line_val
+					return (compare_val - (support_line_val + interval / 2)) / interval
+				features_arr.append(get_complex_features(close[index - 1]))
 				features_arr.append(resistance_line.slope/interval)
 				features_arr.append(support_line.slope/interval)
 				def get_slope(array):
@@ -228,9 +232,6 @@ for chunk in raw_training_data:
 						return 1
 					else:
 						return 0
-				def get_complex_features(compare_val):
-					interval = resistance_line_val - support_line_val
-					return (compare_val - (support_line_val + interval / 2)) / interval
 				features_arr.append(get_complex_features(high[index - 1]))
 				features_arr.append(get_complex_features(low[index - 1]))
 				features_arr.append(get_complex_features(high[index - 2]))
@@ -261,7 +262,6 @@ for chunk in raw_training_data:
 				features_arr.append(get_complex_features(close[index - 20]))
 
 				# print features_arr
-
 				f.write(str(features_arr) + "|"+ str(get_complex_features(good_result[index])) + '\n') # python will convert \n to os.linesep
 	f.close()
 

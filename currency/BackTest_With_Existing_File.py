@@ -44,7 +44,7 @@ def evaluate_output(output):
 training_data = []
 training_result = []
 
-training_data_path = os.path.join(os.getcwd(),"Training2")
+training_data_path = os.path.join(os.getcwd(),"Training4")
 
 def get_training_data1():
 	for file in os.listdir(training_data_path):
@@ -78,7 +78,28 @@ def get_training_data2():
 			    			features_arr.append(float(raw_features[index]))
 			    	training_data.append(features_arr)
 
-get_training_data2()
+def get_training_data4():
+	for file in os.listdir(training_data_path):
+		print file
+		if file[-3:] == "txt":
+			with open(os.path.join(training_data_path, file), "r") as open_file:
+			    for line in open_file:
+			    	result = float(line.split("|")[1][:-1])
+			    	
+			    	features_arr = []
+			    	raw_features = line.split("|")[0][1:-1].split(",")
+			    	for index in range(len(raw_features)):
+			    		if index < 7 and index > 2:
+			    			features_arr.append(int(raw_features[index]))
+			    		else:
+			    			features_arr.append(float(raw_features[index]))
+			    	training_data.append(features_arr)
+			    	if features_arr[0] > result:
+			    		training_result.append(1)
+			    	else:
+			    		training_result.append(0)
+
+get_training_data4()
 threshold = len(training_data)/3
 training_set = training_data[:threshold]
 training_set_result = training_result[:threshold]
