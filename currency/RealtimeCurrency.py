@@ -56,7 +56,6 @@ while True:
                 else:
                     symbol_cache["data"][minute] = [[current_time, info[symbol]]]
                 db.realtime_data.update({"symbol": symbol, "date": current_date}, symbol_cache, False)
-        time.sleep(1)
     except Exception, e:
         print e
 
