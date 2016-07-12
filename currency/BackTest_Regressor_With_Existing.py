@@ -22,7 +22,7 @@ from sklearn.svm import SVR
 training_data = []
 training_result = []
 
-training_data_path = os.path.join(os.getcwd(),"Training3")
+training_data_path = os.path.join(os.getcwd(),"Training4")
 
 
 def get_training_data():
@@ -34,7 +34,7 @@ def get_training_data():
 			    	training_result.append(float(line.split("|")[1][:-1]))
 			    	features_arr = []
 			    	raw_features = line.split("|")[0][1:-1].split(",")
-			    	for index in range(len(raw_features)):
+			    	for index in range(1,len(raw_features)):
 			    		if index < 6 and index > 1:
 			    			features_arr.append(int(raw_features[index]))
 			    		else:
@@ -48,9 +48,9 @@ training_set_result = training_result[:threshold]
 testing_set = training_data[threshold:]
 testing_set_result = training_result[threshold:]
 
-# svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
-# svr = svr.fit(np.array(training_set), np.array(training_set_result))
-# joblib.dump(svr, 'SVR.pkl') 
+svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
+svr = svr.fit(np.array(training_set), np.array(training_set_result))
+joblib.dump(svr, 'SVR.pkl') 
 svr = joblib.load('SVR/SVR.pkl')
 
 def evaluate_output(output):
