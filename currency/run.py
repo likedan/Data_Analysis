@@ -19,6 +19,7 @@ import urllib2
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.externals import joblib
 from scipy import stats
+import Indicators
 
 symbol = "EURUSD"
 start_time = 20160223
@@ -28,11 +29,12 @@ currency_data = db.get_range_currency_date(symbol, start_time ,end_time)
 raw_training_data = Helper.get_ML_data_for_resistance_support(currency_data, symbol = symbol, start_time = start_time, end_time = end_time)
 for chunk in raw_training_data:
 	unixtime, opening, high, low, close, good_result = chunk
-	mean_average5 = Helper.compute_moving_average(high, 5)
-	mean_average14 = Helper.compute_moving_average(high, 14)
-	print len(mean_average5)
+	mean_average5 = Indicators.compute_moving_average(high, 5)
+	mean_average14 = Indicators.compute_moving_average(high, 14)
+	center, up, down = Indicators.compute_bollinger_bands(close, 14, 2)
+	print len(center)
 	print len(opening)
-	Plot.plot_day_candle(Helper.unix_to_date_object(unixtime), opening, high, low, close, symbol, start_index=[4,13], lines=[mean_average5, mean_average14])
+	Plot.plot_day_candle(Helper.unix_to_date_object(unixtime), opening, high, low, close, symbol, start_index=[13, 13, 13], lines=[center, up, down])
 	# print mean_average3
 	# print close
 	break

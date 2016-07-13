@@ -24,13 +24,6 @@ def unix_to_date_object(time_in_unix):
         result = datetime.datetime.fromtimestamp(time_in_unix)
     return result
 
-def compute_moving_average(data, mean_length):
-    result = []
-    for index in range(len(data) - mean_length + 1):
-        average = sum(data[index: index + mean_length])/float(mean_length)
-        result.append(average)
-    return result
-
 def get_opening_high_low_close(price_data):
     close = []
     high = []
