@@ -23,7 +23,7 @@ from sklearn.svm import SVR
 import Indicators
 
 symbol = "EURUSD"
-start_time = 20160123
+start_time = 20150623
 end_time = 20160529
 db = Database()
 training_data = []
@@ -100,6 +100,8 @@ testing_set_result = training_result[threshold:]
 
 svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
 svr = svr.fit(np.array(training_set), np.array(training_set_result))
+joblib.dump(svr, 'SVR.pkl') 
+# forest = joblib.load('RandomForrest.pkl')
 
 def evaluate_output(output):
 	total_diff = 0.0
