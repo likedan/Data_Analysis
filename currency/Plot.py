@@ -1,4 +1,3 @@
-from Crawler import Crawler
 from DefaultVariables import *
 from Database import Database
 import Helper

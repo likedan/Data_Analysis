@@ -1,9 +1,6 @@
-from Crawler import Crawler
-from Crawler import Crawler
 from DefaultVariables import *
 from Database import Database
 import Helper
-from Line import Line
 import threading
 import zipfile
 import time, os, sys, datetime
@@ -12,8 +9,6 @@ import operator
 import Plot
 import numpy as np
 import math
-from SupportResistance import compute_support_resistance
-from TradingView import TradingView
 from PIL import Image
 import urllib2
 from sklearn.ensemble import RandomForestClassifier
@@ -23,7 +18,7 @@ from sklearn.svm import SVR
 import Indicators
 
 symbol = "EURUSD"
-start_time = 20150623
+start_time = 20160523
 end_time = 20160529
 db = Database()
 training_data = []

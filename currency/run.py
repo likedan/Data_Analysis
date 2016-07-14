@@ -1,9 +1,6 @@
-from Crawler import Crawler
-from Crawler import Crawler
 from DefaultVariables import *
 from Database import Database
 import Helper
-from Line import Line
 import threading
 import zipfile
 import time, os, sys, datetime
@@ -12,18 +9,17 @@ import operator
 import Plot
 import numpy as np
 import math
-from SupportResistance import compute_support_resistance
 from TradingView import TradingView
 from PIL import Image
 import urllib2
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.externals import joblib
 from scipy import stats
-from sklearn.svm import SVR
+from sklearn.neural_network import MLPClassifier
 import Indicators
 
 symbol = "EURUSD"
-start_time = 20160123
+start_time = 20160523
 end_time = 20160529
 db = Database()
 training_data = []
@@ -62,9 +58,13 @@ for chunk in raw_training_data:
 				interval = outer_up[i] - outer_down[i]
 				return (compare_val - center[i]) / interval
 			
-			training_result.append(get_complex_features(good_result[index], index - 1))
+			if good_result[index] > close[index - 1]:
+				training_result.append(0)
+			else:
+				training_result.append(1)
 			
 			features_arr = []
+			features_arr.append(get_complex_features(close[index - 1], index - 1))
 			for x in range(1,20):
 				features_arr.append(get_complex_features(high[index - x], index - x))
 				features_arr.append(get_complex_features(low[index - x], index - x))
@@ -98,60 +98,19 @@ training_set_result = training_result[:threshold]
 testing_set = training_data[threshold:]
 testing_set_result = training_result[threshold:]
 
-svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
-svr = svr.fit(np.array(training_set), np.array(training_set_result))
+nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(1000, 200, 100, 50, 20, 10, 5), random_state=100, max_iter=100000)
+nn.fit(training_set, training_set_result)
 
-def evaluate_output(output):
-	total_diff = 0.0
-	diff_bigger1 = 0
-	diff_bigger2 = 0
-	diff_bigger3 = 0
-	diff_bigger4 = 0
-	diff_bigger5 = 0
-	diff_smaller1 = 0
-	diff_smaller2 = 0
-	diff_smaller3 = 0
-	diff_smaller4 = 0
-	diff_smaller5 = 0
+result = nn.predict(testing_set)
+result_proba = nn.predict_proba(testing_set)
+total = 0
+succ = 0
+for index in range(len(result_proba)):
+	if result_proba[index][result[index]] >= 1:
+		total += 1
+		if result[index] == testing_set_result[index]:
+			succ += 1
 
-	for index in range(len(output)):
-		# print (output[index], testing_set_result[index])
-		if output[index] - testing_set_result[index] > 0.02:
-			diff_bigger1 += 1
-		if output[index] - testing_set_result[index] > 0.04:
-			diff_bigger2 += 1
-		if output[index] - testing_set_result[index] > 0.06:
-			diff_bigger3 += 1
-		if output[index] - testing_set_result[index] > 0.08:
-			diff_bigger4 += 1
-		if output[index] - testing_set_result[index] > 0.1:
-			diff_bigger5 += 1
-
-		if output[index] - testing_set_result[index] < -0.02:
-			diff_smaller1 += 1
-		if output[index] - testing_set_result[index] < -0.04:
-			diff_smaller2 += 1
-		if output[index] - testing_set_result[index] < -0.06:
-			diff_smaller3 += 1
-		if output[index] - testing_set_result[index] < -0.08:
-			diff_smaller4 += 1
-		if output[index] - testing_set_result[index] < -0.1:
-			diff_smaller5 += 1
-
-		total_diff += abs(output[index] - testing_set_result[index])
-
-	print total_diff/float(len(output))
-	print float(diff_bigger1)/float(len(output))
-	print float(diff_smaller1)/float(len(output))
-	print float(diff_bigger2)/float(len(output))
-	print float(diff_smaller2)/float(len(output))
-	print float(diff_bigger3)/float(len(output))
-	print float(diff_smaller3)/float(len(output))
-	print float(diff_bigger4)/float(len(output))
-	print float(diff_smaller4)/float(len(output))
-	print float(diff_bigger5)/float(len(output))
-	print float(diff_smaller5)/float(len(output))
-	print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-
-output = svr.predict(np.array(testing_set))
-evaluate_output(output)
+print float(succ)/(total)
+print total
+print len(result_proba)
