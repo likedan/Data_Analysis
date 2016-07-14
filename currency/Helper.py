@@ -44,7 +44,6 @@ def get_ML_data_for_resistance_support(currency_data, symbol = "EURUSD", start_t
     serialized_chunk = [[]]
 
     for day_data in currency_data:
-        print day_data["unix_time"]
         if day_data["unix_time"] != suppose_unix_time:
             serialized_chunk.append([])
             suppose_unix_time = day_data["unix_time"]

@@ -1,4 +1,5 @@
 from Crawler import Crawler
+from Crawler import Crawler
 from DefaultVariables import *
 from Database import Database
 import Helper
@@ -12,46 +13,93 @@ import Plot
 import numpy as np
 import math
 from SupportResistance import compute_support_resistance
-from matplotlib.dates import date2num
-from scipy import stats
+from TradingView import TradingView
+from PIL import Image
+import urllib2
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.externals import joblib
+from scipy import stats
 from sklearn.svm import SVR
+import Indicators
 
-
-
+symbol = "EURUSD"
+start_time = 20160123
+end_time = 20160529
+db = Database()
 training_data = []
 training_result = []
 
-training_data_path = os.path.join(os.getcwd(),"Training3")
+currency_data = db.get_range_currency_date(symbol, start_time ,end_time)
+raw_training_data = Helper.get_ML_data_for_resistance_support(currency_data, symbol = symbol, start_time = start_time, end_time = end_time)
+for chunk in raw_training_data:
+	unixtime, opening, high, low, close, good_result = chunk
 
+	mean_average5 = Indicators.compute_moving_average(close, 5)
+	mean_average9 = Indicators.compute_moving_average(close, 9)
+	mean_average20 = Indicators.compute_moving_average(close, 20)
+	mean_average50 = Indicators.compute_moving_average(close, 50)
 
-def get_training_data():
-	for file in os.listdir(training_data_path):
-		print file
-		if file[-3:] == "txt":
-			with open(os.path.join(training_data_path, file), "r") as open_file:
-			    for line in open_file:
-			    	training_result.append(float(line.split("|")[1][:-1]))
-			    	features_arr = []
-			    	raw_features = line.split("|")[0][1:-1].split(",")
-			    	for index in range(len(raw_features)):
-			    		if index < 6 and index > 1:
-			    			features_arr.append(int(raw_features[index]))
-			    		else:
-			    			features_arr.append(float(raw_features[index]))
-			    	training_data.append(features_arr)
+	mean_average5 = [0 for x in range(len(opening) - len(mean_average5))] + mean_average5
+	mean_average9 = [0 for x in range(len(opening) - len(mean_average9))] + mean_average9
+	mean_average20 = [0 for x in range(len(opening) - len(mean_average20))] + mean_average20
+	mean_average50 = [0 for x in range(len(opening) - len(mean_average50))] + mean_average50
 
-get_training_data()
-threshold = int(float(len(training_data))/1.25)
+	center, outer_up, outer_down = Indicators.compute_bollinger_bands(close, 14, 2)
+	# center, inner_up, inner_down = Indicators.compute_bollinger_bands(close, 14, 1)
+	# inner_up = [0 for x in range(len(opening) - len(inner_up))] + inner_up
+	# inner_down = [0 for x in range(len(opening) - len(inner_down))] + inner_down
+	center = [0 for x in range(len(opening) - len(center))] + center
+	outer_up = [0 for x in range(len(opening) - len(outer_up))] + outer_up
+	outer_down = [0 for x in range(len(opening) - len(outer_down))] + outer_down
+
+	total = 0
+	for index in range(100,len(opening)):
+
+		interval = outer_up[index] - outer_down[index]
+		total += (high[index] - low[index]) / interval
+		if good_result[index] != 0.0:				
+			def get_complex_features(compare_val, i):
+				interval = outer_up[i] - outer_down[i]
+				return (compare_val - center[i]) / interval
+			
+			training_result.append(get_complex_features(good_result[index], index - 1))
+			
+			features_arr = []
+			for x in range(1,20):
+				features_arr.append(get_complex_features(high[index - x], index - x))
+				features_arr.append(get_complex_features(low[index - x], index - x))
+				features_arr.append(get_complex_features(mean_average5[index - x], index - x))
+				features_arr.append(get_complex_features(mean_average9[index - x], index - x))
+				features_arr.append(get_complex_features(mean_average20[index - x], index - x))
+				features_arr.append(get_complex_features(mean_average50[index - x], index - x))
+
+			def get_slope(array):
+				x = np.array(range(0,len(array)))
+				y = np.array(array)
+				slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
+				return slope
+			fifty_high_slope = get_slope(high[index - 50:index - 1])
+			fifty_low_slope = get_slope(low[index - 50:index - 1])
+			hundred_high_slope = get_slope(high[index - 100:index - 1])
+			hundred_low_slope = get_slope(low[index - 100:index - 1])
+			features_arr.append(int(fifty_high_slope > 0))
+			features_arr.append(int(fifty_low_slope > 0))
+			features_arr.append(int(hundred_high_slope > 0))
+			features_arr.append(int(hundred_low_slope > 0))
+			# print features_arr
+			training_data.append(features_arr)
+	# Plot.plot_day_candle(Helper.unix_to_date_object(unixtime), opening, high, low, close, symbol, start_index=[13, 13, 13], lines=[center[13:], outer_up[13:], outer_down[13:]])
+
+	# print total / (len(opening)-100)
+
+threshold = len(training_data)/3
 training_set = training_data[:threshold]
 training_set_result = training_result[:threshold]
 testing_set = training_data[threshold:]
 testing_set_result = training_result[threshold:]
 
-# svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
-# svr = svr.fit(np.array(training_set), np.array(training_set_result))
-# joblib.dump(svr, 'SVR.pkl') 
-svr = joblib.load('SVR/SVR.pkl')
+svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
+svr = svr.fit(np.array(training_set), np.array(training_set_result))
 
 def evaluate_output(output):
 	total_diff = 0.0
@@ -68,40 +116,29 @@ def evaluate_output(output):
 
 	for index in range(len(output)):
 		# print (output[index], testing_set_result[index])
-		if output[index] - testing_set_result[index] > 0.1:
+		if output[index] - testing_set_result[index] > 0.02:
 			diff_bigger1 += 1
-		if output[index] - testing_set_result[index] > 0.2:
+		if output[index] - testing_set_result[index] > 0.04:
 			diff_bigger2 += 1
-		if output[index] - testing_set_result[index] > 0.3:
+		if output[index] - testing_set_result[index] > 0.06:
 			diff_bigger3 += 1
-		if output[index] - testing_set_result[index] > 0.4:
+		if output[index] - testing_set_result[index] > 0.08:
 			diff_bigger4 += 1
-		if output[index] - testing_set_result[index] > 0.5:
+		if output[index] - testing_set_result[index] > 0.1:
 			diff_bigger5 += 1
 
-		if output[index] - testing_set_result[index] < -0.1:
+		if output[index] - testing_set_result[index] < -0.02:
 			diff_smaller1 += 1
-		if output[index] - testing_set_result[index] < -0.2:
+		if output[index] - testing_set_result[index] < -0.04:
 			diff_smaller2 += 1
-		if output[index] - testing_set_result[index] < -0.3:
+		if output[index] - testing_set_result[index] < -0.06:
 			diff_smaller3 += 1
-		if output[index] - testing_set_result[index] < -0.4:
+		if output[index] - testing_set_result[index] < -0.08:
 			diff_smaller4 += 1
-		if output[index] - testing_set_result[index] < -0.5:
+		if output[index] - testing_set_result[index] < -0.1:
 			diff_smaller5 += 1
 
 		total_diff += abs(output[index] - testing_set_result[index])
-
-		# if output[index] == testing_set_result[index]:
-		# 	correct_count += 1
-		# if output[index] == 1:
-		# 	total_count += 1 
-		# 	if testing_set_result[index] == 1:
-		# 		true_count += 1
-		# if output[index] == -1:
-		# 	total_count += 1 
-		# 	if testing_set_result[index] == -1:
-		# 		true_count += 1
 
 	print total_diff/float(len(output))
 	print float(diff_bigger1)/float(len(output))
@@ -114,14 +151,7 @@ def evaluate_output(output):
 	print float(diff_smaller4)/float(len(output))
 	print float(diff_bigger5)/float(len(output))
 	print float(diff_smaller5)/float(len(output))
-	# print float(true_count) / float(total_count)
-	# print (correct_count, len(output))
-	# print float(correct_count) / float(len(output))
 	print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-for index in range(1000):
-	output = svr.predict(np.array(training_data[index*1000:(index + 1) * 1000]))
-	evaluate_output(output)
-
-# output = nn.predict(np.array(testing_set))
-# evaluate_output(output)
+output = svr.predict(np.array(testing_set))
+evaluate_output(output)

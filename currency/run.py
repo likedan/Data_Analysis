@@ -23,8 +23,8 @@ from sklearn.svm import SVR
 import Indicators
 
 symbol = "EURUSD"
-start_time = 20160223
-end_time = 20160229
+start_time = 20160123
+end_time = 20160529
 db = Database()
 training_data = []
 training_result = []
@@ -52,11 +52,15 @@ for chunk in raw_training_data:
 	outer_up = [0 for x in range(len(opening) - len(outer_up))] + outer_up
 	outer_down = [0 for x in range(len(opening) - len(outer_down))] + outer_down
 
+	total = 0
 	for index in range(100,len(opening)):
+
+		interval = outer_up[index] - outer_down[index]
+		total += (high[index] - low[index]) / interval
 		if good_result[index] != 0.0:				
-			def get_complex_features(compare_val, index):
-				interval = outer_up[index] - outer_down[index]
-				return (compare_val - center[index]) / interval
+			def get_complex_features(compare_val, i):
+				interval = outer_up[i] - outer_down[i]
+				return (compare_val - center[i]) / interval
 			
 			training_result.append(get_complex_features(good_result[index], index - 1))
 			
@@ -85,8 +89,8 @@ for chunk in raw_training_data:
 			# print features_arr
 			training_data.append(features_arr)
 	# Plot.plot_day_candle(Helper.unix_to_date_object(unixtime), opening, high, low, close, symbol, start_index=[13, 13, 13], lines=[center[13:], outer_up[13:], outer_down[13:]])
-	# print mean_average3
-	# print close
+
+	# print total / (len(opening)-100)
 
 threshold = len(training_data)/3
 training_set = training_data[:threshold]
@@ -112,26 +116,26 @@ def evaluate_output(output):
 
 	for index in range(len(output)):
 		# print (output[index], testing_set_result[index])
-		if output[index] - testing_set_result[index] > 0.1:
+		if output[index] - testing_set_result[index] > 0.02:
 			diff_bigger1 += 1
-		if output[index] - testing_set_result[index] > 0.2:
+		if output[index] - testing_set_result[index] > 0.04:
 			diff_bigger2 += 1
-		if output[index] - testing_set_result[index] > 0.3:
+		if output[index] - testing_set_result[index] > 0.06:
 			diff_bigger3 += 1
-		if output[index] - testing_set_result[index] > 0.4:
+		if output[index] - testing_set_result[index] > 0.08:
 			diff_bigger4 += 1
-		if output[index] - testing_set_result[index] > 0.5:
+		if output[index] - testing_set_result[index] > 0.1:
 			diff_bigger5 += 1
 
-		if output[index] - testing_set_result[index] < -0.1:
+		if output[index] - testing_set_result[index] < -0.02:
 			diff_smaller1 += 1
-		if output[index] - testing_set_result[index] < -0.2:
+		if output[index] - testing_set_result[index] < -0.04:
 			diff_smaller2 += 1
-		if output[index] - testing_set_result[index] < -0.3:
+		if output[index] - testing_set_result[index] < -0.06:
 			diff_smaller3 += 1
-		if output[index] - testing_set_result[index] < -0.4:
+		if output[index] - testing_set_result[index] < -0.08:
 			diff_smaller4 += 1
-		if output[index] - testing_set_result[index] < -0.5:
+		if output[index] - testing_set_result[index] < -0.1:
 			diff_smaller5 += 1
 
 		total_diff += abs(output[index] - testing_set_result[index])
