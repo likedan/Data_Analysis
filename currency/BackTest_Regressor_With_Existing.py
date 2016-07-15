@@ -17,15 +17,20 @@ from scipy import stats
 from sklearn.svm import SVR
 import Indicators
 
-symbol = "EURUSD"
-start_time = 20160523
+
+start_time = 20160528
 end_time = 20160529
 db = Database()
+symbols = db.get_currency_list()
 training_data = []
 training_result = []
 
-currency_data = db.get_range_currency_date(symbol, start_time ,end_time)
-raw_training_data = Helper.get_ML_data_for_resistance_support(currency_data, symbol = symbol, start_time = start_time, end_time = end_time)
+raw_training_data = []
+
+for symbol in symbols:
+	currency_data = db.get_range_currency_date(symbol, start_time ,end_time)
+	raw_training_data = raw_training_data + Helper.get_ML_data_for_resistance_support(currency_data, symbol = symbol, start_time = start_time, end_time = end_time)
+
 for chunk in raw_training_data:
 	unixtime, opening, high, low, close, good_result = chunk
 
@@ -60,7 +65,8 @@ for chunk in raw_training_data:
 			training_result.append(get_complex_features(good_result[index], index - 1))
 			
 			features_arr = []
-			for x in range(1,20):
+			for x in range(1,30):
+				features_arr.append(get_complex_features(close[index - x], index - x))
 				features_arr.append(get_complex_features(high[index - x], index - x))
 				features_arr.append(get_complex_features(low[index - x], index - x))
 				features_arr.append(get_complex_features(mean_average5[index - x], index - x))
@@ -94,9 +100,9 @@ training_set_result = training_result[:threshold]
 testing_set = training_data[threshold:]
 testing_set_result = training_result[threshold:]
 
-# svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
-# svr = svr.fit(np.array(training_set), np.array(training_set_result))
-# joblib.dump(svr, 'SVR.pkl') 
+svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
+svr = svr.fit(np.array(training_set), np.array(training_set_result))
+joblib.dump(svr, 'SVR.pkl') 
 
 svr = joblib.load('SVR1/SVR.pkl')
 
