@@ -24,6 +24,7 @@ db = Database()
 training_data = []
 training_result = []
 
+<<<<<<< HEAD
 currency_data = db.get_range_currency_date(symbol, start_time ,end_time)
 raw_training_data = Helper.get_ML_data_for_resistance_support(currency_data, symbol = symbol, start_time = start_time, end_time = end_time)
 for chunk in raw_training_data:
@@ -88,6 +89,29 @@ for chunk in raw_training_data:
 	# print total / (len(opening)-100)
 
 threshold = len(training_data)/3
+=======
+training_data_path = os.path.join(os.getcwd(),"Training4")
+
+
+def get_training_data():
+	for file in os.listdir(training_data_path):
+		print file
+		if file[-3:] == "txt":
+			with open(os.path.join(training_data_path, file), "r") as open_file:
+			    for line in open_file:
+			    	training_result.append(float(line.split("|")[1][:-1]))
+			    	features_arr = []
+			    	raw_features = line.split("|")[0][1:-1].split(",")
+			    	for index in range(1,len(raw_features)):
+			    		if index < 6 and index > 1:
+			    			features_arr.append(int(raw_features[index]))
+			    		else:
+			    			features_arr.append(float(raw_features[index]))
+			    	training_data.append(features_arr)
+
+get_training_data()
+threshold = int(float(len(training_data))/1.25)
+>>>>>>> master
 training_set = training_data[:threshold]
 training_set_result = training_result[:threshold]
 testing_set = training_data[threshold:]
@@ -96,7 +120,11 @@ testing_set_result = training_result[threshold:]
 svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
 svr = svr.fit(np.array(training_set), np.array(training_set_result))
 joblib.dump(svr, 'SVR.pkl') 
+<<<<<<< HEAD
 # forest = joblib.load('RandomForrest.pkl')
+=======
+svr = joblib.load('SVR/SVR.pkl')
+>>>>>>> master
 
 def evaluate_output(output):
 	total_diff = 0.0

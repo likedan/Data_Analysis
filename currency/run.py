@@ -19,7 +19,7 @@ from sklearn.neural_network import MLPClassifier
 import Indicators
 
 symbol = "EURUSD"
-start_time = 20160523
+start_time = 20160519
 end_time = 20160529
 db = Database()
 training_data = []
@@ -64,8 +64,8 @@ for chunk in raw_training_data:
 				training_result.append(1)
 			
 			features_arr = []
-			features_arr.append(get_complex_features(close[index - 1], index - 1))
-			for x in range(1,20):
+			for x in range(1,30):
+				features_arr.append(get_complex_features(close[index - x], index - x))
 				features_arr.append(get_complex_features(high[index - x], index - x))
 				features_arr.append(get_complex_features(low[index - x], index - x))
 				features_arr.append(get_complex_features(mean_average5[index - x], index - x))
@@ -92,17 +92,29 @@ for chunk in raw_training_data:
 
 	# print total / (len(opening)-100)
 
-threshold = len(training_data)/3
+threshold = len(training_data)/2
 training_set = training_data[:threshold]
 training_set_result = training_result[:threshold]
 testing_set = training_data[threshold:]
 testing_set_result = training_result[threshold:]
 
-nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(1000, 200, 100, 50, 20, 10, 5), random_state=100, max_iter=100000)
+nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-3, hidden_layer_sizes=(100, 70, 50, 30, 20, 15, 10, 5), random_state=100, max_iter=100000)
 nn.fit(training_set, training_set_result)
 
 result = nn.predict(testing_set)
 result_proba = nn.predict_proba(testing_set)
+total = 0
+succ = 0
+for index in range(len(result_proba)):
+	if result_proba[index][result[index]] >= 0.5:
+		total += 1
+		if result[index] == testing_set_result[index]:
+			succ += 1
+
+print float(succ)/(total)
+print total
+print len(result_proba)
+
 total = 0
 succ = 0
 for index in range(len(result_proba)):
