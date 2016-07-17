@@ -20,7 +20,7 @@ CURRENCYLIST_URL = "/download-free-forex-historical-data/?/ascii/tick-data-quote
 DATA_DOWNLOAD_URL = "/download-free-forex-historical-data/?/ninjatrader/tick-last-quotes/"
 
 DEFAULT_IQOPTION_URL = "https://iqoption.com/en/forbidden"
-
+DEFAULT_EXPERTOPTION_URL = "https://expertoption.com"
 # file system path
 RAW_DATA_PATH = "RawCurrencyData"
 DATA_PATH = "CurrencyData"
