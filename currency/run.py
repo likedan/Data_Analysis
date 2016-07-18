@@ -40,11 +40,8 @@ for chunk in raw_training_data:
 	mean_average20 = [0 for x in range(len(opening) - len(mean_average20))] + mean_average20
 	mean_average50 = [0 for x in range(len(opening) - len(mean_average50))] + mean_average50
 
-	total = 0
 	for index in range(100,len(opening)):
 
-		interval = outer_up[index] - outer_down[index]
-		total += (high[index] - low[index]) / interval
 		if good_result[index] != 0.0:				
 			def get_complex_features(compare_val, i):
 				return compare_val - mean_average50[i]
