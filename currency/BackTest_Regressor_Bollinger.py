@@ -18,12 +18,13 @@ from sklearn.svm import SVR
 import Indicators
 
 
-start_time = 20160416
+start_time = 20160516
 end_time = 20160529
 db = Database()
-symbols = [ "GBPCAD", "USDDKK", "USDDKK", "EURNOK", "CADCHF", "AUDNZD", "USDSEK", "GBPNZD", "GBPAUD", "USDPLN", "NZDCHF", "AUDCHF", "USDNOK", "SGDJPY", "NZDCAD", "EURNZD", "CADJPY", "AUDCAD", "EURCAD", "NZDJPY", "CHFJPY", "AUDUSD", "AUDJPY", "GBPUSD", "GBPJPY", "GBPCHF", "USDJPY", "USDCHF", "USDCAD" , "EURAUD", "EURJPY", "EURGBP", "EURCHF", "EURUSD"] 
+symbols = [ "EURUSD"]#, "GBPCAD", "USDDKK", "USDDKK", "EURNOK", "CADCHF", "AUDNZD", "USDSEK", "GBPNZD", "GBPAUD", "USDPLN", "NZDCHF", "AUDCHF", "USDNOK", "SGDJPY", "NZDCAD", "EURNZD", "CADJPY", "AUDCAD", "EURCAD", "NZDJPY", "CHFJPY", "AUDUSD", "AUDJPY", "GBPUSD", "GBPJPY", "GBPCHF", "USDJPY", "USDCHF", "USDCAD" , "EURAUD", "EURJPY", "EURGBP", "EURCHF"] 
 training_data = []
 training_result = []
+determinant = []
 
 for symbol in symbols:
 	print symbol
@@ -62,7 +63,7 @@ for symbol in symbols:
 					return (compare_val - center[i]) / interval
 				
 				training_result.append(get_complex_features(good_result[index], index - 1))
-				
+				determinant.append((get_complex_features(high[index], index - 1), get_complex_features(low[index], index - 1)))
 				features_arr = []
 				for x in range(1,30):
 					features_arr.append(get_complex_features(close[index - x], index - x))
@@ -96,65 +97,74 @@ threshold = len(training_data)/3
 
 training_set = training_data[:threshold]
 training_set_result = training_result[:threshold]
+
 testing_set = training_data[threshold:]
 testing_set_result = training_result[threshold:]
+testing_set_result_determinant = determinant[threshold:]
 
-svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
-svr = svr.fit(np.array(training_set), np.array(training_set_result))
-joblib.dump(svr, 'SVR.pkl') 
+# svr = SVR(kernel='rbf', C=1.0, epsilon=0.2)
+# svr = svr.fit(np.array(training_set), np.array(training_set_result))
+# joblib.dump(svr, 'SVR.pkl') 
 
 svr = joblib.load('SVR.pkl')
 
 def evaluate_output(output):
+
+	tradable = [0 for x in range(10)]
+	win = [0 for x in range(10)]
+
 	total_diff = 0.0
-	diff_bigger1 = 0
-	diff_bigger2 = 0
-	diff_bigger3 = 0
-	diff_bigger4 = 0
-	diff_bigger5 = 0
-	diff_smaller1 = 0
-	diff_smaller2 = 0
-	diff_smaller3 = 0
-	diff_smaller4 = 0
-	diff_smaller5 = 0
 
 	for index in range(len(output)):
 		# print (output[index], testing_set_result[index])
-		if output[index] - testing_set_result[index] > 0.02:
-			diff_bigger1 += 1
-		if output[index] - testing_set_result[index] > 0.04:
-			diff_bigger2 += 1
-		if output[index] - testing_set_result[index] > 0.06:
-			diff_bigger3 += 1
-		if output[index] - testing_set_result[index] > 0.08:
-			diff_bigger4 += 1
-		if output[index] - testing_set_result[index] > 0.1:
-			diff_bigger5 += 1
+		if testing_set_result_determinant[index][0] - output[index] > 0.02:
+			tradable[0] += 1
+			if testing_set_result[index] - output[index] <= 0.02:
+				win[0] += 1
+		if testing_set_result_determinant[index][0] - output[index] > 0.04:
+			tradable[1] += 1
+			if testing_set_result[index] - output[index] <= 0.04:
+				win[1] += 1
+		if testing_set_result_determinant[index][0] - output[index] > 0.06:
+			tradable[2] += 1
+			if testing_set_result[index] - output[index] <= 0.06:
+				win[2] += 1
+		if testing_set_result_determinant[index][0] - output[index] > 0.08:
+			tradable[3] += 1
+			if testing_set_result[index] - output[index] <= 0.08:
+				win[3] += 1
+		if testing_set_result_determinant[index][0] - output[index] > 0.1:
+			tradable[4] += 1
+			if testing_set_result[index] - output[index] <= 0.1:
+				win[4] += 1
 
-		if output[index] - testing_set_result[index] < -0.02:
-			diff_smaller1 += 1
-		if output[index] - testing_set_result[index] < -0.04:
-			diff_smaller2 += 1
-		if output[index] - testing_set_result[index] < -0.06:
-			diff_smaller3 += 1
-		if output[index] - testing_set_result[index] < -0.08:
-			diff_smaller4 += 1
-		if output[index] - testing_set_result[index] < -0.1:
-			diff_smaller5 += 1
+		if output[index] - testing_set_result_determinant[index][1] > 0.02:
+			tradable[5] += 1
+			if output[index] - testing_set_result[index] <= 0.02:
+				win[5] += 1
+		if output[index] - testing_set_result_determinant[index][1] > 0.04:
+			tradable[6] += 1
+			if output[index] - testing_set_result[index] <= 0.04:
+				win[6] += 1
+		if output[index] - testing_set_result_determinant[index][1] > 0.06:
+			tradable[7] += 1
+			if output[index] - testing_set_result[index] <= 0.06:
+				win[7] += 1
+		if output[index] - testing_set_result_determinant[index][1] > 0.08:
+			tradable[8] += 1
+			if output[index] - testing_set_result[index] <= 0.08:
+				win[8] += 1
+		if output[index] - testing_set_result_determinant[index][1] > 0.1:
+			tradable[9] += 1
+			if output[index] - testing_set_result[index] <= 0.1:
+				win[9] += 1
+
 
 		total_diff += abs(output[index] - testing_set_result[index])
 
 	print total_diff/float(len(output))
-	print float(diff_bigger1)/float(len(output))
-	print float(diff_smaller1)/float(len(output))
-	print float(diff_bigger2)/float(len(output))
-	print float(diff_smaller2)/float(len(output))
-	print float(diff_bigger3)/float(len(output))
-	print float(diff_smaller3)/float(len(output))
-	print float(diff_bigger4)/float(len(output))
-	print float(diff_smaller4)/float(len(output))
-	print float(diff_bigger5)/float(len(output))
-	print float(diff_smaller5)/float(len(output))
+	for i in range(10):
+		print float(win[i])/float(tradable[i])
 	print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 output = svr.predict(np.array(testing_set))

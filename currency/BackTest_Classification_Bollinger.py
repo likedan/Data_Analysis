@@ -40,6 +40,14 @@ for chunk in raw_training_data:
 	mean_average20 = [0 for x in range(len(opening) - len(mean_average20))] + mean_average20
 	mean_average50 = [0 for x in range(len(opening) - len(mean_average50))] + mean_average50
 
+	center, outer_up, outer_down = Indicators.compute_bollinger_bands(close, 14, 2)
+	# center, inner_up, inner_down = Indicators.compute_bollinger_bands(close, 14, 1)
+	# inner_up = [0 for x in range(len(opening) - len(inner_up))] + inner_up
+	# inner_down = [0 for x in range(len(opening) - len(inner_down))] + inner_down
+	center = [0 for x in range(len(opening) - len(center))] + center
+	outer_up = [0 for x in range(len(opening) - len(outer_up))] + outer_up
+	outer_down = [0 for x in range(len(opening) - len(outer_down))] + outer_down
+
 	total = 0
 	for index in range(100,len(opening)):
 
@@ -47,7 +55,8 @@ for chunk in raw_training_data:
 		total += (high[index] - low[index]) / interval
 		if good_result[index] != 0.0:				
 			def get_complex_features(compare_val, i):
-				return compare_val - mean_average50[i]
+				interval = outer_up[i] - outer_down[i]
+				return (compare_val - center[i]) / interval
 			
 			if good_result[index] > close[index - 1]:
 				training_result.append(0)
@@ -56,12 +65,13 @@ for chunk in raw_training_data:
 			
 			features_arr = []
 			for x in range(1,20):
-				features_arr.append(get_complex_features(close[index - x], index - x))
-				features_arr.append(get_complex_features(high[index - x], index - x))
-				features_arr.append(get_complex_features(low[index - x], index - x))
-				features_arr.append(get_complex_features(mean_average5[index - x], index - x))
-				features_arr.append(get_complex_features(mean_average9[index - x], index - x))
-				features_arr.append(get_complex_features(mean_average20[index - x], index - x))
+				features_arr.append(get_complex_features(close[index - x], index - 1))
+				features_arr.append(get_complex_features(high[index - x], index - 1))
+				features_arr.append(get_complex_features(low[index - x], index - 1))
+				features_arr.append(get_complex_features(mean_average5[index - x], index - 1))
+				features_arr.append(get_complex_features(mean_average9[index - x], index - 1))
+				features_arr.append(get_complex_features(mean_average20[index - x], index - 1))
+				features_arr.append(get_complex_features(mean_average50[index - x], index - 1))
 
 			def get_slope(array):
 				x = np.array(range(0,len(array)))
