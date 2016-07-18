@@ -26,7 +26,7 @@ db = Database()
 trading = TradingView()
 current_element, tradable_elements = trading.get_all_available_trades()
 while True:
-	trading.trade_up()
+	print trading.trade_up()
 	time.sleep(1)
 
 # for symbol in tradable_elements.keys():
