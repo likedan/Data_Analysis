@@ -85,13 +85,13 @@ training_set_result = training_result[:threshold]
 testing_set = training_data[threshold:]
 testing_set_result = training_result[threshold:]
 
-# forest = RandomForestClassifier(n_estimators = 50)
-# forest = forest.fit(np.array(training_set), np.array(training_set_result))
-nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-3, hidden_layer_sizes=(50, 20, 10), random_state=100, max_iter=100000)
-nn.fit(training_set, training_set_result)
+forest = RandomForestClassifier(n_estimators = 50)
+forest = forest.fit(np.array(training_set), np.array(training_set_result))
+# nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(50, 20, 10, 5), random_state=100, max_iter=1000000)
+# nn.fit(training_set, training_set_result)
 
-result = nn.predict(testing_set)
-result_proba = nn.predict_proba(testing_set)
+result = forest.predict(testing_set)
+result_proba = forest.predict_proba(testing_set)
 total = 0
 succ = 0
 for index in range(len(result_proba)):
@@ -107,7 +107,9 @@ print len(result_proba)
 total = 0
 succ = 0
 for index in range(len(result_proba)):
-	if result_proba[index][result[index]] >= 1:
+	# print result[index]
+	# print result_proba[index]
+	if result_proba[index][result[index]] >= 0.6:
 		total += 1
 		if result[index] == testing_set_result[index]:
 			succ += 1
