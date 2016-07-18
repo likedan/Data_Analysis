@@ -30,11 +30,11 @@ class TradingView:
             wait = ui.WebDriverWait(self.driver, 20)
             wait.until(lambda driver: self.driver.find_element_by_xpath("//div[@class='ngdialog-close']"))
             self.driver.find_element_by_xpath("//div[@class='ngdialog-close']").click()
-            time.sleep(2)
+            time.sleep(1)
         except Exception as e:
             print "connection failed"
             print e
-            
+
     def trade_up(self):
         try:
             self.driver.find_element_by_xpath("//span[@class='operate-button call ng-binding']").click()
@@ -43,9 +43,14 @@ class TradingView:
                 self.driver.find_element_by_xpath("//span[@class='new-button ng-binding']").click()
                 self.driver.find_element_by_xpath("//span[@class='operate-button call ng-binding']").click()
             except Exception as e:
-                print e
-                return False
-        return True 
+                try:
+                    self.driver.find_element_by_xpath("//div[@class='ngdialog-close']").click()
+                    time.sleep(1)
+                    self.driver.find_element_by_xpath("//span[@class='operate-button call ng-binding']").click()
+                except Exception, e:
+                    print e
+                    return False
+        return self.check_exceed_limit()
 
     def trade_down(self):
         try:
@@ -55,9 +60,22 @@ class TradingView:
                 self.driver.find_element_by_xpath("//span[@class='new-button ng-binding']").click()
                 self.driver.find_element_by_xpath("//span[@class='operate-button put ng-binding']").click()
             except Exception as e:
-                print e
+                try:
+                    self.driver.find_element_by_xpath("//div[@class='ngdialog-close']").click()
+                    time.sleep(1)
+                    self.driver.find_element_by_xpath("//span[@class='operate-button put ng-binding']").click()
+                except Exception, e:
+                    print e
+                    return False
+        return self.check_exceed_limit() 
+
+    def check_exceed_limit(self):
+        try:
+            if self.driver.find_element_by_xpath("//div[@class='message ng-binding']").text == "Open positions limit exceeded":
                 return False
-        return True 
+        except Exception as e:
+            pass
+        return True
 
     def trade_element(self, symbol):
         try:
