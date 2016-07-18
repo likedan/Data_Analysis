@@ -30,72 +30,69 @@ class TradingView:
             wait = ui.WebDriverWait(self.driver, 20)
             wait.until(lambda driver: self.driver.find_element_by_xpath("//div[@class='ngdialog-close']"))
             self.driver.find_element_by_xpath("//div[@class='ngdialog-close']").click()
+            time.sleep(2)
         except Exception as e:
             print "connection failed"
             print e
-
-
-    def click_canvas_position(self, x, y):
+            
+    def trade_up(self):
         try:
-            element = self.driver.find_element_by_id("glcanvas")
-            action = webdriver.common.action_chains.ActionChains(self.driver)
-            #position of down button
-            action.move_to_element(element).move_by_offset(x, y).click().perform()
-            return True
-        except Exception, e:
-            raise e
-
-    def clean_new_trade(self):
-        self.driver.save_screenshot(self.screenshot_file)
-        im = Image.open(self.screenshot_file)
-        rgb_im = im.convert('RGB')
-        r, g, b = rgb_im.getpixel((1120, 400))
-        #click open new trade
-        if Helper.similar_color((r,g,b), NEWTRADE_BUTTON): 
-            self.click_canvas_position(550, 100)
-            time.sleep(0.2)
+            self.driver.find_element_by_xpath("//span[@class='operate-button call ng-binding']").click()
+        except Exception as e:
+            try:
+                self.driver.find_element_by_xpath("//span[@class='new-button ng-binding']").click()
+                self.driver.find_element_by_xpath("//span[@class='operate-button call ng-binding']").click()
+            except Exception as e:
+                print e
+                return False
+        return True 
 
     def trade_down(self):
+        try:
+            self.driver.find_element_by_xpath("//span[@class='operate-button put ng-binding']").click()
+        except Exception as e:
+            try:
+                self.driver.find_element_by_xpath("//span[@class='new-button ng-binding']").click()
+                self.driver.find_element_by_xpath("//span[@class='operate-button put ng-binding']").click()
+            except Exception as e:
+                print e
+                return False
+        return True 
 
-        self.driver.save_screenshot(self.screenshot_file)
-        im = Image.open(self.screenshot_file)
-        rgb_im = im.convert('RGB')
-        r, g, b = rgb_im.getpixel((1120, 400))
-        #click open new trade
-        if Helper.similar_color((r,g,b), NEWTRADE_BUTTON): 
-            self.click_canvas_position(550, 100)
-            time.sleep(0.5)
-            self.driver.save_screenshot(self.screenshot_file)
-            im = Image.open(self.screenshot_file)
-            rgb_im = im.convert('RGB')
-            r, g, b = rgb_im.getpixel((1120, 400))
-        
-        print (r,g,b)
-        if (Helper.similar_color((r,g,b), UP_BUTTON_COLOR) or Helper.similar_color((r,g,b), UP_BUTTON_COLOR2)) and self.is_ready:
-            return self.click_canvas_position(550, 240)
-        else:
+    def trade_element(self, symbol):
+        try:
+            self.driver.find_element_by_xpath("//span[@class='arm']").click()
+            self.driver.find_element_by_xpath("//div[@data-reactid='" + self.tradable_elements[symbol]["reactid"] + "']").click()
+        except Exception as e:
             return False
+        return True
 
-
-    def trade_up(self):
-        self.driver.save_screenshot(self.screenshot_file)
-        im = Image.open(self.screenshot_file)
-        rgb_im = im.convert('RGB')
-        r, g, b = rgb_im.getpixel((1120, 400))
-
-        #click open new trade
-        if Helper.similar_color((r,g,b), NEWTRADE_BUTTON): 
-            self.click_canvas_position(550, 100)
-            time.sleep(0.5)
-            self.driver.save_screenshot(self.screenshot_file)
-            im = Image.open(self.screenshot_file)
-            rgb_im = im.convert('RGB')
-            r, g, b = rgb_im.getpixel((1120, 400))
-        print (r,g,b)
-        if (Helper.similar_color((r,g,b), UP_BUTTON_COLOR) or  Helper.similar_color((r,g,b), UP_BUTTON_COLOR2)) and self.is_ready:
-            return self.click_canvas_position(550, 100)
-        else:
-            return False
+    def get_all_available_trades(self):
+        try:
+            self.tradable_elements = {}
+            self.current_trade_element = {}
+            source = lxml.html.fromstring(self.driver.page_source)
+            for element in source.xpath('.//div[@class="nano-content"]'):
+                if "row selected" in etree.tostring(element):
+                    for div in element.xpath('.//div[@class="row"]'):
+                        # for d in div.xpath('.//div[@class="row"]'):
+                        ele_source = etree.tostring(div)
+                        reactid = ele_source.split('data-reactid="')[1].split('"')[0]
+                        title = ele_source.split('title">')[1].split('<')[0]
+                        profit = ele_source.split('"profit"><')[1].split('<')[0].split('>')[1]
+                        self.tradable_elements[title] = {"profit":int(profit), "reactid": reactid}
+                        
+                    for div in element.xpath('.//div[@class="row selected"]'):
+                        ele_source = etree.tostring(div)
+                        reactid = ele_source.split('data-reactid="')[1].split('"')[0]
+                        title = ele_source.split('title">')[1].split('<')[0]
+                        profit = ele_source.split('"profit"><')[1].split('<')[0].split('>')[1]
+                        self.tradable_elements[title] = {"profit":int(profit), "reactid": reactid}
+                        self.current_trade_element = title
+                    break
+        except Exception, e:
+            raise e
+        return (self.current_trade_element, self.tradable_elements)
 
     def quit(self):
         self.driver.quit()

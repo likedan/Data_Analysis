@@ -24,6 +24,14 @@ from scipy import stats
 
 db = Database()
 trading = TradingView()
+current_element, tradable_elements = trading.get_all_available_trades()
+while True:
+	trading.trade_up()
+	trading.sleep(1)
+
+# for symbol in tradable_elements.keys():
+# 	print symbol
+# 	print trading.trade_element(symbol)
 trading_symbol = "USDCAD"
 # existing_file = 'RandomForrest/RandomForrest.pkl'
 # forest = joblib.load(existing_file)
