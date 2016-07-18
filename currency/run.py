@@ -107,9 +107,7 @@ print len(result_proba)
 total = 0
 succ = 0
 for index in range(len(result_proba)):
-	# print result[index]
-	# print result_proba[index]
-	if result_proba[index][result[index]] >= 0.6:
+	if result_proba[index][result[index]] >= 0.7:
 		total += 1
 		if result[index] == testing_set_result[index]:
 			succ += 1

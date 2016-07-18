@@ -157,7 +157,7 @@ if found_trade_symbol:
 
 		# print latest_time - current_minute
 		tradable = False
-		if last_price != latest_price and latest_time - current_minute < 28:
+		if last_price != latest_price and latest_time - current_minute > 20 and latest_time - current_minute < 28:
 			tradable = True
 			last_price = latest_price
 
@@ -172,13 +172,13 @@ if found_trade_symbol:
 			print desired_result
 			print current_result
 			print "!!!"
-			if current_result - desired_result > 0.06 and should_down_trade():
+			if current_result - desired_result > 0 and should_down_trade():
 				print "trade_down"
 				if trading.trade_down():
 					last_down_trade_time = latest_time
 					traded_down_num += 1
 					last_down_trade_price = latest_price
-			if desired_result - current_result > 0.06 and should_up_trade():
+			if desired_result - current_result > 0 and should_up_trade():
 				print "trade_up"
 				if trading.trade_up():
 					last_down_trade_time = latest_time
