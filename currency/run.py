@@ -18,8 +18,8 @@ from scipy import stats
 from sklearn.neural_network import MLPClassifier
 import Indicators
 
-symbol = "EURUSD"
-start_time = 20160519
+symbol = "USDCAD"
+start_time = 20160509
 end_time = 20160529
 db = Database()
 training_data = []
@@ -64,14 +64,14 @@ for chunk in raw_training_data:
 				training_result.append(1)
 			
 			features_arr = []
-			for x in range(1,30):
-				features_arr.append(get_complex_features(close[index - x], index - x))
-				features_arr.append(get_complex_features(high[index - x], index - x))
-				features_arr.append(get_complex_features(low[index - x], index - x))
-				features_arr.append(get_complex_features(mean_average5[index - x], index - x))
-				features_arr.append(get_complex_features(mean_average9[index - x], index - x))
-				features_arr.append(get_complex_features(mean_average20[index - x], index - x))
-				features_arr.append(get_complex_features(mean_average50[index - x], index - x))
+			for x in range(1,20):
+				features_arr.append(get_complex_features(close[index - x], index - 1))
+				features_arr.append(get_complex_features(high[index - x], index - 1))
+				features_arr.append(get_complex_features(low[index - x], index - 1))
+				features_arr.append(get_complex_features(mean_average5[index - x], index - 1))
+				features_arr.append(get_complex_features(mean_average9[index - x], index - 1))
+				features_arr.append(get_complex_features(mean_average20[index - x], index - 1))
+				features_arr.append(get_complex_features(mean_average50[index - x], index - 1))
 
 			def get_slope(array):
 				x = np.array(range(0,len(array)))
@@ -82,10 +82,10 @@ for chunk in raw_training_data:
 			fifty_low_slope = get_slope(low[index - 50:index - 1])
 			hundred_high_slope = get_slope(high[index - 100:index - 1])
 			hundred_low_slope = get_slope(low[index - 100:index - 1])
-			features_arr.append(int(fifty_high_slope > 0))
-			features_arr.append(int(fifty_low_slope > 0))
-			features_arr.append(int(hundred_high_slope > 0))
-			features_arr.append(int(hundred_low_slope > 0))
+			features_arr.append(fifty_high_slope)
+			features_arr.append(fifty_low_slope)
+			features_arr.append(hundred_high_slope )
+			features_arr.append(hundred_low_slope)
 			# print features_arr
 			training_data.append(features_arr)
 	# Plot.plot_day_candle(Helper.unix_to_date_object(unixtime), opening, high, low, close, symbol, start_index=[13, 13, 13], lines=[center[13:], outer_up[13:], outer_down[13:]])
@@ -98,7 +98,9 @@ training_set_result = training_result[:threshold]
 testing_set = training_data[threshold:]
 testing_set_result = training_result[threshold:]
 
-nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-3, hidden_layer_sizes=(100, 70, 50, 30, 20, 15, 10, 5), random_state=100, max_iter=100000)
+# forest = RandomForestClassifier(n_estimators = 50)
+# forest = forest.fit(np.array(training_set), np.array(training_set_result))
+nn = MLPClassifier(algorithm='l-bfgs', alpha=1e-3, hidden_layer_sizes=(50, 20, 10), random_state=100, max_iter=100000)
 nn.fit(training_set, training_set_result)
 
 result = nn.predict(testing_set)
